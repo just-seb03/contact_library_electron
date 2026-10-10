@@ -1,24 +1,24 @@
-import Home from './pages/Home';
-import Summary from './pages/Summary';
+import HomePage from './pages/Home';
 import Calendar from './pages/Calendar';
-import Settings from './pages/Configuration';
+import Summary from './pages/Summary';
+import Configuration from './pages/Configuration';
 
 const routes = [
   {
     path: '/',
-    component: Home,
-  },
-  {
-    path: '/summary/',
-    component: Summary,
+    component: HomePage,
   },
   {
     path: '/calendar/',
     component: Calendar,
   },
   {
+    path: '/summary/',
+    component: Summary,
+  },
+  {
     path: '/settings/',
-    component: Settings,
+    component: Configuration,
   },
 ];
 

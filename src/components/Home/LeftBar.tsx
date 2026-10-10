@@ -1,34 +1,133 @@
-import { useState } from 'react';
-import { Page, Navbar, List, ListItem, Icon } from 'framework7-react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { f7 } from 'framework7-react';
+import 'framework7-icons/css/framework7-icons.css';
 
-const navigationItems = [
-  { id: 'home', title: 'Inicio', icon: 'house_fill', link: '/' },
-  { id: 'summary', title: 'Sumario', icon: 'briefcase_fill', link: '/summary/' },
-  { id: 'calendar', title: 'Calendario', icon: 'calendar', link: '/calendar/' },
-  { id: 'settings', title: 'Configuraciones', icon: 'gear_alt_fill', link: '/settings/' },
-] as const;
+type LeftBarProps = {
+  activeTab?: string;
+  defaultTab?: string;
+  onSelectTab?: (tab: string) => void;
+};
 
-export function LeftBar() {
-  const [activeItem, setActiveItem] = useState<string>('home');
+const routeMap: Record<string, string> = {
+  inicio: '/',
+  calendar: '/calendar/',
+  sumario: '/summary/',
+  config: '/settings/',
+};
+
+export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
+  const currentTab = activeTab ?? defaultTab;
+  const [selected, setSelected] = useState(currentTab);
+
+  useEffect(() => {
+    if (activeTab) {
+      setSelected(activeTab);
+    }
+  }, [activeTab]);
+
+  const navItems = [
+    { id: 'inicio', label: 'Inicio', icon: 'house' },
+    { id: 'calendar', label: 'Agenda', icon: 'device_laptop' },
+    { id: 'sumario', label: 'Sumario', icon: 'rectangle_3_offgrid' },
+    { id: 'config', label: 'Ajustes', icon: 'hammer_fill' },
+  ];
+
+  const handleSelect = (id: string) => {
+    setSelected(id);
+    onSelectTab?.(id);
+
+    const path = routeMap[id];
+    if (path && f7.views?.main) {
+      f7.views.main.router.navigate(path, { transition: 'f7-parallax' });
+    }
+  };
 
   return (
-    <Page className="bg-color-white">
-      <Navbar title="Navegación" transparent />
-      <List menuList className="margin-horizontal-half">
-        {navigationItems.map((item) => (
-          <ListItem
-            key={item.id}
-            title={item.title}
-            link={item.link}
-            selected={activeItem === item.id}
-            onClick={() => setActiveItem(item.id)}
-            view=".view-main"
-            panelClose="left"
-          >
-            <Icon slot="media" f7={item.icon} />
-          </ListItem>
-        ))}
-      </List>
-    </Page>
+    <aside style={styles.container}>
+      <nav style={styles.navGroup}>
+        {navItems.map((item) => {
+          const isActive = selected === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleSelect(item.id)}
+              style={{
+                ...styles.button,
+                ...(isActive ? styles.activeButton : {}),
+              }}
+              title={item.label}
+            >
+              <i className="f7-icons" style={styles.icon}>
+                {item.icon}
+              </i>
+              <span style={styles.label}>{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
+    </aside>
   );
-}
+};
+
+export const Sidebar = LeftBar;
+
+const styles: Record<string, CSSProperties> = {
+  container: {
+    width: '76px',
+    height: 'calc(100% - 124px)',
+    margin: '70px 0 16px 16px',
+    padding: '20px 8px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+    userSelect: 'none',
+    zIndex: 100,
+    background: 'rgba(121, 119, 119, 0.25)',
+    backdropFilter: 'blur(30px) saturate(200%)',
+    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
+    borderRadius: '24px',
+    border: '1px solid rgb(223, 221, 221)',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
+  },
+  navGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+    width: '100%',
+    alignItems: 'center',
+  },
+  button: {
+    background: 'transparent',
+    border: 'none',
+    outline: 'none',
+    cursor: 'pointer',
+    width: '56px',
+    height: '56px',
+    borderRadius: '16px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'rgba(0, 0, 0, 0.65)',
+    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+    padding: '4px',
+  },
+  activeButton: {
+    backgroundColor: 'rgba(130, 130, 131, 0.55)',
+    color: '#000000',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    transform: 'scale(1.04)',
+  },
+  icon: {
+    fontSize: '22px',
+    lineHeight: '1',
+    marginBottom: '3px',
+  },
+  label: {
+    fontSize: '9px',
+    fontWeight: '600',
+    letterSpacing: '-0.1px',
+  },
+};
