@@ -1,8 +1,9 @@
-// src/App.tsx
-import { App as Framework7App, View, Page, Navbar } from 'framework7-react';
+import { App as Framework7App, View } from 'framework7-react';
+import routes from './routes';
 import 'framework7/css';
 import { LeftBar } from './components/Home/LeftBar';
 import './App.css';
+import './index.css';
 
 declare global {
   interface Window {
@@ -15,17 +16,17 @@ declare global {
 }
 
 function App() {
+  const f7params = {
+    theme: 'ios',
+    routes,
+  };
+
   return (
-    <Framework7App theme="ios">
-      <View main>
-        <Page>
-          <Navbar title="Contactos" />
-          <div className="home-layout">
-            <LeftBar />
-            <main className="home-content" aria-label="Contenido principal" />
-          </div>
-        </Page>
-      </View>
+    <Framework7App {...f7params}>
+      <div className="home-layout liquid-container">
+        <LeftBar />
+        <View main className="home-content liquid-view" url="/" />
+      </div>
     </Framework7App>
   );
 }

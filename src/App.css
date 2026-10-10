@@ -6,7 +6,7 @@
 }
 
 body {
-  background: #fefefe url('./assets/images/bg.jpg') center / cover no-repeat;
+  background: #ffffff !important;
   width: 100vw;
   height: 100vh;
   overflow: hidden; /* Evita que aparezcan barras de scroll nativas */
@@ -98,7 +98,7 @@ body {
 
 .leftbar {
   flex: 0 0 240px;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 12px 8px;
   border-right: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--f7-page-bg-color);

@@ -41,7 +41,10 @@ function createWindow() {
     },
   })
 
-  win.once('ready-to-show', () => win?.show())
+  win.once('ready-to-show', () => {
+    win?.show();
+    win?.webContents.openDevTools();
+  })
 
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
