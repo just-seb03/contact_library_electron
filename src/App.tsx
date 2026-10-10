@@ -1,7 +1,7 @@
 // src/App.tsx
 import { App as Framework7App, View, Page, Navbar } from 'framework7-react';
 import 'framework7/css';
-import { TitleBar } from './components/TitleBar';
+import { LeftBar } from './components/Home/LeftBar';
 import './App.css';
 
 declare global {
@@ -19,8 +19,11 @@ function App() {
     <Framework7App theme="ios">
       <View main>
         <Page>
-          <TitleBar />
           <Navbar title="Contactos" />
+          <div className="home-layout">
+            <LeftBar />
+            <main className="home-content" aria-label="Contenido principal" />
+          </div>
         </Page>
       </View>
     </Framework7App>
