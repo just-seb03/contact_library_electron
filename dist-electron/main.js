@@ -1,8 +1,6 @@
 import { ipcMain, app, BrowserWindow } from "electron";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-createRequire(import.meta.url);
 const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
 process.env.APP_ROOT = path.join(__dirname$1, "..");
 const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
@@ -25,7 +23,7 @@ function createWindow() {
     height: 720,
     frame: false,
     show: false,
-    backgroundColor: "#fefefe",
+    backgroundColor: "#f5f5f7",
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname$1, "preload.mjs")
@@ -33,7 +31,6 @@ function createWindow() {
   });
   win.once("ready-to-show", () => {
     win == null ? void 0 : win.show();
-    win == null ? void 0 : win.webContents.openDevTools();
   });
   win.webContents.on("did-finish-load", () => {
     win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());

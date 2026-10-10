@@ -1,3 +1,4 @@
+import Home from './pages/Home';
 import Summary from './pages/Summary';
 import Calendar from './pages/Calendar';
 import Settings from './pages/Configuration';
@@ -5,7 +6,7 @@ import Settings from './pages/Configuration';
 const routes = [
   {
     path: '/',
-    component: Summary,
+    component: Home,
   },
   {
     path: '/summary/',

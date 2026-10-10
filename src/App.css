@@ -1,27 +1,41 @@
-/* src/App.css */
+/* Light Grey Theme Layout & Electron Window Controls */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body {
-  background: #ffffff !important;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden; /* Evita que aparezcan barras de scroll nativas */
+body,
+html,
+#app,
+.framework7-root {
+  background-color: #f5f5f7 !important;
+  color: #1c1c1e;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
+
+body {
+  min-width: 0;
+  min-height: 0;
+}
+
 .titlebar {
   height: 38px;
   background-color: transparent;
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  -webkit-app-region: drag; /* Permite arrastrar la ventana */
-  width: 100vw;
+  -webkit-app-region: drag;
+  width: 100%;
   user-select: none;
   box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
 }
 
 .titlebar-buttons {
@@ -30,7 +44,7 @@ body {
   gap: 8px;
   height: 100%;
   padding: 0 12px;
-  -webkit-app-region: no-drag; /* Obligatorio: si no pones esto, los botones no se podrán hacer clic */
+  -webkit-app-region: no-drag;
 }
 
 .titlebar-button {
@@ -63,61 +77,101 @@ body {
   filter: brightness(0.9);
 }
 
-.titlebar-button::after {
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 9px;
-  font-weight: 700;
-  line-height: 1;
-  opacity: 0;
-  pointer-events: none;
-  position: absolute;
-}
+.app-shell {
+  --leftbar-width: 260px;
+  --leftbar-gap: 16px;
+  --content-inset: calc(var(--leftbar-width) + var(--leftbar-gap));
 
-.titlebar-buttons:hover .titlebar-button::after {
-  opacity: 1;
-}
-
-.titlebar-button.close::after {
-  content: "×";
-}
-
-.titlebar-button.minimize::after {
-  content: "−";
-}
-
-.titlebar-button.maximize::after {
-  content: "⤢";
-  font-size: 8px;
-}
-
-.home-layout {
-  display: flex;
-  height: 100%;
-  min-height: 0;
+  position: fixed;
+  inset: 38px 0 0;
+  overflow: hidden;
 }
 
 .leftbar {
-  flex: 0 0 240px;
-  overflow: hidden;
-  padding: 12px 8px;
-  border-right: 1px solid rgba(0, 0, 0, 0.08);
-  background: var(--f7-page-bg-color);
+  position: absolute;
+  z-index: 6000;
+  top: 14px;
+  bottom: 14px;
+  left: 14px;
+  width: var(--leftbar-width);
+  padding: 18px 12px;
+  overflow: auto;
+  color: #1c1c1e;
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  border-radius: 22px;
+  box-shadow:
+    0 12px 32px rgba(31, 38, 54, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(24px) saturate(180%);
 }
 
-.leftbar-list {
-  margin: 0;
-}
-
-.leftbar-item-active .item-title,
-.leftbar-item-active .icon {
-  color: var(--f7-theme-color);
-}
-
-.leftbar-item-active .item-title {
+.leftbar .block-title {
+  color: #6e6e73;
   font-weight: 600;
 }
 
-.home-content {
-  flex: 1;
+.leftbar .list,
+.leftbar .list ul {
+  background: transparent;
+}
+
+.leftbar .item-content {
+  color: #1c1c1e;
+  border-radius: 12px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.leftbar .item-content:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.leftbar-item-active .item-content {
+  color: #007aff;
+  font-weight: 600;
+  background: rgba(0, 122, 255, 0.12);
+}
+
+.home-content,
+.home-content.view {
+  position: absolute;
+  inset: 14px;
+  width: auto;
   min-width: 0;
+  height: auto;
+}
+
+.home-content,
+.home-content .page-content {
+  background: transparent !important;
+}
+
+.home-content .page-content,
+.home-content .navbar-inner {
+  padding-left: var(--content-inset);
+}
+
+.home-content .page {
+  background: #f5f5f7 !important;
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    --leftbar-width: 200px;
+    --leftbar-gap: 12px;
+  }
+
+  .leftbar {
+    padding: 14px 8px;
+    border-radius: 18px;
+  }
+}
+
+.hamburger-btn {
+  color: #007aff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }

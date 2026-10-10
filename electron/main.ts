@@ -1,10 +1,8 @@
 // electron/main.ts
 import { app, BrowserWindow, ipcMain } from 'electron'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-const require = createRequire(import.meta.url)
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 process.env.APP_ROOT = path.join(__dirname, '..')
@@ -34,7 +32,7 @@ function createWindow() {
     height: 720,
     frame: false,
     show: false,
-    backgroundColor: '#fefefe',
+    backgroundColor: '#f5f5f7',
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
@@ -43,7 +41,6 @@ function createWindow() {
 
   win.once('ready-to-show', () => {
     win?.show();
-    win?.webContents.openDevTools();
   })
 
   win.webContents.on('did-finish-load', () => {
