@@ -1,4 +1,10 @@
 /* Light Grey Theme Layout & Electron Window Controls */
+:root {
+  --f7-theme-color: #007aff;
+  /* Espacio reservado para la barra de título de macOS/Electron */
+  --f7-safe-area-top: 38px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -24,7 +30,7 @@ body {
 
 .titlebar {
   height: 38px;
-  background-color: transparent;
+  background-color: #ffffff;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -36,6 +42,7 @@ body {
   top: 0;
   left: 0;
   z-index: 10000;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 
 .titlebar-buttons {
@@ -61,117 +68,7 @@ body {
   transition: filter 0.15s ease;
 }
 
-.titlebar-button.close {
-  background-color: #ff5f57;
-}
-
-.titlebar-button.minimize {
-  background-color: #febc2e;
-}
-
-.titlebar-button.maximize {
-  background-color: #28c840;
-}
-
-.titlebar-button:hover {
-  filter: brightness(0.9);
-}
-
-.app-shell {
-  --leftbar-width: 260px;
-  --leftbar-gap: 16px;
-  --content-inset: calc(var(--leftbar-width) + var(--leftbar-gap));
-
-  position: fixed;
-  inset: 38px 0 0;
-  overflow: hidden;
-}
-
-.leftbar {
-  position: absolute;
-  z-index: 6000;
-  top: 14px;
-  bottom: 14px;
-  left: 14px;
-  width: var(--leftbar-width);
-  padding: 18px 12px;
-  overflow: auto;
-  color: #1c1c1e;
-  background: rgba(255, 255, 255, 0.34);
-  border: 1px solid rgba(255, 255, 255, 0.62);
-  border-radius: 22px;
-  box-shadow:
-    0 12px 32px rgba(31, 38, 54, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-}
-
-.leftbar .block-title {
-  color: #6e6e73;
-  font-weight: 600;
-}
-
-.leftbar .list,
-.leftbar .list ul {
-  background: transparent;
-}
-
-.leftbar .item-content {
-  color: #1c1c1e;
-  border-radius: 12px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.leftbar .item-content:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.leftbar-item-active .item-content {
-  color: #007aff;
-  font-weight: 600;
-  background: rgba(0, 122, 255, 0.12);
-}
-
-.home-content,
-.home-content.view {
-  position: absolute;
-  inset: 14px;
-  width: auto;
-  min-width: 0;
-  height: auto;
-}
-
-.home-content,
-.home-content .page-content {
-  background: transparent !important;
-}
-
-.home-content .page-content,
-.home-content .navbar-inner {
-  padding-left: var(--content-inset);
-}
-
-.home-content .page {
-  background: #f5f5f7 !important;
-}
-
-@media (max-width: 640px) {
-  .app-shell {
-    --leftbar-width: 200px;
-    --leftbar-gap: 12px;
-  }
-
-  .leftbar {
-    padding: 14px 8px;
-    border-radius: 18px;
-  }
-}
-
-.hamburger-btn {
-  color: #007aff !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
+.titlebar-button.close { background-color: #ff5f57; }
+.titlebar-button.minimize { background-color: #febc2e; }
+.titlebar-button.maximize { background-color: #28c840; }
+.titlebar-button:hover { filter: brightness(0.9); }

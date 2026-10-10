@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BlockTitle, List, ListItem } from 'framework7-react';
+import { Page, Navbar, List, ListItem, Icon } from 'framework7-react';
 
 const navigationItems = [
   { id: 'home', title: 'Inicio', icon: 'house_fill', link: '/' },
@@ -12,21 +12,23 @@ export function LeftBar() {
   const [activeItem, setActiveItem] = useState<string>('home');
 
   return (
-    <aside className="leftbar" aria-label="Navegación principal">
-      <BlockTitle>Menú de Navegación</BlockTitle>
-      <List menuList>
+    <Page className="bg-color-white">
+      <Navbar title="Navegación" transparent />
+      <List menuList className="margin-horizontal-half">
         {navigationItems.map((item) => (
           <ListItem
             key={item.id}
             title={item.title}
             link={item.link}
             selected={activeItem === item.id}
-            className={activeItem === item.id ? 'leftbar-item-active' : undefined}
             onClick={() => setActiveItem(item.id)}
-            view=".home-content"
-          />
+            view=".view-main"
+            panelClose="left"
+          >
+            <Icon slot="media" f7={item.icon} />
+          </ListItem>
         ))}
       </List>
-    </aside>
+    </Page>
   );
 }
