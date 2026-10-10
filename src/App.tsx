@@ -1,4 +1,6 @@
 // src/App.tsx
+import { App as Framework7App, View, Page, Navbar } from 'framework7-react';
+import 'framework7/css';
 import { TitleBar } from './components/TitleBar';
 import './App.css';
 
@@ -14,10 +16,14 @@ declare global {
 
 function App() {
   return (
-    <div className="app-container">
-      <TitleBar />
-      {/* El lienzo está listo para tu nuevo diseño */}
-    </div>
+    <Framework7App theme="ios">
+      <View main>
+        <Page>
+          <TitleBar />
+          <Navbar title="Contactos" />
+        </Page>
+      </View>
+    </Framework7App>
   );
 }
 
