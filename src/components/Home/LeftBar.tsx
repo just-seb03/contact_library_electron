@@ -99,7 +99,7 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'center',
   },
   button: {
-    background: 'transparent',
+    backgroundColor: 'transparent',
     border: 'none',
     outline: 'none',
     cursor: 'pointer',
@@ -113,9 +113,11 @@ const styles: Record<string, CSSProperties> = {
     color: 'rgba(0, 0, 0, 0.65)',
     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
     padding: '4px',
+    WebkitAppearance: 'none',
+    margin: 0,
   },
   activeButton: {
-    backgroundColor: 'rgba(130, 130, 131, 0.55)',
+    backgroundColor: '#ffffff',
     color: '#000000',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
     transform: 'scale(1.04)',
