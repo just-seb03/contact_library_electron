@@ -144,7 +144,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: 'transparent',
   },
   header: {
-    padding: '30px 24px 20px',
+    padding: '70px 24px 20px',
     borderBottom: '1px solid #f0f0f0',
     display: 'flex',
     justifyContent: 'space-between',
