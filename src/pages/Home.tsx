@@ -12,8 +12,8 @@ export default function HomePage() {
         {/* Áreas de contenido cambiante según la opción elegida */}
         <div style={styles.contentArea}>
           <Views tabs className="safe-areas">
-            <View id="view-home" tab tabActive url="/home-content/" />
-            <View id="view-calendar" tab url="/calendar/" />
+            <View id="view-home" tab tabActive url="/home-content/"/>
+            <View id="view-calendar" tab url="/calendar/"/>
             <View id="view-cliente" tab url="/cliente/" />
             <View id="view-pagos" tab url="/pagos/" />
             <View id="view-summary" tab url="/summary/" />
