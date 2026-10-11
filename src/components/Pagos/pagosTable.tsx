@@ -1,35 +1,50 @@
-import React from 'react';
+import type { CSSProperties, FC } from 'react';
 import { Payment } from './types';
 
 interface TableProps {
   payments: Payment[];
 }
 
-export const PaymentsTable: React.FC<TableProps> = ({ payments }) => {
+export const PaymentsTable: FC<TableProps> = ({ payments }) => {
+  const tableWrapperStyle: CSSProperties = {
+    background: 'rgba(255, 255, 255, 0.45)',
+    backdropFilter: 'blur(20px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+    border: '1px solid rgba(255, 255, 255, 0.6)',
+    borderRadius: '18px',
+    overflowX: 'auto', 
+    width: '100%',
+  };
+
   return (
-    <div style={styles.tableContainer}>
-      <table style={styles.table}>
+    <div className="data-table elevation-2 margin-bottom" style={tableWrapperStyle}>
+      <table>
         <thead>
-          <tr style={styles.tableHeaderRow}>
-            <th style={styles.th}>Cliente / Entidad</th>
-            <th style={styles.th}>Concepto</th>
-            <th style={styles.th}>Fecha</th>
-            <th style={styles.th}>Monto</th>
-            <th style={styles.th}>Estado</th>
+          <tr>
+            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Cliente / Entidad</th>
+            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Concepto</th>
+            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Fecha</th>
+            <th className="numeric-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Monto</th>
+            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Estado</th>
           </tr>
         </thead>
         <tbody>
           {payments.map((item) => (
-            <tr key={item.id} style={styles.tableRow}>
-              <td style={styles.tdBold}>{item.client}</td>
-              <td style={styles.td}>{item.concept}</td>
-              <td style={styles.td}>{item.date}</td>
-              <td style={styles.tdAmount}>${item.amount.toFixed(2)}</td>
-              <td style={styles.td}>
-                <span style={getStatusBadgeStyle(item.status)}>
-                  {item.status === 'completed' && 'Completado'}
-                  {item.status === 'pending' && 'Pendiente'}
-                  {item.status === 'overdue' && 'Vencido'}
+            <tr key={item.id}>
+              <td className="label-cell font-weight-600" style={{ color: '#1d1d1f' }}>
+                {item.client}
+              </td>
+              <td className="label-cell text-color-gray">{item.concept}</td>
+              <td className="label-cell text-color-gray">{item.date}</td>
+              <td className="numeric-cell font-weight-600" style={{ color: '#1d1d1f' }}>
+                ${item.amount.toFixed(2)}
+              </td>
+              <td className="label-cell">
+                <span 
+                  className={`badge ${getBadgeColor(item.status)}`} 
+                  style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}
+                >
+                  {getStatusText(item.status)}
                 </span>
               </td>
             </tr>
@@ -40,66 +55,16 @@ export const PaymentsTable: React.FC<TableProps> = ({ payments }) => {
   );
 };
 
-const getStatusBadgeStyle = (status: Payment['status']): React.CSSProperties => {
-  const base: React.CSSProperties = {
-    padding: '4px 10px',
-    borderRadius: '12px',
-    fontSize: '11px',
-    fontWeight: '600',
-    display: 'inline-block',
-  };
-
-  if (status === 'completed') return { ...base, backgroundColor: 'rgba(16, 185, 129, 0.15)', color: '#065f46' };
-  if (status === 'pending') return { ...base, backgroundColor: 'rgba(245, 158, 11, 0.15)', color: '#92400e' };
-  return { ...base, backgroundColor: 'rgba(239, 68, 68, 0.15)', color: '#991b1b' };
+// Asigna la clase de color nativa de Framework7
+const getBadgeColor = (status: Payment['status']): string => {
+  if (status === 'completed') return 'color-green';
+  if (status === 'pending') return 'color-orange';
+  return 'color-red';
 };
 
-const styles: { [key: string]: React.CSSProperties } = {
-  tableContainer: {
-    background: 'rgba(255, 255, 255, 0.45)',
-    backdropFilter: 'blur(20px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    borderRadius: '18px',
-    border: '1px solid rgba(255, 255, 255, 0.6)',
-    overflow: 'hidden',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse',
-    textAlign: 'left',
-  },
-  tableHeaderRow: {
-    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  th: {
-    padding: '14px 18px',
-    fontSize: '11px',
-    fontWeight: '700',
-    color: '#86868b',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  tableRow: {
-    borderBottom: '1px solid rgba(0, 0, 0, 0.04)',
-    transition: 'background-color 0.15s ease',
-  },
-  tdBold: {
-    padding: '14px 18px',
-    fontSize: '13px',
-    fontWeight: '600',
-    color: '#1d1d1f',
-  },
-  td: {
-    padding: '14px 18px',
-    fontSize: '13px',
-    color: '#424245',
-  },
-  tdAmount: {
-    padding: '14px 18px',
-    fontSize: '13px',
-    fontWeight: '600',
-    color: '#1d1d1f',
-  },
+// Traduce el estado a texto legible
+const getStatusText = (status: Payment['status']): string => {
+  if (status === 'completed') return 'Completado';
+  if (status === 'pending') return 'Pendiente';
+  return 'Vencido';
 };

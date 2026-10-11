@@ -1,4 +1,4 @@
-import React from 'react';
+import type { CSSProperties, FC } from 'react';
 
 interface StatsProps {
   totalIngresos: number;
@@ -7,69 +7,62 @@ interface StatsProps {
   totalTransacciones: number;
 }
 
-export const PaymentsStats: React.FC<StatsProps> = ({
+export const PaymentsStats: FC<StatsProps> = ({
   totalIngresos,
   totalPendientes,
   cobrosPendientesCount,
   totalTransacciones,
 }) => {
-  return (
-    <section style={styles.statsGrid}>
-      <div style={styles.glassCard}>
-        <span style={styles.cardLabel}>Ingresos Cobrados</span>
-        <div style={{ ...styles.cardValue, color: '#10b981' }}>${totalIngresos.toFixed(2)}</div>
-        <span style={styles.cardSubtext}>Este mes</span>
-      </div>
-
-      <div style={styles.glassCard}>
-        <span style={styles.cardLabel}>Por Cobrar</span>
-        <div style={{ ...styles.cardValue, color: '#f59e0b' }}>${totalPendientes.toFixed(2)}</div>
-        <span style={styles.cardSubtext}>{cobrosPendientesCount} cobros pendientes</span>
-      </div>
-
-      <div style={styles.glassCard}>
-        <span style={styles.cardLabel}>Total Transacciones</span>
-        <div style={styles.cardValue}>{totalTransacciones}</div>
-        <span style={styles.cardSubtext}>Registradas en agenda</span>
-      </div>
-    </section>
-  );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-    gap: '16px',
-    marginBottom: '24px',
-  },
-  glassCard: {
+  const glassStyle: CSSProperties = {
     background: 'rgba(255, 255, 255, 0.45)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    borderRadius: '18px',
     border: '1px solid rgba(255, 255, 255, 0.6)',
-    padding: '20px',
-    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  cardLabel: {
-    fontSize: '12px',
-    fontWeight: '600',
-    color: '#86868b',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-  },
-  cardValue: {
-    fontSize: '28px',
-    fontWeight: '700',
-    margin: '8px 0 4px 0',
-    letterSpacing: '-0.5px',
-    color: '#1d1d1f',
-  },
-  cardSubtext: {
-    fontSize: '11px',
-    color: '#86868b',
-  },
+    borderRadius: '18px',
+  };
+
+  return (
+    <div className="row margin-bottom">
+      
+      {/* Columna 1 */}
+      <div className="col-100 medium-33 margin-bottom-half">
+        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
+          <div className="card-content card-content-padding">
+            <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Ingresos Cobrados</div>
+            <div className="text-color-green font-weight-bold margin-vertical-half" style={{ fontSize: '28px' }}>
+              ${totalIngresos.toFixed(2)}
+            </div>
+            <div className="text-color-gray" style={{ fontSize: '11px' }}>Este mes</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Columna 2 */}
+      <div className="col-100 medium-33 margin-bottom-half">
+        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
+          <div className="card-content card-content-padding">
+            <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Por Cobrar</div>
+            <div className="text-color-orange font-weight-bold margin-vertical-half" style={{ fontSize: '28px' }}>
+              ${totalPendientes.toFixed(2)}
+            </div>
+            <div className="text-color-gray" style={{ fontSize: '11px' }}>{cobrosPendientesCount} cobros pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Columna 3 */}
+      <div className="col-100 medium-33 margin-bottom-half">
+        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
+          <div className="card-content card-content-padding">
+            <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Total Transacciones</div>
+            <div className="font-weight-bold margin-vertical-half" style={{ fontSize: '28px', color: '#1d1d1f' }}>
+              {totalTransacciones}
+            </div>
+            <div className="text-color-gray" style={{ fontSize: '11px' }}>Registradas en agenda</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  );
 };

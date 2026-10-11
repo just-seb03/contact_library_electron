@@ -71,11 +71,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     background: 'transparent',
     overflowY: 'auto',
     height: '100%',
+    width: '100%',
+    overflowX: 'hidden', // Evita scroll horizontal a nivel de página
   },
   wrapper: {
-    padding: '24px 32px',
-    maxWidth: '1100px',
+    // Dejamos un margen superior para evitar que el contenido choque con la parte superior
+    padding: '48px 4% 24px',
+    maxWidth: '100px auto',
     margin: '0 auto',
     boxSizing: 'border-box',
+    width: '100%',
   },
 };
