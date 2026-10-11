@@ -11,6 +11,8 @@ type LeftBarProps = {
 const tabMap: Record<string, string> = {
   inicio: '#view-home',
   calendar: '#view-calendar',
+  cliente: '#view-cliente',
+  pagos: '#view-pagos',
   sumario: '#view-summary',
   config: '#view-settings',
 };
@@ -28,6 +30,8 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
   const navItems = [
     { id: 'inicio', label: 'Inicio', icon: 'house' },
     { id: 'calendar', label: 'Agenda', icon: 'device_laptop' },
+    { id: 'cliente', label: 'Cliente', icon: 'person_3' },
+    { id: 'pagos', label: 'Pagos', icon: 'creditcard' },
     { id: 'sumario', label: 'Sumario', icon: 'rectangle_3_offgrid' },
     { id: 'config', label: 'Ajustes', icon: 'hammer_fill' },
   ];
@@ -94,7 +98,7 @@ const styles: Record<string, CSSProperties> = {
   navGroup: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '20px',
+    gap: '12px',
     width: '100%',
     alignItems: 'center',
   },

@@ -14,6 +14,8 @@ export default function HomePage() {
           <Views tabs className="safe-areas">
             <View id="view-home" tab tabActive url="/home-content/" />
             <View id="view-calendar" tab url="/calendar/" />
+            <View id="view-cliente" tab url="/cliente/" />
+            <View id="view-pagos" tab url="/pagos/" />
             <View id="view-summary" tab url="/summary/" />
             <View id="view-settings" tab url="/settings/" />
           </Views>

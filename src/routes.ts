@@ -3,6 +3,8 @@ import Calendar from './pages/Calendar';
 import Summary from './pages/Summary';
 import Configuration from './pages/Configuration';
 import Dashboard from './pages/Dashboard';
+import Cliente from './pages/Cliente';
+import Pagos from './pages/Pagos';
 
 const routes = [
   {
@@ -16,6 +18,14 @@ const routes = [
   {
     path: '/calendar/',
     component: Calendar,
+  },
+  {
+    path: '/cliente/',
+    component: Cliente,
+  },
+  {
+    path: '/pagos/',
+    component: Pagos,
   },
   {
     path: '/summary/',
