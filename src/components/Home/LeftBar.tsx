@@ -8,11 +8,11 @@ type LeftBarProps = {
   onSelectTab?: (tab: string) => void;
 };
 
-const routeMap: Record<string, string> = {
-  inicio: '/',
-  calendar: '/calendar/',
-  sumario: '/summary/',
-  config: '/settings/',
+const tabMap: Record<string, string> = {
+  inicio: '#view-home',
+  calendar: '#view-calendar',
+  sumario: '#view-summary',
+  config: '#view-settings',
 };
 
 export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
@@ -36,9 +36,9 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
     setSelected(id);
     onSelectTab?.(id);
 
-    const path = routeMap[id];
-    if (path && f7.views?.main) {
-      f7.views.main.router.navigate(path, { transition: 'f7-parallax' });
+    const tabId = tabMap[id];
+    if (tabId) {
+      f7.tab.show(tabId);
     }
   };
 

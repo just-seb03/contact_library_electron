@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { App as Framework7App, View } from 'framework7-react';
 import routes from './routes';
-import { LeftBar } from './components/Home/LeftBar';
 import 'framework7/css/bundle';
 import 'framework7-icons/css/framework7-icons.css';
 import './App.css';
@@ -17,12 +15,6 @@ declare global {
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('inicio');
-
-  const handleSelectTab = (tab: string) => {
-    setActiveTab(tab);
-  };
-
   const f7params = {
     name: 'Contact Library',
     theme: 'ios',
@@ -40,10 +32,7 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', height: '100vh'}}>
-        <LeftBar activeTab={activeTab} onSelectTab={handleSelectTab} />
-        <View id="main-view" main url="/" style={{ flex: 1 }} />
-      </div>
+      <View id="main-view" main url="/" style={{ height: '100vh' }} />
     </Framework7App>
   );
 }
