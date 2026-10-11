@@ -67,7 +67,41 @@ body {
   cursor: pointer;
   transition: filter 0.15s ease;
 }
+/* 1. Contenedor relativo para que las vistas se apilen correctamente */
+.views.tabs {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+}
 
+/* 2. Forzar a que las pestañas SIEMPRE existan (quitamos el display: none) */
+.views.tabs > .view.tab {
+  display: block !important; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  /* Estado inactivo: invisible, un poco más pequeño y sin interacción */
+  opacity: 0;
+  transform: scale(0.98) translateY(4px);
+  pointer-events: none;
+  z-index: 0;
+  
+  /* Curva de animación suave (Liquid/macOS) */
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* 3. Estado Activo de la pestaña */
+.views.tabs > .view.tab.tab-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto; /* Permite hacer clic de nuevo */
+  z-index: 1;
+}
 .titlebar-button.close { background-color: #ff5f57; }
 .titlebar-button.minimize { background-color: #febc2e; }
 .titlebar-button.maximize { background-color: #28c840; }

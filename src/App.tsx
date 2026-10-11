@@ -20,6 +20,12 @@ export default function App() {
     theme: 'ios',
     dark: false,
     routes,
+    // 1. AGREGADO: Configuración global de transiciones
+    view: {
+      animate: true,
+      transition: 'f7-fade', // Opciones: 'f7-fade', 'f7-push', 'f7-cover', 'f7-circle-crop'
+      iosSwipeBack: true,
+    },
   };
 
   return (
@@ -32,7 +38,8 @@ export default function App() {
         </div>
       </div>
 
-      <View id="main-view" main url="/" style={{ height: '100vh' }} />
+      {/* Se mantiene la vista principal con animación habilitada */}
+      <View id="main-view" main url="/" style={{ height: '100vh' }} transition="f7-fade" />
     </Framework7App>
   );
 }

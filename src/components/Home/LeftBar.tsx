@@ -41,8 +41,9 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
     onSelectTab?.(id);
 
     const tabId = tabMap[id];
-    if (tabId) {
-      f7.tab.show(tabId);
+    if (tabId && f7) {
+      // 💡 Se pasa `true` como segundo parámetro para forzar la animación
+      f7.tab.show(tabId, true);
     }
   };
 
