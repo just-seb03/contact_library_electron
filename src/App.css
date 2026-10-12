@@ -107,4 +107,10 @@ body {
 .titlebar-button.maximize { background-color: #28c840; }
 .titlebar-button:hover { filter: brightness(0.9); }
 
+/* Desactivar fondo oscuro/gris del backdrop de Framework7 Searchbar */
+.searchbar-backdrop {
+  display: none !important;
+}
+
+
 

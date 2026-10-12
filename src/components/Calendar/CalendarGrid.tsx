@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties, FC } from 'react';
 import { Card, CardContent } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 
 interface CalendarGridProps {
   currentYear: number;
@@ -16,6 +17,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
   onSelectDay,
 }) => {
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
+  const { hearings } = useApp();
 
   const firstDay = new Date(currentYear, currentMonthIndex, 1);
   const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
@@ -73,6 +75,10 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
               };
             }
 
+            const hasHearing = hearings.some(
+              (h) => h.day === d && h.monthIndex === currentMonthIndex && h.year === currentYear
+            );
+
             return (
               <div 
                 key={d} 
@@ -82,6 +88,19 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                 style={cellStyle}
               >
                 <span style={{ fontSize: '15px' }}>{d}</span>
+                {hasHearing && (
+                  <span 
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: isCurrent ? '#ffffff' : '#007aff',
+                      marginTop: '4px',
+                      boxShadow: isCurrent ? '0 0 4px #fff' : '0 0 4px rgba(0, 122, 255, 0.6)',
+                    }}
+                    title="Audiencia programada"
+                  />
+                )}
               </div>
             );
           })}

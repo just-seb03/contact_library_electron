@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, Icon } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 
 type DayScheduleProps = {
   date: number;
@@ -12,6 +13,8 @@ export const DayScheduleOverlay = ({ date, month, year, onClose }: DaySchedulePr
   const [isVisible, setIsVisible] = useState(false);
   const [panelWidth, setPanelWidth] = useState(420);
   const isResizing = useRef(false);
+  const { hearings } = useApp();
+  const dayHearings = hearings.filter((h) => h.day === date);
   
   useEffect(() => {
     // Dispara la animación de entrada después de montar
@@ -80,6 +83,30 @@ export const DayScheduleOverlay = ({ date, month, year, onClose }: DaySchedulePr
             <Icon f7="multiply_circle_fill" size="28px" color="gray" />
           </Link>
         </div>
+
+        {dayHearings.length > 0 && (
+          <div style={{
+            margin: '0 20px 14px 20px',
+            padding: '12px 16px',
+            background: 'rgba(0, 122, 255, 0.08)',
+            border: '1px solid rgba(0, 122, 255, 0.25)',
+            borderRadius: '16px',
+          }}>
+            {dayHearings.map((h) => (
+              <div key={h.id} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                <div style={{ fontWeight: 600, color: '#007aff', fontSize: '13px' }}>
+                  {h.timeStr} · {h.clientName}
+                </div>
+                <div style={{ fontSize: '12px', color: '#555' }}>
+                  {h.expediente} — {h.materia}
+                </div>
+                <div style={{ fontSize: '11px', color: '#888' }}>
+                  {h.juzgado}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         
         <div style={styles.scheduleContainer}>
           <div style={styles.scheduleInner}>

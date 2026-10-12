@@ -41,6 +41,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
           customSearch
           disableButton={false}
           clearButton
+          backdrop={false}
           placeholder="Buscar audiencias, casos, clientes..."
           value={searchQuery}
           onInput={(e) => onSearchChange((e.target as HTMLInputElement).value)}

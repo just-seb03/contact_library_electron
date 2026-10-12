@@ -1,5 +1,6 @@
 import type { CSSProperties, FC } from 'react';
 import { Card, CardContent, List, ListItem, Icon } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 
 interface DayDetailsCardProps {
   month: string;
@@ -7,6 +8,9 @@ interface DayDetailsCardProps {
 }
 
 export const DayDetailsCard: FC<DayDetailsCardProps> = ({ month, day }) => {
+  const { hearings, setSelectedClientId } = useApp();
+  const dayHearings = hearings.filter((h) => h.day === day);
+
   return (
     <Card 
       outline={false}
@@ -24,13 +28,28 @@ export const DayDetailsCard: FC<DayDetailsCardProps> = ({ month, day }) => {
         </div>
         <div style={styles.listContainer}>
           <List mediaList className="no-hairlines no-hairlines-between" style={{ margin: 0, background: 'transparent' }}>
-            <ListItem
-              title="Sin eventos programados"
-              subtitle="Espacio reservado para detalles de audiencia / caso"
-              style={styles.emptyEventItem}
-            >
-              <Icon slot="media" f7="calendar_badge_minus" size="30px" color="gray" />
-            </ListItem>
+            {dayHearings.length > 0 ? (
+              dayHearings.map((h) => (
+                <ListItem
+                  key={h.id}
+                  title={`${h.clientName} - Audiencia`}
+                  subtitle={`${h.timeStr} · ${h.juzgado}`}
+                  text={`${h.expediente} · ${h.materia}`}
+                  onClick={() => setSelectedClientId(h.clientId)}
+                  style={{ ...styles.emptyEventItem, cursor: 'pointer' }}
+                >
+                  <Icon slot="media" f7="calendar_badge_plus" size="30px" color="blue" />
+                </ListItem>
+              ))
+            ) : (
+              <ListItem
+                title="Sin eventos programados"
+                subtitle="Espacio reservado para detalles de audiencia / caso"
+                style={styles.emptyEventItem}
+              >
+                <Icon slot="media" f7="calendar_badge_minus" size="30px" color="gray" />
+              </ListItem>
+            )}
           </List>
         </div>
       </CardContent>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Page } from 'framework7-react';
 
-// Importamos los componentes modulares y el tipo
-import { Payment } from '../components/Pagos/types';
+// Importamos el contexto y componentes modulares
+import { useApp } from '../context/AppContext';
 import { PaymentsHeader } from '../components/Pagos/pagosHeader';
 import { PaymentsStats } from '../components/Pagos/pagosStatistics';
 import { PaymentsFilterBar } from '../components/Pagos/pagosFilter';
@@ -11,14 +11,7 @@ import { RegisterPaymentButton } from '../components/Pagos/pagosRegisterButton';
 
 export default function PaymentsPage() {
   const [filter, setFilter] = useState<'all' | 'completed' | 'pending'>('all');
-
-  // Datos simulados (estado)
-  const [payments] = useState<Payment[]>([
-    { id: '1', client: 'El manzano', concept: 'Asesoría Mensual', amount: 450.00, date: '10 Oct, 2026', status: 'completed' },
-    { id: '2', client: 'Sebastian Bastian', concept: 'Desarrollo de Modulo', amount: 1200.00, date: '14 Oct, 2026', status: 'pending' },
-    { id: '3', client: 'MaxiMaxi', concept: 'Mantenimiento de Agenda', amount: 300.00, date: '05 Oct, 2026', status: 'overdue' },
-    { id: '4', client: 'No se guardo', concept: 'Consulta Individual', amount: 80.00, date: '11 Oct, 2026', status: 'completed' },
-  ]);
+  const { payments, updatePaymentStatus } = useApp();
 
   // Lógica de filtrado y estadísticas
   const filteredPayments = payments.filter((item) => {
@@ -56,7 +49,10 @@ export default function PaymentsPage() {
           onFilterChange={setFilter} 
         />
 
-        <PaymentsTable payments={filteredPayments} />
+        <PaymentsTable 
+          payments={filteredPayments} 
+          onStatusChange={updatePaymentStatus}
+        />
 
         <RegisterPaymentButton onClick={handleRegisterPayment} />
         

@@ -1,4 +1,5 @@
 import type { CSSProperties, FC } from 'react';
+import { formatCLP } from '../../utils/format';
 
 interface StatsProps {
   totalIngresos: number;
@@ -30,7 +31,7 @@ export const PaymentsStats: FC<StatsProps> = ({
           <div className="card-content card-content-padding">
             <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Ingresos Cobrados</div>
             <div className="text-color-green font-weight-bold margin-vertical-half" style={{ fontSize: '28px' }}>
-              ${totalIngresos.toFixed(2)}
+              {formatCLP(totalIngresos)}
             </div>
             <div className="text-color-gray" style={{ fontSize: '11px' }}>Este mes</div>
           </div>
@@ -43,7 +44,7 @@ export const PaymentsStats: FC<StatsProps> = ({
           <div className="card-content card-content-padding">
             <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Por Cobrar</div>
             <div className="text-color-orange font-weight-bold margin-vertical-half" style={{ fontSize: '28px' }}>
-              ${totalPendientes.toFixed(2)}
+              {formatCLP(totalPendientes)}
             </div>
             <div className="text-color-gray" style={{ fontSize: '11px' }}>{cobrosPendientesCount} cobros pendientes</div>
           </div>

@@ -1,54 +1,63 @@
-import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { Page } from 'framework7-react';
-import { Client } from '../components/Cliente/types';
+import { useApp } from '../context/AppContext';
 import { ClientList } from '../components/Cliente/ClientList';
 import { ClientDetails } from '../components/Cliente/ClientDetails';
 
-const MOCK_CLIENTS: Client[] = [
-  { id: 1, name: 'Juan Pérez García', phone: '+34 612 345 678' },
-  { id: 2, name: 'María Gómez López', phone: '+34 689 123 456' },
-  { id: 3, name: 'Carlos Rodríguez', phone: '+34 655 987 654' },
-  { id: 4, name: 'Ana Martínez', phone: '+34 677 111 222' },
-  { id: 5, name: 'Luis Fernando Torres', phone: '+34 633 444 555' },
-  { id: 6, name: 'Sofía Castro', phone: '+34 699 888 777' },
-  { id: 7, name: 'Alejandro Morales', phone: '+34 622 333 444' },
-  { id: 8, name: 'Elena Navarro', phone: '+34 644 555 666' },
-  { id: 9, name: 'David Romero', phone: '+34 666 777 888' },
-  { id: 10, name: 'Carmen Delgado', phone: '+34 678 999 000' },
-];
-
 export default function Cliente() {
-  const [selectedClient, setSelectedClient] = useState<Client>(MOCK_CLIENTS[0]);
+  const { clients, selectedClient, setSelectedClientId } = useApp();
 
   return (
-    <Page className="liquid-page" pageContent={false}>
-      <div 
-        className="page-content" 
-        style={{ 
-          display: 'flex', 
-          flexDirection: 'row', 
-          height: '100%', 
-          padding: '70px 20px 20px 8px', 
-          boxSizing: 'border-box', 
-          gap: '16px',
-          overflow: 'hidden' 
-        }}
-      >
-        {/* Columna Izquierda: Clientes a la izquierda (a la derecha de LeftBar, casi pegados) */}
-        <div style={{ width: '320px', minWidth: '280px', maxWidth: '360px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Page className="liquid-page" pageContent={false} style={{ background: 'transparent' }}>
+      <div className="page-content" style={styles.pageContent}>
+        {/* Columna Izquierda: Directorio de Clientes */}
+        <div style={styles.leftColumn}>
           <ClientList 
-            clients={MOCK_CLIENTS} 
+            clients={clients} 
             selectedClient={selectedClient} 
-            onSelectClient={setSelectedClient} 
+            onSelectClient={(c) => setSelectedClientId(c.id)} 
           />
         </div>
 
-        {/* Columna Derecha: A la derecha de los clientes, título azul con nombre/teléfono arriba y detalles debajo */}
-        <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-          <ClientDetails client={selectedClient} />
+        {/* Columna Derecha: Detalles del Cliente y Seguimiento de Caso */}
+        <div style={styles.rightColumn}>
+          {selectedClient ? (
+            <ClientDetails client={selectedClient} />
+          ) : (
+            <div style={{ color: 'rgba(0,0,0,0.4)', padding: '24px' }}>
+              Selecciona un cliente para ver sus detalles
+            </div>
+          )}
         </div>
       </div>
     </Page>
   );
 }
 
+const styles: Record<string, CSSProperties> = {
+  pageContent: {
+    display: 'flex',
+    flexDirection: 'row',
+    height: '100%',
+    padding: '70px 24px 24px 12px',
+    boxSizing: 'border-box',
+    gap: '18px',
+    overflow: 'hidden',
+    background: 'transparent',
+  },
+  leftColumn: {
+    width: '340px',
+    minWidth: '300px',
+    maxWidth: '380px',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  rightColumn: {
+    flex: 1,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+  },
+};

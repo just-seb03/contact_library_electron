@@ -1,11 +1,13 @@
 import type { CSSProperties, FC } from 'react';
 import { Payment } from './types';
+import { formatCLP } from '../../utils/format';
 
 interface TableProps {
   payments: Payment[];
+  onStatusChange?: (id: string, status: 'completed' | 'pending' | 'overdue') => void;
 }
 
-export const PaymentsTable: FC<TableProps> = ({ payments }) => {
+export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
   const tableWrapperStyle: CSSProperties = {
     background: 'rgba(255, 255, 255, 0.45)',
     backdropFilter: 'blur(20px) saturate(180%)',
@@ -14,6 +16,12 @@ export const PaymentsTable: FC<TableProps> = ({ payments }) => {
     borderRadius: '18px',
     overflowX: 'auto', 
     width: '100%',
+  };
+
+  const nextStatusMap: Record<Payment['status'], Payment['status']> = {
+    completed: 'pending',
+    pending: 'overdue',
+    overdue: 'completed',
   };
 
   return (
@@ -37,12 +45,22 @@ export const PaymentsTable: FC<TableProps> = ({ payments }) => {
               <td className="label-cell text-color-gray">{item.concept}</td>
               <td className="label-cell text-color-gray">{item.date}</td>
               <td className="numeric-cell font-weight-600" style={{ color: '#1d1d1f' }}>
-                ${item.amount.toFixed(2)}
+                {formatCLP(item.amount)}
               </td>
               <td className="label-cell">
                 <span 
                   className={`badge ${getBadgeColor(item.status)}`} 
-                  style={{ padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}
+                  onClick={() => onStatusChange && onStatusChange(item.id, nextStatusMap[item.status])}
+                  style={{ 
+                    padding: '4px 10px', 
+                    borderRadius: '12px', 
+                    fontSize: '11px', 
+                    fontWeight: 600,
+                    cursor: onStatusChange ? 'pointer' : 'default',
+                    userSelect: 'none',
+                    transition: 'transform 0.15s ease',
+                  }}
+                  title={onStatusChange ? 'Haz clic para cambiar estado' : undefined}
                 >
                   {getStatusText(item.status)}
                 </span>

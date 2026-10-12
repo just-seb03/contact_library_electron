@@ -1,93 +1,190 @@
 import { useState } from 'react';
-import { List, ListItem, Icon, Card } from 'framework7-react';
+import type { CSSProperties, FC } from 'react';
+import { Card, Icon, Button, Searchbar, Badge } from 'framework7-react';
 import { Client } from './types';
+import { ClientListItem } from './ClientListItem';
 
-type ClientListProps = {
+interface ClientListProps {
   clients: Client[];
   selectedClient: Client | null;
   onSelectClient: (client: Client) => void;
-};
+}
 
-export const ClientList = ({ clients, selectedClient, onSelectClient }: ClientListProps) => {
+export const ClientList: FC<ClientListProps> = ({
+  clients,
+  selectedClient,
+  onSelectClient,
+}) => {
   const [filterText, setFilterText] = useState('');
 
   const filteredClients = clients.filter((c) =>
     c.name.toLowerCase().includes(filterText.toLowerCase()) ||
-    c.phone.includes(filterText)
+    c.phone.includes(filterText) ||
+    (c.email && c.email.toLowerCase().includes(filterText.toLowerCase()))
   );
 
   return (
     <Card 
-      style={{ 
-        margin: 0, 
-        height: '100%', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        borderRadius: '16px', 
-        overflow: 'hidden', 
-        boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-        border: '1px solid #e8e8e8',
-        backgroundColor: '#ffffff'
-      }}
+      outline={false}
+      className="no-border margin-horizontal-none margin-vertical-none elevation-2"
+      style={styles.cardContainer}
     >
-      {/* Buscador superior y herramientas */}
-      <div style={{ display: 'flex', alignItems: 'center', padding: '16px', borderBottom: '1px solid #f0f0f0', backgroundColor: '#fff' }}>
-        <div style={{ flex: 1, display: 'flex', alignItems: 'center', backgroundColor: '#f4f5f7', borderRadius: '10px', padding: '8px 12px' }}>
-          <Icon f7="search" size="16px" color="gray" />
-          <input 
-            type="text" 
-            placeholder="Filtro de búsqueda" 
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            style={{ border: 'none', background: 'transparent', width: '100%', marginLeft: '8px', outline: 'none', fontSize: '13px', color: '#333' }} 
-          />
-          {filterText && (
-            <span 
-              onClick={() => setFilterText('')} 
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+      {/* Encabezado del Directorio */}
+      <div style={styles.header}>
+        <div style={styles.titleRow}>
+          <div style={styles.titleWithBadge}>
+            <span style={styles.titleText}>Clientes</span>
+            <Badge color="blue" style={styles.badge}>
+              {filteredClients.length}
+            </Badge>
+          </div>
+
+          <div style={styles.headerButtons}>
+            <Button 
+              round 
+              small 
+              className="display-flex align-items-center justify-content-center"
+              style={styles.toolBtn}
+              tooltip="Filtrar"
             >
-              <Icon f7="xmark_circle_fill" size="14px" color="gray" />
-            </span>
-          )}
+              <Icon f7="line_horizontal_3_decrease" size="15px" color="gray" />
+            </Button>
+            <Button 
+              round 
+              small 
+              className="display-flex align-items-center justify-content-center"
+              style={styles.toolBtn}
+              tooltip="Nuevo Cliente"
+            >
+              <Icon f7="plus" size="15px" color="gray" />
+            </Button>
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '14px', marginLeft: '14px' }}>
-          <Icon f7="line_horizontal_3_decrease" size="18px" color="gray" style={{ cursor: 'pointer' }} />
-          <Icon f7="plus" size="18px" color="gray" style={{ cursor: 'pointer' }} />
-          <Icon f7="ellipsis_vertical" size="18px" color="gray" style={{ cursor: 'pointer' }} />
+
+        {/* Buscador nativo Framework7 con Glassmorphism y backdrop desactivado */}
+        <div style={styles.searchbarContainer}>
+          <Searchbar
+            inline
+            customSearch
+            disableButton={false}
+            clearButton
+            backdrop={false}
+            placeholder="Buscar por nombre, teléfono..."
+            value={filterText}
+            onInput={(e) => setFilterText((e.target as HTMLInputElement).value)}
+            style={styles.searchbar}
+          />
         </div>
       </div>
 
-      {/* Lista de clientes scrolleable */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
-        <List mediaList style={{ margin: 0 }}>
-          {filteredClients.map((c) => {
-            const isSelected = selectedClient?.id === c.id;
-            return (
-              <ListItem 
-                key={c.id}
-                title={c.name}
-                onClick={() => onSelectClient(c)}
-                style={{ 
-                  backgroundColor: isSelected ? '#edf5ff' : '#fff', 
-                  borderLeft: isSelected ? '4px solid #0056b3' : '4px solid transparent',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  borderBottom: '1px solid #f2f2f5',
-                  padding: '6px 0',
-                  fontWeight: isSelected ? '600' : '400',
-                }}
-              >
-              </ListItem>
-            );
-          })}
-          {filteredClients.length === 0 && (
-            <div style={{ padding: '32px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-              No se encontraron clientes
-            </div>
-          )}
-        </List>
+      {/* Lista de clientes scrolleable con diseño cristalino */}
+      <div style={styles.listContainer}>
+        {filteredClients.map((client) => (
+          <ClientListItem
+            key={client.id}
+            client={client}
+            isSelected={selectedClient?.id === client.id}
+            onSelect={onSelectClient}
+          />
+        ))}
+
+        {filteredClients.length === 0 && (
+          <div style={styles.emptyResults}>
+            <Icon f7="person_crop_circle_badge_exclamation" size="36px" color="gray" style={{ opacity: 0.5, marginBottom: '8px' }} />
+            <div>No se encontraron clientes</div>
+          </div>
+        )}
       </div>
     </Card>
   );
 };
 
+const styles: Record<string, CSSProperties> = {
+  cardContainer: {
+    margin: 0,
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    background: 'rgba(255, 255, 255, 0.45)',
+    backdropFilter: 'blur(25px) saturate(190%)',
+    WebkitBackdropFilter: 'blur(25px) saturate(190%)',
+    border: '1px solid rgba(255, 255, 255, 0.65)',
+    borderRadius: '24px',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+    overflow: 'hidden',
+  },
+  header: {
+    padding: '16px 14px 12px',
+    borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+  },
+  titleRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  titleWithBadge: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  titleText: {
+    fontSize: '18px',
+    fontWeight: 700,
+    color: '#1d1d1f',
+    letterSpacing: '-0.3px',
+  },
+  badge: {
+    fontSize: '11px',
+    fontWeight: 700,
+    padding: '2px 8px',
+  },
+  headerButtons: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  toolBtn: {
+    width: '30px',
+    height: '30px',
+    minWidth: '30px',
+    padding: 0,
+    background: 'rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.75)',
+    borderRadius: '10px',
+    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.02)',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
+  searchbarContainer: {
+    width: '100%',
+  },
+  searchbar: {
+    background: 'rgba(255, 255, 255, 0.6)',
+    backdropFilter: 'blur(15px) saturate(180%)',
+    WebkitBackdropFilter: 'blur(15px) saturate(180%)',
+    borderRadius: '18px',
+    border: '1px solid rgba(255, 255, 255, 0.75)',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+    overflow: 'hidden',
+  },
+  listContainer: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '6px 4px',
+  },
+  emptyResults: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '48px 16px',
+    color: '#86868b',
+    fontSize: '13px',
+    textAlign: 'center',
+  },
+};
