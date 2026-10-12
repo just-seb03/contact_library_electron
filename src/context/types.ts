@@ -15,12 +15,16 @@ export interface HearingEvent {
   timeStr: string;
 }
 
+export type AppTab = 'inicio' | 'calendar' | 'cliente' | 'pagos' | 'sumario' | 'config';
+
 export interface AppContextType {
   clients: Client[];
   selectedClientId: number;
   selectedClient: Client | null;
   payments: Payment[];
   hearings: HearingEvent[];
+  activeTab: AppTab;
+  setActiveTab: (tab: AppTab) => void;
   setSelectedClientId: (id: number) => void;
   updateClient: (id: number, data: Partial<Client>) => void;
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;

@@ -72,6 +72,7 @@ export const MOCK_CLIENTS: Client[] = [
       juzgado: 'Juzgado de Policía Local',
       materia: 'Consulta Individual de Urgencia',
       estado: 'Consulta finalizada con éxito',
+      proximaAudiencia: '11 Oct, 2026 - 09:30 AM',
     },
     pago: {
       monto: 80000,

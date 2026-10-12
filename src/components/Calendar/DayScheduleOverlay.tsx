@@ -4,17 +4,45 @@ import { useApp } from '../../context/AppContext';
 
 type DayScheduleProps = {
   date: number;
+  monthIndex: number;
   month: string;
   year: number;
   onClose: () => void;
 };
 
-export const DayScheduleOverlay = ({ date, month, year, onClose }: DayScheduleProps) => {
+const HOUR_ROW_HEIGHT = 70;
+const SCHEDULE_TOP_PADDING = 20;
+const HEARING_DURATION_MINUTES = 60;
+
+function parseTime(timeStr: string): number | null {
+  const match = timeStr.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (!match) return null;
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2] ?? 0);
+  const period = match[3].toUpperCase();
+  if (hour < 1 || hour > 12 || minute > 59) return null;
+
+  return (hour % 12 + (period === 'PM' ? 12 : 0)) * 60 + minute;
+}
+
+function formatTime(minutes: number): string {
+  const normalizedMinutes = minutes % (24 * 60);
+  const hour = Math.floor(normalizedMinutes / 60);
+  const minute = normalizedMinutes % 60;
+  const period = hour < 12 ? 'AM' : 'PM';
+  const displayHour = hour % 12 || 12;
+  return `${displayHour}:${String(minute).padStart(2, '0')} ${period}`;
+}
+
+export const DayScheduleOverlay = ({ date, monthIndex, month, year, onClose }: DayScheduleProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [panelWidth, setPanelWidth] = useState(420);
   const isResizing = useRef(false);
   const { hearings } = useApp();
-  const dayHearings = hearings.filter((h) => h.day === date);
+  const dayHearings = hearings.filter(
+    (h) => h.day === date && h.monthIndex === monthIndex && h.year === year
+  );
   
   useEffect(() => {
     // Dispara la animación de entrada después de montar
@@ -120,6 +148,30 @@ export const DayScheduleOverlay = ({ date, month, year, onClose }: DaySchedulePr
                 </div>
               </div>
             ))}
+            {dayHearings.map((hearing) => {
+              const startMinutes = parseTime(hearing.timeStr);
+              if (startMinutes === null) return null;
+
+              const top = SCHEDULE_TOP_PADDING + (startMinutes / 60) * HOUR_ROW_HEIGHT;
+              const endTime = formatTime(startMinutes + HEARING_DURATION_MINUTES);
+
+              return (
+                <div
+                  key={hearing.id}
+                  style={{
+                    ...styles.hearingBlock,
+                    top,
+                    height: HOUR_ROW_HEIGHT,
+                  }}
+                >
+                  <div style={styles.hearingTime}>
+                    {hearing.timeStr} - {endTime}
+                  </div>
+                  <div style={styles.hearingTitle}>{hearing.clientName}</div>
+                  <div style={styles.hearingDetails}>{hearing.expediente} · {hearing.materia}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -209,6 +261,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   scheduleInner: {
     padding: '20px 0 60px',
+    position: 'relative',
   },
   hourRow: {
     display: 'flex',
@@ -237,5 +290,34 @@ const styles: Record<string, React.CSSProperties> = {
     left: 0,
     right: 0,
     borderTop: '1px dashed rgba(0, 0, 0, 0.04)', 
-  }
+  },
+  hearingBlock: {
+    position: 'absolute',
+    left: '88px',
+    right: '12px',
+    zIndex: 1,
+    boxSizing: 'border-box',
+    padding: '8px 10px',
+    overflow: 'hidden',
+    borderRadius: '10px',
+    border: '1px solid rgba(0, 122, 255, 0.35)',
+    background: 'rgba(0, 122, 255, 0.14)',
+    boxShadow: '0 2px 8px rgba(0, 122, 255, 0.12)',
+  },
+  hearingTime: {
+    color: '#0066cc',
+    fontSize: '11px',
+    fontWeight: 700,
+  },
+  hearingTitle: {
+    marginTop: '3px',
+    color: '#1d1d1f',
+    fontSize: '13px',
+    fontWeight: 600,
+  },
+  hearingDetails: {
+    marginTop: '2px',
+    color: '#555',
+    fontSize: '11px',
+  },
 };

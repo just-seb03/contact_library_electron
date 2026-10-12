@@ -1,14 +1,16 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { f7 } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
+import type { AppTab } from '../../context/types';
 import 'framework7-icons/css/framework7-icons.css';
 
 type LeftBarProps = {
-  activeTab?: string;
-  defaultTab?: string;
-  onSelectTab?: (tab: string) => void;
+  activeTab?: AppTab;
+  defaultTab?: AppTab;
+  onSelectTab?: (tab: AppTab) => void;
 };
 
-const tabMap: Record<string, string> = {
+const tabMap: Record<AppTab, string> = {
   inicio: '#view-home',
   calendar: '#view-calendar',
   cliente: '#view-cliente',
@@ -18,16 +20,10 @@ const tabMap: Record<string, string> = {
 };
 
 export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
-  const currentTab = activeTab ?? defaultTab;
-  const [selected, setSelected] = useState(currentTab);
+  const { activeTab: appActiveTab, setActiveTab } = useApp();
+  const selected = activeTab ?? appActiveTab ?? defaultTab;
 
-  useEffect(() => {
-    if (activeTab) {
-      setSelected(activeTab);
-    }
-  }, [activeTab]);
-
-  const navItems = [
+  const navItems: { id: AppTab; label: string; icon: string }[] = [
     { id: 'inicio', label: 'Inicio', icon: 'house' },
     { id: 'calendar', label: 'Agenda', icon: 'device_laptop' },
     { id: 'cliente', label: 'Cliente', icon: 'person_3' },
@@ -36,8 +32,8 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
     { id: 'config', label: 'Ajustes', icon: 'hammer_fill' },
   ];
 
-  const handleSelect = (id: string) => {
-    setSelected(id);
+  const handleSelect = (id: AppTab) => {
+    setActiveTab(id);
     onSelectTab?.(id);
 
     const tabId = tabMap[id];

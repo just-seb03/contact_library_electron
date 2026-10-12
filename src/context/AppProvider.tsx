@@ -41,6 +41,7 @@ function parseHearing(client: Client): HearingEvent | null {
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
   const [selectedClientId, setSelectedClientId] = useState<number>(MOCK_CLIENTS[0]?.id ?? 1);
+  const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
 
   // Cliente actualmente seleccionado
   const selectedClient = useMemo(() => {
@@ -119,6 +120,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     selectedClient,
     payments,
     hearings,
+    activeTab,
+    setActiveTab,
     setSelectedClientId,
     updateClient,
     updatePaymentStatus,

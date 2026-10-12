@@ -56,6 +56,7 @@ export default function Calendar() {
       {selectedDay !== null && (
         <DayScheduleOverlay 
           date={selectedDay}
+          monthIndex={currentDate.getMonth()}
           month={currentMonth}
           year={currentYear}
           onClose={() => setSelectedDay(null)}
