@@ -1,4 +1,5 @@
 import type { CSSProperties, FC } from 'react';
+import { useApp } from '../../context/AppContext';
 import { Payment } from './types';
 import { formatCLP } from '../../utils/format';
 
@@ -8,14 +9,17 @@ interface TableProps {
 }
 
 export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
+  const { darkMode } = useApp();
+
   const tableWrapperStyle: CSSProperties = {
-    background: 'rgba(255, 255, 255, 0.45)',
+    background: darkMode ? 'rgba(22, 24, 30, 0.65)' : 'rgba(255, 255, 255, 0.45)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    border: '1px solid rgba(255, 255, 255, 0.6)',
+    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.6)',
     borderRadius: '18px',
     overflowX: 'auto', 
     width: '100%',
+    color: darkMode ? '#f5f5f7' : 'inherit',
   };
 
   const nextStatusMap: Record<Payment['status'], Payment['status']> = {

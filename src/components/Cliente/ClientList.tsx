@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties, FC } from 'react';
 import { Card, Icon, Button, Searchbar, Badge } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 import { Client } from './types';
 import { ClientListItem } from './ClientListItem';
 
@@ -15,6 +16,7 @@ export const ClientList: FC<ClientListProps> = ({
   selectedClient,
   onSelectClient,
 }) => {
+  const { darkMode } = useApp();
   const [filterText, setFilterText] = useState('');
 
   const filteredClients = clients.filter((c) =>
@@ -23,11 +25,38 @@ export const ClientList: FC<ClientListProps> = ({
     (c.email && c.email.toLowerCase().includes(filterText.toLowerCase()))
   );
 
+  const cardStyle: CSSProperties = {
+    ...styles.cardContainer,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const toolBtnStyle: CSSProperties = {
+    ...styles.toolBtn,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+    } : {}),
+  };
+
+  const searchbarStyle: CSSProperties = {
+    ...styles.searchbar,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.08)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05)',
+    } : {}),
+  };
+
   return (
     <Card 
       outline={false}
       className="no-border margin-horizontal-none margin-vertical-none elevation-2"
-      style={styles.cardContainer}
+      style={cardStyle}
     >
       {/* Encabezado del Directorio */}
       <div style={styles.header}>
@@ -43,8 +72,8 @@ export const ClientList: FC<ClientListProps> = ({
             <Button 
               round 
               small 
-              className="display-flex align-items-center justify-content-center"
-              style={styles.toolBtn}
+              className="client-tool-btn display-flex align-items-center justify-content-center"
+              style={toolBtnStyle}
               tooltip="Filtrar"
             >
               <Icon f7="line_horizontal_3_decrease" size="15px" color="gray" />
@@ -52,8 +81,8 @@ export const ClientList: FC<ClientListProps> = ({
             <Button 
               round 
               small 
-              className="display-flex align-items-center justify-content-center"
-              style={styles.toolBtn}
+              className="client-tool-btn display-flex align-items-center justify-content-center"
+              style={toolBtnStyle}
               tooltip="Nuevo Cliente"
             >
               <Icon f7="plus" size="15px" color="gray" />
@@ -72,7 +101,7 @@ export const ClientList: FC<ClientListProps> = ({
             placeholder="Buscar por nombre, teléfono..."
             value={filterText}
             onInput={(e) => setFilterText((e.target as HTMLInputElement).value)}
-            style={styles.searchbar}
+            style={searchbarStyle}
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
   onSelectDay,
 }) => {
   const [hoveredDay, setHoveredDay] = useState<number | null>(null);
-  const { hearings } = useApp();
+  const { hearings, darkMode } = useApp();
 
   const firstDay = new Date(currentYear, currentMonthIndex, 1);
   const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
@@ -28,27 +28,72 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
   const emptyAfterCount = 42 - firstDayOfWeek - daysInMonth;
   const emptyAfter = Array.from({ length: emptyAfterCount > 0 ? emptyAfterCount : 0 }, (_, i) => i);
 
+  const glassCardStyle: CSSProperties = {
+    ...styles.glassCard,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const gridContainerStyle: CSSProperties = {
+    ...styles.gridContainer,
+    ...(darkMode ? {
+      backgroundColor: 'rgba(0, 0, 0, 0.22)',
+      borderColor: 'rgba(255, 255, 255, 0.08)',
+    } : {}),
+  };
+
+  const headerDayStyle: CSSProperties = {
+    ...styles.headerDay,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#8e8e93',
+    } : {}),
+  };
+
+  const emptyCellStyle: CSSProperties = {
+    ...styles.emptyCell,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.02)',
+      borderColor: 'rgba(255, 255, 255, 0.06)',
+    } : {}),
+  };
+
+  const baseDayCellStyle: CSSProperties = {
+    ...styles.dayCell,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+    } : {}),
+  };
+
   return (
     <Card 
       outline={false}
       className="no-border margin-horizontal-none margin-bottom elevation-2"
-      style={styles.glassCard}
+      style={glassCardStyle}
     >
       <CardContent padding={false} style={{ padding: '12px' }}>
-        <div style={styles.gridContainer} className="calendar-grid-container">
+        <div style={gridContainerStyle} className="calendar-grid-container">
           {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
-            <div key={d} style={styles.headerDay} className="calendar-header-day">{d}</div>
+            <div key={d} style={headerDayStyle} className="calendar-header-day">{d}</div>
           ))}
 
           {emptyBefore.map(i => (
-            <div key={`eb-${i}`} style={styles.emptyCell} className="calendar-empty-cell"></div>
+            <div key={`eb-${i}`} style={emptyCellStyle} className="calendar-empty-cell"></div>
           ))}
 
           {days.map(d => {
             const isCurrent = d === currentDay;
             const isHovered = hoveredDay === d;
 
-            let cellStyle: CSSProperties = { ...styles.dayCell };
+            let cellStyle: CSSProperties = { ...baseDayCellStyle };
 
             if (isCurrent) {
               cellStyle = {
@@ -57,7 +102,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                   ? 'linear-gradient(135deg, rgba(0, 135, 255, 0.95) 0%, rgba(0, 105, 235, 1) 100%)'
                   : 'linear-gradient(135deg, rgba(0, 122, 255, 0.9) 0%, rgba(0, 90, 220, 0.98) 100%)',
                 color: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
+                border: darkMode ? '1px solid rgba(255, 255, 255, 0.45)' : '1px solid rgba(255, 255, 255, 0.5)',
                 boxShadow: isHovered
                   ? '0 8px 22px rgba(0, 122, 255, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.5)'
                   : '0 6px 18px rgba(0, 122, 255, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4)',
@@ -67,9 +112,10 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
             } else if (isHovered) {
               cellStyle = {
                 ...cellStyle,
-                background: 'rgba(255, 255, 255, 0.85)',
-                border: '1px solid rgba(255, 255, 255, 0.9)',
-                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
+                background: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.85)',
+                border: darkMode ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.9)',
+                color: darkMode ? '#ffffff' : '#1d1d1f',
+                boxShadow: darkMode ? '0 4px 14px rgba(0, 0, 0, 0.3)' : '0 6px 16px rgba(0, 0, 0, 0.06), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
                 transform: 'translateY(-2px)',
                 zIndex: 2,
               };

@@ -1,4 +1,4 @@
-import { useEffect, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { f7, f7ready } from 'framework7-react';
 import { useApp } from '../../context/AppContext';
 import type { AppTab } from '../../context/types';
@@ -20,6 +20,7 @@ const tabMap: Record<AppTab, string> = {
 
 export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
   const { activeTab: appActiveTab, setActiveTab, darkMode } = useApp();
+  const [hoveredTab, setHoveredTab] = useState<AppTab | null>(null);
   const selected = activeTab ?? appActiveTab ?? defaultTab;
 
   useEffect(() => {
@@ -65,20 +66,40 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
   };
 
   return (
-    <aside style={styles.container}>
+    <aside style={{ ...styles.container, ...(darkMode ? styles.containerDark : {}) }}>
       <nav style={styles.navGroup}>
         {navItems.map((item) => {
           const isActive = selected === item.id;
+          const isHovered = hoveredTab === item.id;
           const activeStyle = darkMode ? styles.activeButtonDark : styles.activeButtonLight;
+          
+          let itemBtnStyle: CSSProperties = {
+            ...styles.button,
+            color: darkMode ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)',
+          };
+
+          if (isActive) {
+            itemBtnStyle = {
+              ...itemBtnStyle,
+              ...activeStyle,
+              ...(isHovered && darkMode ? { backgroundColor: 'rgba(255, 255, 255, 0.22)' } : {}),
+            };
+          } else if (isHovered) {
+            itemBtnStyle = {
+              ...itemBtnStyle,
+              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.45)',
+              color: darkMode ? '#ffffff' : '#000000',
+            };
+          }
+
           return (
             <button
               key={item.id}
               className={`leftbar-button ${isActive ? 'active' : ''}`}
               onClick={() => handleSelect(item.id)}
-              style={{
-                ...styles.button,
-                ...(isActive ? activeStyle : {}),
-              }}
+              onMouseEnter={() => setHoveredTab(item.id)}
+              onMouseLeave={() => setHoveredTab(null)}
+              style={itemBtnStyle}
               title={item.label}
             >
               <i className="f7-icons" style={styles.icon}>
@@ -114,6 +135,11 @@ const styles: Record<string, CSSProperties> = {
     borderRadius: '24px',
     border: '1px solid rgb(223, 221, 221)',
     boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
+  },
+  containerDark: {
+    background: 'rgba(22, 23, 29, 0.6)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
   },
   navGroup: {
     display: 'flex',

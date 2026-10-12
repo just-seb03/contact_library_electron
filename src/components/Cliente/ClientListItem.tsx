@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { CSSProperties, FC } from 'react';
 import { Icon } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 import { Client } from './types';
 import { formatCLP } from '../../utils/format';
 
@@ -15,10 +16,16 @@ export const ClientListItem: FC<ClientListItemProps> = ({
   isSelected,
   onSelect,
 }) => {
+  const { darkMode } = useApp();
   const [isHovered, setIsHovered] = useState(false);
 
   let itemStyle: CSSProperties = {
     ...styles.baseItem,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+    } : {}),
   };
 
   if (isSelected) {
@@ -33,10 +40,10 @@ export const ClientListItem: FC<ClientListItemProps> = ({
   } else if (isHovered) {
     itemStyle = {
       ...itemStyle,
-      background: 'rgba(255, 255, 255, 0.85)',
-      color: '#1d1d1f',
-      border: '1px solid rgba(255, 255, 255, 0.9)',
-      boxShadow: '0 6px 16px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
+      background: darkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(255, 255, 255, 0.85)',
+      color: darkMode ? '#ffffff' : '#1d1d1f',
+      border: darkMode ? '1px solid rgba(255, 255, 255, 0.18)' : '1px solid rgba(255, 255, 255, 0.9)',
+      boxShadow: darkMode ? '0 4px 14px rgba(0, 0, 0, 0.3)' : '0 6px 16px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
       transform: 'translateY(-2px)',
     };
   }

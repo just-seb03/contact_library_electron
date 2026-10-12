@@ -39,7 +39,7 @@ export const DayScheduleOverlay = ({ date, monthIndex, month, year, onClose }: D
   const [isVisible, setIsVisible] = useState(false);
   const [panelWidth, setPanelWidth] = useState(420);
   const isResizing = useRef(false);
-  const { hearings } = useApp();
+  const { hearings, darkMode } = useApp();
   const dayHearings = hearings.filter(
     (h) => h.day === date && h.monthIndex === monthIndex && h.year === year
   );
@@ -99,16 +99,28 @@ export const DayScheduleOverlay = ({ date, monthIndex, month, year, onClose }: D
         className="day-schedule-panel"
         style={{
           ...styles.panel, 
+          ...(darkMode ? {
+            backgroundColor: 'rgba(18, 20, 26, 0.94)',
+            borderRightColor: 'rgba(255, 255, 255, 0.12)',
+            boxShadow: '10px 0 40px rgba(0, 0, 0, 0.6)',
+            color: '#f5f5f7',
+          } : {}),
           width: `${panelWidth}px`,
           transform: isVisible ? 'translateX(0)' : 'translateX(-100%)',
           // Evita transiciones de ancho mientras se arrastra
           transition: isResizing.current ? 'none' : 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)'
         }}
       >
-        <div style={styles.header}>
+        <div style={{
+          ...styles.header,
+          ...(darkMode ? {
+            backgroundColor: 'rgba(24, 26, 34, 0.75)',
+            borderBottomColor: 'rgba(255, 255, 255, 0.08)',
+          } : {})
+        }}>
           <div>
-            <h2 style={styles.title}>{date} de {month}</h2>
-            <span style={styles.subtitle}>{year}</span>
+            <h2 style={{ ...styles.title, color: darkMode ? '#f5f5f7' : 'inherit' }}>{date} de {month}</h2>
+            <span style={{ ...styles.subtitle, color: darkMode ? '#8e8e93' : '#666' }}>{year}</span>
           </div>
           <Link onClick={handleClose}>
             <Icon f7="multiply_circle_fill" size="28px" color="gray" />

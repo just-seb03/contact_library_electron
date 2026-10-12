@@ -1,5 +1,6 @@
 import type { CSSProperties, FC } from 'react';
 import { Card, CardContent, Icon, Button, BlockTitle } from 'framework7-react';
+import { useApp } from '../../context/AppContext';
 import { Client } from './types';
 import { formatCLP } from '../../utils/format';
 
@@ -8,13 +9,51 @@ interface ClientCaseDetailsProps {
 }
 
 export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
+  const { darkMode } = useApp();
   const { caso, pago } = client;
+
+  const cardContainerStyle: CSSProperties = {
+    ...styles.cardContainer,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const infoGlassCardStyle: CSSProperties = {
+    ...styles.infoGlassCard,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const paymentCardStyle: CSSProperties = {
+    ...styles.paymentCard,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const hearingCardStyle: CSSProperties = {
+    ...styles.hearingCard,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+    } : {}),
+  };
 
   return (
     <Card 
       outline={false}
       className="no-border margin-horizontal-none margin-bottom-none elevation-2"
-      style={styles.cardContainer}
+      style={cardContainerStyle}
     >
       <CardContent style={styles.cardContent}>
         {caso ? (
@@ -22,7 +61,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
             {/* Header del Expediente */}
             <div style={styles.caseHeader}>
               <div>
-                <BlockTitle className="font-weight-bold margin-none" style={styles.sectionTitle}>
+                <BlockTitle className="font-weight-bold margin-none" style={{ ...styles.sectionTitle, color: darkMode ? '#f5f5f7' : '#1d1d1f' }}>
                   Expediente y Seguimiento Jurídico
                 </BlockTitle>
                 <div style={styles.courtSubtitle}>
@@ -39,12 +78,12 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
 
             {/* Grid de Tarjetas de Información del Caso */}
             <div style={styles.infoCardsGrid}>
-              <div style={styles.infoGlassCard}>
+              <div className="case-info-card" style={infoGlassCardStyle}>
                 <div style={styles.label}>N° de Expediente</div>
                 <div style={styles.value}>{caso.expediente}</div>
               </div>
 
-              <div style={styles.infoGlassCard}>
+              <div className="case-info-card" style={infoGlassCardStyle}>
                 <div style={styles.label}>Materia Principal</div>
                 <div style={styles.value}>{caso.materia}</div>
               </div>
@@ -52,7 +91,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
 
             {/* Tarjeta de Honorarios y Cobros sincronizada con Pagos */}
             {pago && (
-              <div style={styles.paymentCard}>
+              <div className="case-payment-card" style={paymentCardStyle}>
                 <div style={{ flex: 1 }}>
                   <div style={styles.label}>Estado en Gestión de Pagos</div>
                   <div style={styles.paymentConcept}>
@@ -75,7 +114,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
 
             {/* Próxima Audiencia si existe */}
             {caso.proximaAudiencia && (
-              <div style={styles.hearingCard}>
+              <div className="case-hearing-card" style={hearingCardStyle}>
                 <div style={styles.hearingIconBox}>
                   <Icon f7="calendar_badge_plus" size="24px" color="blue" />
                 </div>

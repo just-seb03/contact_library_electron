@@ -3,21 +3,50 @@ import { Card, List, ListItem, Icon, BlockTitle } from 'framework7-react';
 import { useApp } from '../../context/AppContext';
 
 export const UpcomingHearings: FC = () => {
-  const { hearings, setSelectedClientId } = useApp();
+  const { hearings, setSelectedClientId, darkMode } = useApp();
+
+  const cardStyle: CSSProperties = {
+    ...styles.glassCard,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const itemStyle: CSSProperties = {
+    ...styles.upcomingItem,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      color: '#f5f5f7',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+    } : {}),
+  };
+
+  const iconBoxStyle: CSSProperties = {
+    ...styles.upcomingIconWrapper,
+    ...(darkMode ? {
+      backgroundColor: 'rgba(0, 122, 255, 0.15)',
+      borderColor: 'rgba(0, 122, 255, 0.25)',
+      boxShadow: '0 2px 8px rgba(0, 122, 255, 0.15)',
+    } : {}),
+  };
 
   return (
     <>
-      <BlockTitle className="font-weight-bold" style={styles.title}>
+      <BlockTitle className="font-weight-bold" style={{ ...styles.title, color: darkMode ? '#f5f5f7' : '#1d1d1f' }}>
         Próximas Audiencias ({hearings.length})
       </BlockTitle>
       <Card 
         outline={false}
         className="no-border margin-horizontal-none elevation-2"
-        style={styles.glassCard}
+        style={cardStyle}
       >
         <List mediaList className="no-hairlines no-hairlines-between" style={{ margin: '8px 0', background: 'transparent' }}>
           {hearings.length === 0 ? (
-            <div style={{ padding: '24px', textAlign: 'center', color: '#888' }}>
+            <div style={{ padding: '24px', textAlign: 'center', color: darkMode ? '#8e8e93' : '#888' }}>
               No hay audiencias programadas
             </div>
           ) : (
@@ -28,10 +57,10 @@ export const UpcomingHearings: FC = () => {
                 subtitle={h.dateStr}
                 text={`${h.expediente} · ${h.materia}`}
                 onClick={() => setSelectedClientId(h.clientId)}
-                style={styles.upcomingItem}
+                style={itemStyle}
                 className="upcoming-hearing-item"
               >
-                <div slot="media" style={styles.upcomingIconWrapper} className="upcoming-icon-box">
+                <div slot="media" style={iconBoxStyle} className="upcoming-icon-box">
                   <Icon f7="calendar_badge_clock" size="22px" color="blue" />
                 </div>
               </ListItem>

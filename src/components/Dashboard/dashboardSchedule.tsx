@@ -1,5 +1,6 @@
 import { Card, CardContent, List, ListItem, Icon, Button, Badge } from 'framework7-react';
 import type { CSSProperties } from 'react';
+import { useApp } from '../../context/AppContext';
 import type { AppTab, HearingEvent } from '../../context/types';
 
 interface DashboardScheduleProps {
@@ -60,17 +61,43 @@ export function DashboardSchedule({
   openClient,
   showTab,
 }: DashboardScheduleProps) {
+  const { darkMode } = useApp();
+
+  const dynamicCardStyle: CSSProperties = {
+    ...glassCardStyle,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      borderColor: 'rgba(255, 255, 255, 0.12)',
+      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+      color: '#f5f5f7',
+    } : {}),
+    display: 'flex',
+    flex: 1,
+  };
+
+  const dynamicItemStyle: CSSProperties = {
+    ...listItemStyle,
+    ...(darkMode ? {
+      background: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
+  const badgeBg = darkMode ? 'rgba(0, 122, 255, 0.2)' : '#eaf2ff';
+  const badgeColor = darkMode ? '#64d2ff' : '#3477ce';
+
   return (
     <section className="row" style={{ flex: '0 0 auto' }} aria-label="Agenda y próximas audiencias">
       <div className="col-100 medium-50 margin-bottom-half" style={{ display: 'flex' }}>
-        <Card className="elevation-2 margin-horizontal-none" style={{ ...glassCardStyle, display: 'flex', flex: 1 }}>
+        <Card className="elevation-2 margin-horizontal-none" style={dynamicCardStyle}>
           <CardContent style={{ padding: '15px', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <div style={panelHeaderStyle}>
-              <h2 style={panelTitleStyle}>Audiencias de hoy</h2>
+              <h2 style={{ ...panelTitleStyle, color: darkMode ? '#f5f5f7' : 'inherit' }}>Audiencias de hoy</h2>
               <Badge
                 style={{
-                  background: '#eaf2ff',
-                  color: '#3477ce',
+                  background: badgeBg,
+                  color: badgeColor,
                   fontSize: '12px',
                   fontWeight: 700,
                   padding: '0 8px',
@@ -94,13 +121,14 @@ export function DashboardSchedule({
                     key={hearing.id}
                     link="#"
                     onClick={() => openClient(hearing.clientId)}
-                    style={listItemStyle}
+                    style={dynamicItemStyle}
+                    className="dashboard-schedule-item"
                   >
                     <div
                       slot="media"
                       style={{
-                        color: '#3378d0',
-                        background: '#edf4ff',
+                        color: darkMode ? '#64d2ff' : '#3378d0',
+                        background: darkMode ? 'rgba(0, 122, 255, 0.2)' : '#edf4ff',
                         fontSize: '11px',
                         fontWeight: 700,
                         padding: '6px 8px',
@@ -110,8 +138,8 @@ export function DashboardSchedule({
                     >
                       {hearing.timeStr}
                     </div>
-                    <div slot="title" style={{ fontWeight: 600, color: 'inherit' }}>{hearing.clientName}</div>
-                    <div slot="text" style={{ fontSize: '12px', color: '#758093' }}>{hearing.materia}</div>
+                    <div slot="title" style={{ fontWeight: 600, color: darkMode ? '#f5f5f7' : 'inherit' }}>{hearing.clientName}</div>
+                    <div slot="text" style={{ fontSize: '12px', color: darkMode ? '#a1a1a6' : '#758093' }}>{hearing.materia}</div>
                   </ListItem>
                 ))}
               </List>
@@ -147,6 +175,7 @@ export function DashboardSchedule({
                     link="#"
                     onClick={() => openClient(hearing.clientId)}
                     style={listItemStyle}
+                    className="dashboard-schedule-item"
                   >
                     <div
                       slot="media"
