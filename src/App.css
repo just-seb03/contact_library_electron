@@ -128,5 +128,108 @@ body {
   background: rgba(0, 0, 0, 0.28);
 }
 
+/* ========================================================
+   MODO OSCURO COMPLETO (Midnight Liquid Theme)
+   ======================================================== */
+
+.dark,
+.dark body,
+.dark html,
+.dark #app,
+.dark .framework7-root,
+html.dark,
+body.dark {
+  background-color: #0e0f13 !important;
+  color: #f5f5f7 !important;
+}
+
+/* 1. Titlebar en modo oscuro */
+.dark .titlebar {
+  background-color: #16171d !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 2. Barra lateral (Sidebar / LeftBar) */
+.dark aside {
+  background: rgba(22, 23, 29, 0.55) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark aside button {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.dark aside button:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* 3. Tarjetas Cristalinas Generales (Cards y Contenedores Glass) */
+.dark .card {
+  background: rgba(22, 24, 30, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+  color: #f5f5f7 !important;
+}
+
+/* 4. Textos y títulos */
+.dark .block-title,
+.dark h1,
+.dark h2,
+.dark h3 {
+  color: #f5f5f7 !important;
+}
+
+/* 5. Vista de Pagos: Tabla y Estadísticas */
+.dark .data-table {
+  background: rgba(22, 24, 30, 0.65) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.dark .data-table table thead th {
+  color: rgba(255, 255, 255, 0.5) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .data-table table tbody td {
+  color: #f5f5f7 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .data-table table tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 6. Vista de Calendario */
+.dark .calendar-grid {
+  background: rgba(22, 24, 30, 0.65) !important;
+}
+
+/* Celdas de días del calendario en modo oscuro */
+.dark [style*="minHeight: '70px'"],
+.dark [style*="min-height: 70px"],
+.dark [style*="rgba(255, 255, 255, 0.42)"] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f5f5f7 !important;
+}
+
+/* Tarjetas interiores de expediente y cobro */
+.dark [style*="rgba(255, 255, 255, 0.55)"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f7 !important;
+}
+
+/* Scrollbar en modo oscuro */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.32) !important;
+}
+
 
 

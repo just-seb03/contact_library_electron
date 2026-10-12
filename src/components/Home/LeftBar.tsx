@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import { f7 } from 'framework7-react';
+import { useEffect, type CSSProperties } from 'react';
+import { f7, f7ready } from 'framework7-react';
 import { useApp } from '../../context/AppContext';
 import type { AppTab } from '../../context/types';
 import 'framework7-icons/css/framework7-icons.css';
@@ -15,7 +15,6 @@ const tabMap: Record<AppTab, string> = {
   calendar: '#view-calendar',
   cliente: '#view-cliente',
   pagos: '#view-pagos',
-  sumario: '#view-summary',
   config: '#view-settings',
 };
 
@@ -23,13 +22,28 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
   const { activeTab: appActiveTab, setActiveTab } = useApp();
   const selected = activeTab ?? appActiveTab ?? defaultTab;
 
+  useEffect(() => {
+    f7ready(() => {
+      const tabId = tabMap[selected];
+      if (tabId && f7) {
+        f7.tab.show(tabId, false);
+        const view = f7.views?.get(tabId) ?? f7.view?.get(tabId);
+        if (view && view.router && (!view.router.currentRoute || view.router.history.length === 0)) {
+          const routeUrl = view.params?.url || (selected === 'config' ? '/settings/' : undefined);
+          if (routeUrl) {
+            view.router.navigate(routeUrl, { animate: false });
+          }
+        }
+      }
+    });
+  }, [selected]);
+
   const navItems: { id: AppTab; label: string; icon: string }[] = [
     { id: 'inicio', label: 'Inicio', icon: 'house' },
     { id: 'calendar', label: 'Agenda', icon: 'device_laptop' },
     { id: 'cliente', label: 'Cliente', icon: 'person_3' },
     { id: 'pagos', label: 'Pagos', icon: 'creditcard' },
-    { id: 'sumario', label: 'Sumario', icon: 'rectangle_3_offgrid' },
-    { id: 'config', label: 'Ajustes', icon: 'hammer_fill' },
+    { id: 'config', label: 'Ajustes', icon: 'gear_alt_fill' },
   ];
 
   const handleSelect = (id: AppTab) => {
@@ -40,6 +54,13 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
     if (tabId && f7) {
       // 💡 Se pasa `true` como segundo parámetro para forzar la animación
       f7.tab.show(tabId, true);
+      const view = f7.views?.get(tabId) ?? f7.view?.get(tabId);
+      if (view && view.router && (!view.router.currentRoute || view.router.history.length === 0)) {
+        const routeUrl = view.params?.url || (id === 'config' ? '/settings/' : undefined);
+        if (routeUrl) {
+          view.router.navigate(routeUrl);
+        }
+      }
     }
   };
 

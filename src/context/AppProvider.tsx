@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { Client, ClientPaymentInfo } from '../components/Cliente/types';
 import { Payment } from '../components/Pagos/types';
@@ -42,6 +42,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
   const [selectedClientId, setSelectedClientId] = useState<number>(MOCK_CLIENTS[0]?.id ?? 1);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('contact_library_dark_mode') === 'true';
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('contact_library_dark_mode', String(darkMode));
+    } catch {
+      // fallback
+    }
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   // Cliente actualmente seleccionado
   const selectedClient = useMemo(() => {
@@ -127,6 +147,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updatePaymentStatus,
     updateClientPayment,
     addClient,
+    darkMode,
+    setDarkMode,
+    toggleDarkMode,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -15,7 +15,7 @@ export interface HearingEvent {
   timeStr: string;
 }
 
-export type AppTab = 'inicio' | 'calendar' | 'cliente' | 'pagos' | 'sumario' | 'config';
+export type AppTab = 'inicio' | 'calendar' | 'cliente' | 'pagos' | 'config';
 
 export interface AppContextType {
   clients: Client[];
@@ -30,4 +30,7 @@ export interface AppContextType {
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
+  darkMode: boolean;
+  setDarkMode: (value: boolean) => void;
+  toggleDarkMode: () => void;
 }

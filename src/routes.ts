@@ -1,6 +1,5 @@
 import HomePage from './pages/Home';
 import Calendar from './pages/Calendar';
-import Summary from './pages/Summary';
 import Configuration from './pages/Configuration';
 import Dashboard from './pages/Dashboard';
 import Cliente from './pages/Cliente';
@@ -26,10 +25,6 @@ const routes = [
   {
     path: '/pagos/',
     component: Pagos,
-  },
-  {
-    path: '/summary/',
-    component: Summary,
   },
   {
     path: '/settings/',
