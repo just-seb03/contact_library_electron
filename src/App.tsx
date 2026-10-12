@@ -17,6 +17,8 @@ declare global {
 interface CustomCSSProperties extends React.CSSProperties {
   '--f7-theme-color'?: string;
   '--f7-safe-area-top'?: string;
+  '--f7-card-box-shadow'?: string;
+  '--f7-card-outline-border-color'?: string;
   WebkitAppRegion?: 'drag' | 'no-drag';
 }
 
@@ -44,6 +46,8 @@ function MainApp() {
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     '--f7-theme-color': '#007aff',
     '--f7-safe-area-top': '38px',
+    '--f7-card-box-shadow': 'none',
+    '--f7-card-outline-border-color': 'transparent',
   };
 
   const titlebarStyle: CustomCSSProperties = {

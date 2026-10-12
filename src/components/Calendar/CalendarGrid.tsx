@@ -32,7 +32,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
     ...styles.glassCard,
     ...(darkMode ? {
       background: 'rgba(22, 24, 30, 0.65)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
+      border: 'none',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
       color: '#f5f5f7',
     } : {}),
@@ -42,7 +42,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
     ...styles.gridContainer,
     ...(darkMode ? {
       backgroundColor: 'rgba(0, 0, 0, 0.22)',
-      borderColor: 'rgba(255, 255, 255, 0.08)',
+      border: 'none',
     } : {}),
   };
 
@@ -50,7 +50,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
     ...styles.headerDay,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
       color: '#8e8e93',
     } : {}),
   };
@@ -59,7 +59,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
     ...styles.emptyCell,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.02)',
-      borderColor: 'rgba(255, 255, 255, 0.06)',
+      border: 'none',
     } : {}),
   };
 
@@ -67,16 +67,16 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
     ...styles.dayCell,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
       color: '#f5f5f7',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+      boxShadow: 'none',
     } : {}),
   };
 
   return (
     <Card 
       outline={false}
-      className="no-border margin-horizontal-none margin-bottom elevation-2"
+      className="no-border margin-horizontal-none margin-bottom"
       style={glassCardStyle}
     >
       <CardContent padding={false} style={{ padding: '12px' }}>

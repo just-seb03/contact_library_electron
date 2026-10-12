@@ -67,8 +67,8 @@ export function DashboardSchedule({
     ...glassCardStyle,
     ...(darkMode ? {
       background: 'rgba(22, 24, 30, 0.65)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)',
+      border: 'none',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
       color: '#f5f5f7',
     } : {}),
     display: 'flex',
@@ -79,7 +79,8 @@ export function DashboardSchedule({
     ...listItemStyle,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.08)',
+      border: 'none',
+      boxShadow: 'none',
       color: '#f5f5f7',
     } : {}),
   };
@@ -90,7 +91,7 @@ export function DashboardSchedule({
   return (
     <section className="row" style={{ flex: '0 0 auto' }} aria-label="Agenda y próximas audiencias">
       <div className="col-100 medium-50 margin-bottom-half" style={{ display: 'flex' }}>
-        <Card className="elevation-2 margin-horizontal-none" style={dynamicCardStyle}>
+        <Card outline={false} className="no-border margin-horizontal-none" style={dynamicCardStyle}>
           <CardContent style={{ padding: '15px', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <div style={panelHeaderStyle}>
               <h2 style={{ ...panelTitleStyle, color: darkMode ? '#f5f5f7' : 'inherit' }}>Audiencias de hoy</h2>
@@ -149,7 +150,7 @@ export function DashboardSchedule({
       </div>
 
       <div className="col-100 medium-50 margin-bottom-half" style={{ display: 'flex' }}>
-        <Card className="elevation-2 margin-horizontal-none" style={{ ...glassCardStyle, display: 'flex', flex: 1 }}>
+        <Card outline={false} className="no-border margin-horizontal-none" style={dynamicCardStyle}>
           <CardContent style={{ padding: '15px', display: 'flex', flexDirection: 'column', width: '100%' }}>
             <div style={panelHeaderStyle}>
               <h2 style={panelTitleStyle}>Próximas audiencias</h2>

@@ -16,7 +16,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
     ...styles.cardContainer,
     ...(darkMode ? {
       background: 'rgba(22, 24, 30, 0.65)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
+      border: 'none',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
       color: '#f5f5f7',
     } : {}),
@@ -26,7 +26,8 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
     ...styles.infoGlassCard,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
+      boxShadow: 'none',
       color: '#f5f5f7',
     } : {}),
   };
@@ -35,7 +36,8 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
     ...styles.paymentCard,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
+      boxShadow: 'none',
       color: '#f5f5f7',
     } : {}),
   };
@@ -44,7 +46,8 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
     ...styles.hearingCard,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
+      boxShadow: 'none',
       color: '#f5f5f7',
     } : {}),
   };
@@ -52,7 +55,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
   return (
     <Card 
       outline={false}
-      className="no-border margin-horizontal-none margin-bottom-none elevation-2"
+      className="no-border margin-horizontal-none margin-bottom-none"
       style={cardContainerStyle}
     >
       <CardContent style={styles.cardContent}>

@@ -15,8 +15,11 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
     background: darkMode ? 'rgba(22, 24, 30, 0.65)' : 'rgba(255, 255, 255, 0.45)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.6)',
+    border: darkMode ? 'none' : '1px solid rgba(255, 255, 255, 0.6)',
     borderRadius: '18px',
+    boxShadow: darkMode
+      ? '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)'
+      : '0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
     overflowX: 'auto', 
     width: '100%',
     color: darkMode ? '#f5f5f7' : 'inherit',
@@ -29,7 +32,7 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
   };
 
   return (
-    <div className="data-table elevation-2 margin-bottom" style={tableWrapperStyle}>
+    <div className="data-table margin-bottom" style={tableWrapperStyle}>
       <table>
         <thead>
           <tr>

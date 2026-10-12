@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { Card, CardContent } from 'framework7-react';
 import { useApp } from '../../context/AppContext';
 import { formatCLP } from '../../utils/format';
 
@@ -15,9 +16,13 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
     background: darkMode ? 'rgba(22, 24, 30, 0.65)' : 'rgba(255, 255, 255, 0.45)',
     backdropFilter: 'blur(20px) saturate(180%)',
     WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.6)',
+    border: darkMode ? 'none' : '1px solid rgba(255, 255, 255, 0.6)',
     borderRadius: '18px',
+    boxShadow: darkMode
+      ? '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)'
+      : '0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
     color: darkMode ? '#f5f5f7' : 'inherit',
+    margin: 0,
   };
 
   return (
@@ -32,8 +37,8 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
       }}
     >
       <div style={{ minWidth: 0 }}>
-        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
-          <div className="card-content card-content-padding">
+        <Card outline={false} className="no-border margin-horizontal-none" style={glassStyle}>
+          <CardContent style={{ padding: '16px' }}>
             <div
               className="text-color-gray text-uppercase font-weight-600"
               style={{ fontSize: 'clamp(10px, 1.1vw, 12px)', overflowWrap: 'anywhere' }}
@@ -46,13 +51,13 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
             >
               {clientsCount}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div style={{ minWidth: 0 }}>
-        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
-          <div className="card-content card-content-padding">
+        <Card outline={false} className="no-border margin-horizontal-none" style={glassStyle}>
+          <CardContent style={{ padding: '16px' }}>
             <div
               className="text-color-gray text-uppercase font-weight-600"
               style={{ fontSize: 'clamp(10px, 1.1vw, 12px)', overflowWrap: 'anywhere' }}
@@ -65,13 +70,13 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
             >
               {todayHearingsCount}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div style={{ minWidth: 0 }}>
-        <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
-          <div className="card-content card-content-padding">
+        <Card outline={false} className="no-border margin-horizontal-none" style={glassStyle}>
+          <CardContent style={{ padding: '16px' }}>
             <div
               className="text-color-gray text-uppercase font-weight-600"
               style={{ fontSize: 'clamp(10px, 1.1vw, 12px)', overflowWrap: 'anywhere' }}
@@ -84,8 +89,8 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
             >
               {formatCLP(amountToReview)}
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </section>
   );

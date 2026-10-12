@@ -29,7 +29,7 @@ export const ClientList: FC<ClientListProps> = ({
     ...styles.cardContainer,
     ...(darkMode ? {
       background: 'rgba(22, 24, 30, 0.65)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
+      border: 'none',
       boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
       color: '#f5f5f7',
     } : {}),
@@ -39,7 +39,7 @@ export const ClientList: FC<ClientListProps> = ({
     ...styles.toolBtn,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.08)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
+      border: 'none',
     } : {}),
   };
 
@@ -47,7 +47,7 @@ export const ClientList: FC<ClientListProps> = ({
     ...styles.searchbar,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.08)',
-      borderColor: 'rgba(255, 255, 255, 0.12)',
+      border: 'none',
       boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05)',
     } : {}),
   };
@@ -55,7 +55,7 @@ export const ClientList: FC<ClientListProps> = ({
   return (
     <Card 
       outline={false}
-      className="no-border margin-horizontal-none margin-vertical-none elevation-2"
+      className="no-border margin-horizontal-none margin-vertical-none"
       style={cardStyle}
     >
       {/* Encabezado del Directorio */}

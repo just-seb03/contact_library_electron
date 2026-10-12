@@ -11,13 +11,14 @@ export function DashboardHero({ todayHearingsCount, paymentsToReviewCount }: Das
 
   return (
     <Card
-      className="elevation-2 margin-horizontal-none"
+      outline={false}
+      className="no-border margin-horizontal-none"
       style={{
         margin: '0 0 12px',
-        border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(255, 255, 255, 0.6)',
+        border: darkMode ? 'none' : '1px solid rgba(255, 255, 255, 0.6)',
         borderRadius: '18px',
         background: darkMode ? 'rgba(22, 24, 30, 0.65)' : 'rgba(255, 255, 255, 0.45)',
-        boxShadow: darkMode ? '0 8px 24px rgba(0, 0, 0, 0.4)' : '0 8px 24px rgba(35, 45, 65, 0.045)',
+        boxShadow: darkMode ? '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)' : '0 8px 24px rgba(35, 45, 65, 0.045)',
         backdropFilter: 'blur(20px) saturate(180%)',
         WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         flexShrink: 0,

@@ -14,6 +14,16 @@ import { useApp } from '../context/AppContext';
 export default function Configuration() {
   const { darkMode, toggleDarkMode } = useApp();
 
+  const glassCardStyle: CSSProperties = {
+    ...styles.glassCard,
+    ...(darkMode ? {
+      background: 'rgba(22, 24, 30, 0.65)',
+      border: 'none',
+      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)',
+      color: '#f5f5f7',
+    } : {}),
+  };
+
   return (
     <Page className="liquid-page" pageContent={false} style={{ background: 'transparent' }}>
       <div style={styles.scrollWrapper}>
@@ -37,8 +47,8 @@ export default function Configuration() {
           </BlockTitle>
           <Card 
             outline={false}
-            className="no-border margin-horizontal-none elevation-2"
-            style={styles.glassCard}
+            className="no-border margin-horizontal-none"
+            style={glassCardStyle}
           >
             <List mediaList className="no-hairlines no-hairlines-between" style={styles.listTransparent}>
               {/* Opción Principal: Modo Oscuro */}
@@ -66,8 +76,8 @@ export default function Configuration() {
           </BlockTitle>
           <Card 
             outline={false}
-            className="no-border margin-horizontal-none elevation-2"
-            style={styles.glassCard}
+            className="no-border margin-horizontal-none"
+            style={glassCardStyle}
           >
             <List mediaList className="no-hairlines no-hairlines-between" style={styles.listTransparent}>
               <ListItem
@@ -102,8 +112,8 @@ export default function Configuration() {
           </BlockTitle>
           <Card 
             outline={false}
-            className="no-border margin-horizontal-none elevation-2"
-            style={styles.glassCard}
+            className="no-border margin-horizontal-none"
+            style={glassCardStyle}
           >
             <List mediaList className="no-hairlines no-hairlines-between" style={styles.listTransparent}>
               <ListItem

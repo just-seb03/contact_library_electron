@@ -23,7 +23,7 @@ export const ClientListItem: FC<ClientListItemProps> = ({
     ...styles.baseItem,
     ...(darkMode ? {
       background: 'rgba(255, 255, 255, 0.06)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
+      border: 'none',
       color: '#f5f5f7',
     } : {}),
   };
