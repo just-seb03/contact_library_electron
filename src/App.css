@@ -106,3 +106,5 @@ body {
 .titlebar-button.minimize { background-color: #febc2e; }
 .titlebar-button.maximize { background-color: #28c840; }
 .titlebar-button:hover { filter: brightness(0.9); }
+
+
