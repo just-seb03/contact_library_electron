@@ -1,5 +1,5 @@
 import type { CSSProperties, FC } from 'react';
-import { Icon, Button } from 'framework7-react';
+import { Icon } from 'framework7-react';
 import { Client } from './types';
 
 interface ClientBannerProps {
@@ -42,29 +42,11 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
         </div>
       </div>
 
-      {/* Acciones rápidas y ID */}
+      {/* ID del cliente */}
       <div style={styles.actionsWrapper}>
         <span style={styles.idBadge}>
           ID #{client.id}
         </span>
-        <Button 
-          round 
-          small 
-          className="display-flex align-items-center justify-content-center"
-          style={styles.actionButton}
-          tooltip="Llamar"
-        >
-          <Icon f7="phone" size="16px" color="white" />
-        </Button>
-        <Button 
-          round 
-          small 
-          className="display-flex align-items-center justify-content-center"
-          style={styles.actionButton}
-          tooltip="Enviar Correo"
-        >
-          <Icon f7="envelope" size="16px" color="white" />
-        </Button>
       </div>
     </div>
   );
@@ -97,6 +79,7 @@ const getStatusLabel = (status: string) => {
 
 const styles: Record<string, CSSProperties> = {
   bannerContainer: {
+    flexShrink: 0,
     background: 'linear-gradient(135deg, rgba(0, 114, 235, 0.9) 0%, rgba(0, 75, 195, 0.96) 100%)',
     color: '#fff',
     padding: '20px 24px',
@@ -166,17 +149,5 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     letterSpacing: '0.3px',
     border: '1px solid rgba(255, 255, 255, 0.25)',
-  },
-  actionButton: {
-    width: '36px',
-    height: '36px',
-    minWidth: '36px',
-    padding: 0,
-    borderRadius: '12px',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    border: '1px solid rgba(255, 255, 255, 0.35)',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.06)',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
   },
 };

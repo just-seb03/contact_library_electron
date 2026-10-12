@@ -9,7 +9,7 @@ interface ClientDetailsProps {
 
 export const ClientDetails: FC<ClientDetailsProps> = ({ client }) => {
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0 }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '16px', minWidth: 0, minHeight: 0 }}>
       {/* Cabecera cristalina con Nombre, Estado y Contacto */}
       <ClientBanner client={client} />
 

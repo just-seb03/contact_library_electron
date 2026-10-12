@@ -59,5 +59,6 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
+    minHeight: 0,
   },
 };

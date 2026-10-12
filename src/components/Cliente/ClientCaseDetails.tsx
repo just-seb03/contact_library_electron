@@ -2,7 +2,6 @@ import type { CSSProperties, FC } from 'react';
 import { Card, CardContent, Icon, Button, BlockTitle } from 'framework7-react';
 import { Client } from './types';
 import { formatCLP } from '../../utils/format';
-import { useApp } from '../../context/AppContext';
 
 interface ClientCaseDetailsProps {
   client: Client;
@@ -10,7 +9,6 @@ interface ClientCaseDetailsProps {
 
 export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
   const { caso, pago } = client;
-  const { updatePaymentStatus } = useApp();
 
   return (
     <Card 
@@ -40,13 +38,13 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
             </div>
 
             {/* Grid de Tarjetas de Información del Caso */}
-            <div className="row margin-top-half" style={{ gap: '12px' }}>
-              <div className="col-100 medium-45" style={styles.infoGlassCard}>
+            <div style={styles.infoCardsGrid}>
+              <div style={styles.infoGlassCard}>
                 <div style={styles.label}>N° de Expediente</div>
                 <div style={styles.value}>{caso.expediente}</div>
               </div>
 
-              <div className="col-100 medium-50" style={styles.infoGlassCard}>
+              <div style={styles.infoGlassCard}>
                 <div style={styles.label}>Materia Principal</div>
                 <div style={styles.value}>{caso.materia}</div>
               </div>
@@ -67,12 +65,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
                 <div>
                   <span 
                     className={`badge ${pago.estado === 'completed' ? 'color-green' : pago.estado === 'pending' ? 'color-orange' : 'color-red'}`}
-                    onClick={() => {
-                      const next = pago.estado === 'completed' ? 'pending' : pago.estado === 'pending' ? 'overdue' : 'completed';
-                      updatePaymentStatus(client.id, next);
-                    }}
-                    style={{ ...styles.paymentBadge, cursor: 'pointer', userSelect: 'none' }}
-                    title="Haz clic para alternar estado de pago"
+                    style={styles.paymentBadge}
                   >
                     {pago.estado === 'completed' ? 'Cobrado' : pago.estado === 'pending' ? 'Pendiente' : 'Vencido'}
                   </span>
@@ -96,15 +89,12 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
             {/* Barra de Acciones del Caso */}
             <div style={styles.actionsBar}>
               <Button fill round color="blue" className="elevation-1" style={styles.actionBtn}>
-                <Icon f7="plus_circle_fill" size="16px" className="margin-right-half" />
-                Nueva Actuación
+                <Icon f7="arrow_up_doc_fill" size="16px" className="margin-right-half" />
+                Subir archivo
               </Button>
               <Button outline round color="blue" style={styles.actionBtn}>
-                <Icon f7="doc_text_fill" size="16px" className="margin-right-half" />
-                Ver Expediente
-              </Button>
-              <Button round style={styles.ghostBtn}>
-                <Icon f7="ellipsis_vertical" size="16px" color="gray" />
+                <Icon f7="folder_fill" size="16px" className="margin-right-half" />
+                Ver archivos
               </Button>
             </div>
           </div>
@@ -134,6 +124,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
 const styles: Record<string, CSSProperties> = {
   cardContainer: {
     flex: 1,
+    minHeight: 0,
     display: 'flex',
     flexDirection: 'column',
     background: 'rgba(255, 255, 255, 0.45)',
@@ -147,14 +138,16 @@ const styles: Record<string, CSSProperties> = {
   cardContent: {
     padding: '24px',
     flex: 1,
+    minHeight: 0,
     display: 'flex',
     flexDirection: 'column',
+    overflowY: 'auto',
   },
   caseWrapper: {
     display: 'flex',
     flexDirection: 'column',
     gap: '14px',
-    height: '100%',
+    minHeight: '100%',
   },
   caseHeader: {
     display: 'flex',
@@ -187,13 +180,22 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 600,
     border: '1px solid rgba(0, 122, 255, 0.2)',
   },
+  infoCardsGrid: {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: '14px',
+    marginTop: '6px',
+    marginBottom: '2px',
+  },
   infoGlassCard: {
+    flex: '1 1 200px',
     background: 'rgba(255, 255, 255, 0.55)',
     backdropFilter: 'blur(10px)',
     WebkitBackdropFilter: 'blur(10px)',
     border: '1px solid rgba(255, 255, 255, 0.75)',
     borderRadius: '16px',
-    padding: '12px 16px',
+    padding: '14px 18px',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.02)',
   },
   label: {
@@ -279,26 +281,21 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     gap: '12px',
     alignItems: 'center',
-    paddingTop: '12px',
+    paddingTop: '16px',
+    paddingBottom: '4px',
+    flexShrink: 0,
   },
   actionBtn: {
     padding: '0 18px',
     fontSize: '13px',
     fontWeight: 600,
   },
-  ghostBtn: {
-    background: 'rgba(255, 255, 255, 0.5)',
-    border: '1px solid rgba(255, 255, 255, 0.7)',
-    minWidth: '36px',
-    height: '36px',
-    padding: 0,
-  },
   emptyContainer: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
+    minHeight: '100%',
     padding: '32px 16px',
     textAlign: 'center',
   },
