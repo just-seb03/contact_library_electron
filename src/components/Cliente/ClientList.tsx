@@ -133,7 +133,7 @@ const styles: Record<string, CSSProperties> = {
   titleText: {
     fontSize: '18px',
     fontWeight: 700,
-    color: '#1d1d1f',
+    color: 'inherit',
     letterSpacing: '-0.3px',
   },
   badge: {

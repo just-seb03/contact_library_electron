@@ -61,7 +61,7 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '32px',
     fontWeight: '700',
     margin: 0,
-    color: '#1d1d1f',
+    color: 'inherit',
     letterSpacing: '-0.5px',
   },
   glassButton: {

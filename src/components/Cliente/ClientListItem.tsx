@@ -43,6 +43,7 @@ export const ClientListItem: FC<ClientListItemProps> = ({
 
   return (
     <div
+      className="client-list-item"
       onClick={() => onSelect(client)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -65,7 +66,7 @@ export const ClientListItem: FC<ClientListItemProps> = ({
 
       {/* Datos del cliente */}
       <div style={styles.textContainer}>
-        <div style={{ ...styles.name, color: isSelected ? '#ffffff' : '#1d1d1f' }}>
+        <div style={{ ...styles.name, color: isSelected ? '#ffffff' : 'inherit' }}>
           {client.name}
         </div>
         <div style={{ ...styles.phone, color: isSelected ? 'rgba(255, 255, 255, 0.85)' : '#86868b' }}>

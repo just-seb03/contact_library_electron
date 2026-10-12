@@ -31,18 +31,21 @@ export const PaymentsFilterBar: FC<FilterBarProps> = ({ currentFilter, onFilterC
   return (
     <div className="display-flex flex-wrap margin-bottom" style={{ gap: '8px' }}>
       <button
+        className={`filter-tab-btn ${currentFilter === 'all' ? 'active' : ''}`}
         onClick={() => onFilterChange('all')}
         style={{ ...baseTabStyle, ...(currentFilter === 'all' ? activeTabStyle : {}) }}
       >
         Todos
       </button>
       <button
+        className={`filter-tab-btn ${currentFilter === 'completed' ? 'active' : ''}`}
         onClick={() => onFilterChange('completed')}
         style={{ ...baseTabStyle, ...(currentFilter === 'completed' ? activeTabStyle : {}) }}
       >
         Completados
       </button>
       <button
+        className={`filter-tab-btn ${currentFilter === 'pending' ? 'active' : ''}`}
         onClick={() => onFilterChange('pending')}
         style={{ ...baseTabStyle, ...(currentFilter === 'pending' ? activeTabStyle : {}) }}
       >

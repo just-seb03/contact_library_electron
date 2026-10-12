@@ -19,7 +19,7 @@ const tabMap: Record<AppTab, string> = {
 };
 
 export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
-  const { activeTab: appActiveTab, setActiveTab } = useApp();
+  const { activeTab: appActiveTab, setActiveTab, darkMode } = useApp();
   const selected = activeTab ?? appActiveTab ?? defaultTab;
 
   useEffect(() => {
@@ -69,13 +69,15 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
       <nav style={styles.navGroup}>
         {navItems.map((item) => {
           const isActive = selected === item.id;
+          const activeStyle = darkMode ? styles.activeButtonDark : styles.activeButtonLight;
           return (
             <button
               key={item.id}
+              className={`leftbar-button ${isActive ? 'active' : ''}`}
               onClick={() => handleSelect(item.id)}
               style={{
                 ...styles.button,
-                ...(isActive ? styles.activeButton : {}),
+                ...(isActive ? activeStyle : {}),
               }}
               title={item.label}
             >
@@ -138,10 +140,17 @@ const styles: Record<string, CSSProperties> = {
     WebkitAppearance: 'none',
     margin: 0,
   },
-  activeButton: {
+  activeButtonLight: {
     backgroundColor: '#ffffff',
     color: '#000000',
     boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    transform: 'scale(1.04)',
+  },
+  activeButtonDark: {
+    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+    color: '#ffffff',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
     transform: 'scale(1.04)',
   },
   icon: {

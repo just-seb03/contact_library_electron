@@ -24,7 +24,7 @@ export default function Cliente() {
           {selectedClient ? (
             <ClientDetails client={selectedClient} />
           ) : (
-            <div style={{ color: 'rgba(0,0,0,0.4)', padding: '24px' }}>
+            <div style={{ color: '#8e8e93', padding: '24px' }}>
               Selecciona un cliente para ver sus detalles
             </div>
           )}

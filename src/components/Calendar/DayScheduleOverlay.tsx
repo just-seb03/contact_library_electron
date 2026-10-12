@@ -95,13 +95,16 @@ export const DayScheduleOverlay = ({ date, monthIndex, month, year, onClose }: D
       />
       
       {/* Panel Deslizante */}
-      <div style={{
-        ...styles.panel, 
-        width: `${panelWidth}px`,
-        transform: isVisible ? 'translateX(0)' : 'translateX(-100%)',
-        // Evita transiciones de ancho mientras se arrastra
-        transition: isResizing.current ? 'none' : 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)'
-      }}>
+      <div 
+        className="day-schedule-panel"
+        style={{
+          ...styles.panel, 
+          width: `${panelWidth}px`,
+          transform: isVisible ? 'translateX(0)' : 'translateX(-100%)',
+          // Evita transiciones de ancho mientras se arrastra
+          transition: isResizing.current ? 'none' : 'transform 0.3s cubic-bezier(0.1, 0.7, 0.1, 1)'
+        }}
+      >
         <div style={styles.header}>
           <div>
             <h2 style={styles.title}>{date} de {month}</h2>
@@ -244,7 +247,7 @@ const styles: Record<string, React.CSSProperties> = {
     margin: 0,
     fontSize: '32px',
     fontWeight: '700',
-    color: '#1d1d1f',
+    color: 'inherit',
     letterSpacing: '-0.5px',
   },
   subtitle: {
@@ -311,13 +314,13 @@ const styles: Record<string, React.CSSProperties> = {
   },
   hearingTitle: {
     marginTop: '3px',
-    color: '#1d1d1f',
+    color: 'inherit',
     fontSize: '13px',
     fontWeight: 600,
   },
   hearingDetails: {
     marginTop: '2px',
-    color: '#555',
+    color: '#8e8e93',
     fontSize: '11px',
   },
 };

@@ -158,12 +158,12 @@ const styles: Record<string, CSSProperties> = {
   },
   sectionTitle: {
     fontSize: '18px',
-    color: '#1d1d1f',
+    color: 'inherit',
     letterSpacing: '-0.3px',
   },
   courtSubtitle: {
     fontSize: '13px',
-    color: '#666',
+    color: '#8e8e93',
     marginTop: '4px',
     fontWeight: 500,
   },
@@ -200,7 +200,7 @@ const styles: Record<string, CSSProperties> = {
   },
   label: {
     fontSize: '11px',
-    color: '#777',
+    color: '#8e8e93',
     textTransform: 'uppercase',
     fontWeight: 600,
     letterSpacing: '0.4px',
@@ -208,7 +208,7 @@ const styles: Record<string, CSSProperties> = {
   value: {
     fontSize: '15px',
     fontWeight: 700,
-    color: '#1d1d1f',
+    color: 'inherit',
     marginTop: '3px',
   },
   paymentCard: {
@@ -225,12 +225,12 @@ const styles: Record<string, CSSProperties> = {
   },
   paymentConcept: {
     fontSize: '14px',
-    color: '#424245',
+    color: 'inherit',
     fontWeight: 600,
     marginTop: '3px',
   },
   paymentAmount: {
-    color: '#1d1d1f',
+    color: 'inherit',
     fontWeight: 700,
   },
   paymentDate: {
@@ -273,7 +273,7 @@ const styles: Record<string, CSSProperties> = {
   hearingDate: {
     fontSize: '15px',
     fontWeight: 700,
-    color: '#1d1d1f',
+    color: 'inherit',
     marginTop: '2px',
   },
   actionsBar: {
@@ -315,12 +315,12 @@ const styles: Record<string, CSSProperties> = {
     margin: '0 0 8px 0',
     fontSize: '17px',
     fontWeight: 600,
-    color: '#1d1d1f',
+    color: 'inherit',
   },
   emptyText: {
     fontSize: '13px',
     margin: 0,
-    color: '#666',
+    color: '#8e8e93',
     maxWidth: '420px',
     lineHeight: '1.5',
   },

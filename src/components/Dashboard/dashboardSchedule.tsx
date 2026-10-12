@@ -32,7 +32,7 @@ const panelTitleStyle: CSSProperties = {
   fontSize: '15px',
   margin: 0,
   fontWeight: 700,
-  color: '#263246',
+  color: 'inherit',
 };
 
 const emptyStateStyle: CSSProperties = {
@@ -42,7 +42,7 @@ const emptyStateStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: '8px',
-  color: '#9aa3b1',
+  color: '#8e8e93',
   fontSize: '12px',
   textAlign: 'center',
   flex: 1,
@@ -50,9 +50,7 @@ const emptyStateStyle: CSSProperties = {
 
 const listStyle: CSSProperties = { margin: 0, flex: '1 0 auto', overflowY: 'visible' };
 const listItemStyle: CSSProperties = {
-  border: '1px solid #edf0f4',
   borderRadius: '13px',
-  background: 'rgba(255, 255, 255, 0.72)',
   marginBottom: '6px',
 };
 
@@ -112,7 +110,7 @@ export function DashboardSchedule({
                     >
                       {hearing.timeStr}
                     </div>
-                    <div slot="title" style={{ fontWeight: 600, color: '#1d2735' }}>{hearing.clientName}</div>
+                    <div slot="title" style={{ fontWeight: 600, color: 'inherit' }}>{hearing.clientName}</div>
                     <div slot="text" style={{ fontSize: '12px', color: '#758093' }}>{hearing.materia}</div>
                   </ListItem>
                 ))}
@@ -170,7 +168,7 @@ export function DashboardSchedule({
                         month: 'short',
                       })}
                     </div>
-                    <div slot="title" style={{ fontWeight: 600, color: '#1d2735' }}>{hearing.clientName}</div>
+                    <div slot="title" style={{ fontWeight: 600, color: 'inherit' }}>{hearing.clientName}</div>
                     <div slot="text" style={{ fontSize: '12px', color: '#758093' }}>
                       {hearing.timeStr} · {hearing.materia}
                     </div>

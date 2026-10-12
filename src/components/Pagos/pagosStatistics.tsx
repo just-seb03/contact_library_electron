@@ -56,7 +56,7 @@ export const PaymentsStats: FC<StatsProps> = ({
         <div className="card elevation-2 margin-horizontal-none" style={glassStyle}>
           <div className="card-content card-content-padding">
             <div className="text-color-gray text-uppercase font-weight-600" style={{ fontSize: '12px' }}>Total Transacciones</div>
-            <div className="font-weight-bold margin-vertical-half" style={{ fontSize: '28px', color: '#1d1d1f' }}>
+            <div className="font-weight-bold margin-vertical-half" style={{ fontSize: '28px', color: 'inherit' }}>
               {totalTransacciones}
             </div>
             <div className="text-color-gray" style={{ fontSize: '11px' }}>Registradas en agenda</div>

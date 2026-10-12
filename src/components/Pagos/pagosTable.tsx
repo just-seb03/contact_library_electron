@@ -39,12 +39,12 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
         <tbody>
           {payments.map((item) => (
             <tr key={item.id}>
-              <td className="label-cell font-weight-600" style={{ color: '#1d1d1f' }}>
+              <td className="label-cell font-weight-600" style={{ color: 'inherit' }}>
                 {item.client}
               </td>
               <td className="label-cell text-color-gray">{item.concept}</td>
               <td className="label-cell text-color-gray">{item.date}</td>
-              <td className="numeric-cell font-weight-600" style={{ color: '#1d1d1f' }}>
+              <td className="numeric-cell font-weight-600" style={{ color: 'inherit' }}>
                 {formatCLP(item.amount)}
               </td>
               <td className="label-cell">

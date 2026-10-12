@@ -38,7 +38,7 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
             </div>
             <div
               className="font-weight-bold margin-vertical-half"
-              style={{ fontSize: 'clamp(18px, 2.4vw, 28px)', color: '#1d1d1f' }}
+              style={{ fontSize: 'clamp(18px, 2.4vw, 28px)', color: 'inherit' }}
             >
               {clientsCount}
             </div>
@@ -57,7 +57,7 @@ export function DashboardStats({ clientsCount, todayHearingsCount, amountToRevie
             </div>
             <div
               className="font-weight-bold margin-vertical-half"
-              style={{ fontSize: 'clamp(18px, 2.4vw, 28px)', color: '#1d1d1f' }}
+              style={{ fontSize: 'clamp(18px, 2.4vw, 28px)', color: 'inherit' }}
             >
               {todayHearingsCount}
             </div>

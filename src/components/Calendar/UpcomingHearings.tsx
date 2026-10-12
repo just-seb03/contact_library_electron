@@ -29,8 +29,9 @@ export const UpcomingHearings: FC = () => {
                 text={`${h.expediente} · ${h.materia}`}
                 onClick={() => setSelectedClientId(h.clientId)}
                 style={styles.upcomingItem}
+                className="upcoming-hearing-item"
               >
-                <div slot="media" style={styles.upcomingIconWrapper}>
+                <div slot="media" style={styles.upcomingIconWrapper} className="upcoming-icon-box">
                   <Icon f7="calendar_badge_clock" size="22px" color="blue" />
                 </div>
               </ListItem>
@@ -46,7 +47,7 @@ const styles: Record<string, CSSProperties> = {
   title: {
     fontSize: '18px',
     margin: '0 0 16px 0',
-    color: '#1d1d1f',
+    color: 'inherit',
   },
   glassCard: {
     background: 'rgba(255, 255, 255, 0.45)',

@@ -38,7 +38,7 @@ export function DashboardHero({ todayHearingsCount, paymentsToReviewCount }: Das
           <Icon f7="sun_max_fill" />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <h2 style={{ fontSize: '16px', lineHeight: 1.3, margin: 0, fontWeight: 700, color: '#1d1d1f' }}>
+          <h2 style={{ fontSize: '16px', lineHeight: 1.3, margin: 0, fontWeight: 700, color: 'inherit' }}>
             {todayHearingsCount === 0
               ? 'Hoy no tienes audiencias programadas'
               : `Tienes ${todayHearingsCount} ${todayHearingsCount === 1 ? 'audiencia' : 'audiencias'} hoy`}

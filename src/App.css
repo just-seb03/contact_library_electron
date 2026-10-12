@@ -150,45 +150,304 @@ body.dark {
 }
 
 /* 2. Barra lateral (Sidebar / LeftBar) */
+aside .leftbar-button:hover {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+aside .leftbar-button.active {
+  background-color: #ffffff;
+  color: #000000;
+}
+
 .dark aside {
-  background: rgba(22, 23, 29, 0.55) !important;
+  background: rgba(22, 23, 29, 0.6) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
-.dark aside button {
+.dark aside button,
+.dark aside .leftbar-button {
   color: rgba(255, 255, 255, 0.6) !important;
+  background-color: transparent;
 }
 
-.dark aside button:hover {
+.dark aside button:hover,
+.dark aside .leftbar-button:hover {
   background-color: rgba(255, 255, 255, 0.08) !important;
   color: #ffffff !important;
 }
 
-/* 3. Tarjetas Cristalinas Generales (Cards y Contenedores Glass) */
-.dark .card {
+.dark aside button.active,
+.dark aside .leftbar-button.active {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark aside button.active:hover,
+.dark aside .leftbar-button.active:hover {
+  background-color: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+/* 3. Tarjetas Cristalinas y Contenedores Glass Generales */
+.dark .card,
+.dark .client-list-card {
   background: rgba(22, 24, 30, 0.65) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
   color: #f5f5f7 !important;
 }
 
-/* 4. Textos y títulos */
+/* 4. Textos, títulos y etiquetas */
 .dark .block-title,
 .dark h1,
 .dark h2,
-.dark h3 {
+.dark h3,
+.dark h4 {
   color: #f5f5f7 !important;
 }
 
-/* 5. Vista de Pagos: Tabla y Estadísticas */
+.dark .text-color-gray {
+  color: #a1a1a6 !important;
+}
+
+/* Reglas universales para textos oscuros inline que deben iluminarse en modo oscuro */
+.dark [style*="#1d1d1f"],
+.dark [style*="#1d2735"],
+.dark [style*="#263246"],
+.dark [style*="#2c3e50"],
+.dark [style*="#424245"] {
+  color: #f5f5f7 !important;
+}
+
+.dark [style*="#555"],
+.dark [style*="#666"],
+.dark [style*="#6e6e73"],
+.dark [style*="#777"],
+.dark [style*="#758093"] {
+  color: #a1a1a6 !important;
+}
+
+.dark [style*="#86868b"],
+.dark [style*="#9aa3b1"] {
+  color: #8e8e93 !important;
+}
+
+/* 5. Buscadores (Searchbar) en modo oscuro */
+.dark .searchbar {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark .searchbar input[type="search"],
+.dark .searchbar input {
+  color: #f5f5f7 !important;
+  background: transparent !important;
+}
+
+.dark .searchbar input::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+.dark .searchbar .searchbar-icon {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.dark .searchbar .searchbar-clear {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 6. Vista de Directorio de Clientes */
+.dark .client-list-item:not([style*="linear-gradient"]) {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f7 !important;
+}
+
+.dark .client-list-item:not([style*="linear-gradient"]):hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+/* Botones de herramientas del encabezado de clientes */
+.dark [style*="minWidth: '30px'"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Tarjetas interiores de expediente, cobros y audiencias en clientes */
+.dark [style*="rgba(255, 255, 255, 0.55)"],
+.dark [style*="rgba(255, 255, 255, 0.6)"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f5f5f7 !important;
+}
+
+.dark [style*="rgba(255, 255, 255, 0.85)"] {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: #f5f5f7 !important;
+}
+
+/* 7. Vista de Calendario y Agenda (Estilo exacto de las tarjetas de Clientes) */
+.dark .calendar-grid-container {
+  background-color: rgba(0, 0, 0, 0.22) !important;
+  background: rgba(0, 0, 0, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Encabezados de días (DOM, LUN, etc.) */
+.dark .calendar-header-day {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #8e8e93 !important;
+  border-radius: 12px !important;
+}
+
+/* Celdas de días del calendario */
+.dark .calendar-day-cell:not(.current-day) {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 14px !important;
+  color: #f5f5f7 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .calendar-day-cell:not(.current-day):hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+}
+
+/* Día actual en calendario */
+.dark .calendar-day-cell.current-day {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.9) 0%, rgba(0, 90, 220, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 6px 18px rgba(0, 122, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+/* Celdas vacías */
+.dark .calendar-empty-cell {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.06) !important;
+  border-radius: 14px !important;
+}
+
+/* Cuadros de Próximas Audiencias (Idénticos a las tarjetas de expedientes de Clientes) */
+.dark .upcoming-hearing-item {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  color: #f5f5f7 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark .upcoming-hearing-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.dark .upcoming-hearing-item .item-title {
+  color: #f5f5f7 !important;
+  font-weight: 700 !important;
+}
+
+.dark .upcoming-hearing-item .item-subtitle,
+.dark .upcoming-hearing-item .item-text {
+  color: #8e8e93 !important;
+}
+
+/* Caja de icono de Próximas Audiencias */
+.dark .upcoming-icon-box {
+  background: rgba(0, 122, 255, 0.15) !important;
+  border: 1px solid rgba(0, 122, 255, 0.25) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15) !important;
+}
+
+/* Cuadro de Eventos del Día en DayDetailsCard ("Sin eventos programados") */
+.dark .day-details-event-item {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  color: #f5f5f7 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dark .day-details-event-item .item-title {
+  color: #f5f5f7 !important;
+  font-weight: 700 !important;
+}
+
+.dark .day-details-event-item .item-subtitle {
+  color: #8e8e93 !important;
+}
+
+/* Insignia de fecha del día */
+.dark .day-details-date-badge {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  color: #f5f5f7 !important;
+}
+
+.dark .day-details-date-badge [style*="badgeMonth"],
+.dark [style*="textTransform: 'uppercase'"][style*="fontSize: '13px'"] {
+  color: #8e8e93 !important;
+}
+
+/* Divisor interior de DayDetailsCard */
+.dark [style*="borderLeft: '1px solid rgba(0, 0, 0, 0.07)'"],
+.dark [style*="border-left: 1px solid rgba(0, 0, 0, 0.07)"] {
+  border-left-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Botón de cambio de mes en el encabezado de agenda */
+.dark [style*="marginLeft: '12px'"][style*="cursor: 'pointer'"],
+.dark [style*="margin-left: 12px"][style*="cursor: pointer"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #f5f5f7 !important;
+}
+
+/* Panel Deslizante de la Agenda Diaria (DayScheduleOverlay) */
+.dark .day-schedule-panel {
+  background-color: rgba(18, 20, 26, 0.94) !important;
+  border-right-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 10px 0 40px rgba(0, 0, 0, 0.6) !important;
+  color: #f5f5f7 !important;
+}
+
+.dark .day-schedule-panel > div:first-child {
+  background-color: rgba(24, 26, 34, 0.75) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark [style*="borderTop: '1px solid rgba(0, 0, 0, 0.06)'"] {
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark [style*="borderTop: '1px dashed rgba(0, 0, 0, 0.04)'"] {
+  border-top-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 8. Vista de Pagos: Tabla, Filtros y Estadísticas */
 .dark .data-table {
   background: rgba(22, 24, 30, 0.65) !important;
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .dark .data-table table thead th {
-  color: rgba(255, 255, 255, 0.5) !important;
+  color: rgba(255, 255, 255, 0.55) !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
@@ -198,31 +457,65 @@ body.dark {
 }
 
 .dark .data-table table tbody tr:hover td {
-  background: rgba(255, 255, 255, 0.04) !important;
-}
-
-/* 6. Vista de Calendario */
-.dark .calendar-grid {
-  background: rgba(22, 24, 30, 0.65) !important;
-}
-
-/* Celdas de días del calendario en modo oscuro */
-.dark [style*="minHeight: '70px'"],
-.dark [style*="min-height: 70px"],
-.dark [style*="rgba(255, 255, 255, 0.42)"] {
   background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
-  color: #f5f5f7 !important;
 }
 
-/* Tarjetas interiores de expediente y cobro */
-.dark [style*="rgba(255, 255, 255, 0.55)"] {
+/* Pestañas de filtrado de pagos */
+.dark .filter-tab-btn {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #a1a1a6 !important;
+}
+
+.dark .filter-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #ffffff !important;
+}
+
+.dark .filter-tab-btn.active {
+  background: #007aff !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35) !important;
+}
+
+/* 9. Elementos de Inicio (Dashboard) */
+.dark .list.media-list .item-content,
+.dark [style*="marginBottom: '6px'"] {
   background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark [style*="marginBottom: '6px'"]:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Cajas de iconos azul pastel en modo oscuro */
+.dark [style*="#e9f2ff"],
+.dark [style*="#edf4ff"],
+.dark [style*="#eaf2ff"] {
+  background: rgba(0, 122, 255, 0.2) !important;
+  color: #64d2ff !important;
+}
+
+/* 10. Listas de Framework7 en modo oscuro */
+.dark .list .item-title {
   color: #f5f5f7 !important;
 }
 
-/* Scrollbar en modo oscuro */
+.dark .list .item-subtitle,
+.dark .list .item-text {
+  color: #a1a1a6 !important;
+}
+
+.dark .list .item-after {
+  color: #8e8e93 !important;
+}
+
+.dark .list .item-inner::after,
+.dark .list .item-inner::before {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* 11. Scrollbar en modo oscuro */
 .dark ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.18) !important;
 }
@@ -230,6 +523,7 @@ body.dark {
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.32) !important;
 }
+
 
 
 

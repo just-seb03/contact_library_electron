@@ -18,7 +18,7 @@ export const DayDetailsCard: FC<DayDetailsCardProps> = ({ month, day }) => {
       style={styles.glassCard}
     >
       <CardContent className="display-flex align-items-center" style={{ padding: '18px 24px' }}>
-        <div style={styles.dateBadge}>
+        <div style={styles.dateBadge} className="day-details-date-badge">
           <div style={styles.badgeMonth}>
             {month}
           </div>
@@ -37,6 +37,7 @@ export const DayDetailsCard: FC<DayDetailsCardProps> = ({ month, day }) => {
                   text={`${h.expediente} · ${h.materia}`}
                   onClick={() => setSelectedClientId(h.clientId)}
                   style={{ ...styles.emptyEventItem, cursor: 'pointer' }}
+                  className="day-details-event-item"
                 >
                   <Icon slot="media" f7="calendar_badge_plus" size="30px" color="blue" />
                 </ListItem>
@@ -46,6 +47,7 @@ export const DayDetailsCard: FC<DayDetailsCardProps> = ({ month, day }) => {
                 title="Sin eventos programados"
                 subtitle="Espacio reservado para detalles de audiencia / caso"
                 style={styles.emptyEventItem}
+                className="day-details-event-item"
               >
                 <Icon slot="media" f7="calendar_badge_minus" size="30px" color="gray" />
               </ListItem>
@@ -80,7 +82,7 @@ const styles: Record<string, CSSProperties> = {
   },
   badgeMonth: {
     fontSize: '13px',
-    color: '#666',
+    color: '#8e8e93',
     textTransform: 'uppercase',
     fontWeight: '600',
     letterSpacing: '0.5px',
@@ -89,7 +91,7 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '38px',
     fontWeight: 'bold',
     lineHeight: '1.1',
-    color: '#1d1d1f',
+    color: 'inherit',
   },
   listContainer: {
     flex: 1,

@@ -35,13 +35,13 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
       style={styles.glassCard}
     >
       <CardContent padding={false} style={{ padding: '12px' }}>
-        <div style={styles.gridContainer}>
+        <div style={styles.gridContainer} className="calendar-grid-container">
           {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
-            <div key={d} style={styles.headerDay}>{d}</div>
+            <div key={d} style={styles.headerDay} className="calendar-header-day">{d}</div>
           ))}
 
           {emptyBefore.map(i => (
-            <div key={`eb-${i}`} style={styles.emptyCell}></div>
+            <div key={`eb-${i}`} style={styles.emptyCell} className="calendar-empty-cell"></div>
           ))}
 
           {days.map(d => {
@@ -82,6 +82,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
             return (
               <div 
                 key={d} 
+                className={`calendar-day-cell ${isCurrent ? 'current-day' : ''}`}
                 onClick={() => onSelectDay(d)}
                 onMouseEnter={() => setHoveredDay(d)}
                 onMouseLeave={() => setHoveredDay(null)}
@@ -106,7 +107,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
           })}
 
           {emptyAfter.map(i => (
-            <div key={`ea-${i}`} style={styles.emptyCell}></div>
+            <div key={`ea-${i}`} style={styles.emptyCell} className="calendar-empty-cell"></div>
           ))}
         </div>
       </CardContent>
@@ -141,7 +142,7 @@ const styles: Record<string, CSSProperties> = {
     background: 'rgba(255, 255, 255, 0.6)',
     backdropFilter: 'blur(15px)',
     WebkitBackdropFilter: 'blur(15px)',
-    color: '#555',
+    color: 'inherit',
     fontSize: '12px',
     letterSpacing: '0.5px',
     textTransform: 'uppercase',
@@ -158,7 +159,7 @@ const styles: Record<string, CSSProperties> = {
   dayCell: {
     minHeight: '70px',
     background: 'rgba(255, 255, 255, 0.42)',
-    color: '#2c3e50',
+    color: 'inherit',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-end',

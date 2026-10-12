@@ -24,7 +24,7 @@ export default function Dashboard() {
         style={{
           margin: 0,
           padding: '64px 4% 20px',
-          color: '#1d2735',
+          color: 'inherit',
           minHeight: '100%',
           width: '100%',
           boxSizing: 'border-box',
