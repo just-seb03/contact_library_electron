@@ -64,7 +64,6 @@ export default function PaymentsPage() {
 // Estilos reducidos solo para el layout contenedor principal
 const styles: { [key: string]: React.CSSProperties } = {
   pageContainer: {
-    background: 'transparent',
     overflowY: 'auto',
     height: '100%',
     width: '100%',

@@ -19,6 +19,7 @@ interface CustomCSSProperties extends React.CSSProperties {
   '--f7-safe-area-top'?: string;
   '--f7-card-box-shadow'?: string;
   '--f7-card-outline-border-color'?: string;
+  '--f7-page-bg-color'?: string;
   WebkitAppRegion?: 'drag' | 'no-drag';
 }
 
@@ -41,13 +42,14 @@ function MainApp() {
     width: '100%',
     height: '100%',
     overflow: 'hidden',
-    backgroundColor: darkMode ? '#0e0f13' : '#eeeff098',
+    backgroundColor: darkMode ? '#0e0f13' : '#eeeff0',
     color: darkMode ? '#f5f5f7' : '#1c1c1e',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     '--f7-theme-color': '#007aff',
     '--f7-safe-area-top': '38px',
     '--f7-card-box-shadow': 'none',
     '--f7-card-outline-border-color': 'transparent',
+    '--f7-page-bg-color': darkMode ? '#0e0f13' : '#eeeff0',
   };
 
   const titlebarStyle: CustomCSSProperties = {

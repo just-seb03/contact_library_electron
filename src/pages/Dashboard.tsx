@@ -19,7 +19,7 @@ export default function Dashboard() {
   } = useDashboard();
 
   return (
-    <Page className="liquid-page" style={{ background: 'transparent', overflowX: 'hidden' }}>
+    <Page className="liquid-page" style={{ overflowX: 'hidden' }}>
       <div
         style={{
           margin: 0,

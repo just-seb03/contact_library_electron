@@ -7,7 +7,7 @@ interface DashboardScheduleProps {
   todayHearings: HearingEvent[];
   upcomingHearings: HearingEvent[];
   openClient: (clientId: number) => void;
-  showTab: (tabId: string, activeTab: AppTab) => void;
+  showTab: (tab: AppTab) => void;
 }
 
 const glassCardStyle: CSSProperties = {
@@ -156,7 +156,7 @@ export function DashboardSchedule({
               <h2 style={panelTitleStyle}>Próximas audiencias</h2>
               <Button
                 small
-                onClick={() => showTab('#view-calendar', 'calendar')}
+                onClick={() => showTab('calendar')}
                 style={{ color: '#377bd1', fontWeight: 600, textTransform: 'none' }}
               >
                 Ver agenda

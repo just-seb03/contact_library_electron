@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { f7 } from 'framework7-react';
 import { useApp } from '../../context/useApp';
 import type { AppTab, HearingEvent } from '../../context/types';
+import { navigateToTab } from '../../utils/navigation';
 
 function getTimeInMinutes(time: string): number {
   const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
@@ -25,9 +25,9 @@ function compareHearings(first: HearingEvent, second: HearingEvent): number {
 export function useDashboard() {
   const { clients, hearings, payments, setActiveTab, setSelectedClientId } = useApp();
 
-  const showTab = (tabId: string, activeTab: AppTab) => {
-    setActiveTab(activeTab);
-    if (f7) f7.tab.show(tabId, true);
+  const showTab = (tab: AppTab) => {
+    navigateToTab(tab);
+    setActiveTab(tab);
   };
 
   const now = new Date();
@@ -63,7 +63,7 @@ export function useDashboard() {
 
   const openClient = (clientId: number) => {
     setSelectedClientId(clientId);
-    showTab('#view-cliente', 'cliente');
+    showTab('cliente');
   };
 
   return {

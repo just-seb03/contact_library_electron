@@ -8,7 +8,7 @@ export default function Cliente() {
   const { clients, selectedClient, setSelectedClientId } = useApp();
 
   return (
-    <Page className="liquid-page" pageContent={false} style={{ background: 'transparent' }}>
+    <Page className="liquid-page" pageContent={false}>
       <div className="page-content" style={styles.pageContent}>
         {/* Columna Izquierda: Directorio de Clientes */}
         <div style={styles.leftColumn}>

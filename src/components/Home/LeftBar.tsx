@@ -1,43 +1,12 @@
-import { useEffect, useState, type CSSProperties } from 'react';
-import { f7, f7ready } from 'framework7-react';
+import { useState, type CSSProperties } from 'react';
 import { useApp } from '../../context/AppContext';
 import type { AppTab } from '../../context/types';
+import { navigateToTab } from '../../utils/navigation';
 import 'framework7-icons/css/framework7-icons.css';
 
-type LeftBarProps = {
-  activeTab?: AppTab;
-  defaultTab?: AppTab;
-  onSelectTab?: (tab: AppTab) => void;
-};
-
-const tabMap: Record<AppTab, string> = {
-  inicio: '#view-home',
-  calendar: '#view-calendar',
-  cliente: '#view-cliente',
-  pagos: '#view-pagos',
-  config: '#view-settings',
-};
-
-export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftBarProps) => {
-  const { activeTab: appActiveTab, setActiveTab, darkMode } = useApp();
+export const LeftBar = () => {
+  const { activeTab, setActiveTab, darkMode } = useApp();
   const [hoveredTab, setHoveredTab] = useState<AppTab | null>(null);
-  const selected = activeTab ?? appActiveTab ?? defaultTab;
-
-  useEffect(() => {
-    f7ready(() => {
-      const tabId = tabMap[selected];
-      if (tabId && f7) {
-        f7.tab.show(tabId, false);
-        const view = f7.views?.get(tabId) ?? f7.view?.get(tabId);
-        if (view && view.router && (!view.router.currentRoute || view.router.history.length === 0)) {
-          const routeUrl = view.params?.url || (selected === 'config' ? '/settings/' : undefined);
-          if (routeUrl) {
-            view.router.navigate(routeUrl, { animate: false });
-          }
-        }
-      }
-    });
-  }, [selected]);
 
   const navItems: { id: AppTab; label: string; icon: string }[] = [
     { id: 'inicio', label: 'Inicio', icon: 'house' },
@@ -48,28 +17,15 @@ export const LeftBar = ({ activeTab, defaultTab = 'inicio', onSelectTab }: LeftB
   ];
 
   const handleSelect = (id: AppTab) => {
+    navigateToTab(id);
     setActiveTab(id);
-    onSelectTab?.(id);
-
-    const tabId = tabMap[id];
-    if (tabId && f7) {
-      // 💡 Se pasa `true` como segundo parámetro para forzar la animación
-      f7.tab.show(tabId, true);
-      const view = f7.views?.get(tabId) ?? f7.view?.get(tabId);
-      if (view && view.router && (!view.router.currentRoute || view.router.history.length === 0)) {
-        const routeUrl = view.params?.url || (id === 'config' ? '/settings/' : undefined);
-        if (routeUrl) {
-          view.router.navigate(routeUrl);
-        }
-      }
-    }
   };
 
   return (
     <aside style={{ ...styles.container, ...(darkMode ? styles.containerDark : {}) }}>
       <nav style={styles.navGroup}>
         {navItems.map((item) => {
-          const isActive = selected === item.id;
+          const isActive = activeTab === item.id;
           const isHovered = hoveredTab === item.id;
           const activeStyle = darkMode ? styles.activeButtonDark : styles.activeButtonLight;
           

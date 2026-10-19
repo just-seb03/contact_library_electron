@@ -21,7 +21,7 @@ export default function Calendar() {
   const currentDay = currentDate.getDate();
 
   return (
-    <Page className="liquid-page" style={{ background: 'transparent' }}>
+    <Page className="liquid-page">
       <CalendarHeader
         month={currentMonth}
         year={currentYear}

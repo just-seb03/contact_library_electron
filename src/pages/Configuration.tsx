@@ -25,7 +25,7 @@ export default function Configuration() {
   };
 
   return (
-    <Page className="liquid-page" pageContent={false} style={{ background: 'transparent' }}>
+    <Page className="liquid-page" pageContent={false}>
       <div style={styles.scrollWrapper}>
         <div style={styles.contentContainer}>
           {/* Encabezado Principal */}
