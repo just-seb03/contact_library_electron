@@ -2,6 +2,7 @@
 import { app, BrowserWindow, ipcMain } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import { APP_COLORS } from '../src/core/theme/style'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -39,7 +40,7 @@ function createWindow() {
     titleBarStyle: isMac ? 'hiddenInset' : 'default',
     trafficLightPosition: isMac ? { x: 12, y: 12 } : undefined,
     show: false,
-    backgroundColor: '#f5f5f7',
+    backgroundColor: APP_COLORS.background,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
