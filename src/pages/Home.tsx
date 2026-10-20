@@ -1,4 +1,4 @@
-import { useEffect, useRef, type CSSProperties } from 'react';
+import { useEffect, useRef } from 'react';
 import { Page, View } from 'framework7-react';
 import type { Router as Framework7Router, View as Framework7View } from 'framework7/types';
 import { LeftBar } from '../components/Home/LeftBar';
@@ -27,45 +27,15 @@ export default function HomePage() {
   useEffect(() => () => removeRouteListener.current?.(), []);
 
   return (
-    <Page style={styles.pageContainer}>
-      <div style={styles.layoutWrapper}>
-        <LeftBar />
-
-        <div style={styles.contentArea}>
-          <View
-            id="content-view"
-            className="safe-areas"
-            url="/home-content/"
-            routes={contentRoutes}
-            style={styles.viewsContainer}
-            onViewInit={handleContentViewInit}
-          />
-        </div>
-      </div>
+    <Page>
+      <View
+        id="content-view"
+        className="safe-areas"
+        url="/home-content/"
+        routes={contentRoutes}
+        onViewInit={handleContentViewInit}
+      />
+      <LeftBar />
     </Page>
   );
 }
-
-const styles: Record<string, CSSProperties> = {
-  pageContainer: {
-    height: '100vh',
-    overflow: 'hidden',
-  },
-  layoutWrapper: {
-    display: 'flex',
-    width: '100%',
-    height: '100%',
-    flexDirection: 'row',
-  },
-  contentArea: {
-    flex: 1,
-    height: '100%',
-    position: 'relative',
-  },
-  viewsContainer: {
-    position: 'relative',
-    overflow: 'hidden',
-    height: '100%',
-    width: '100%',
-  },
-};

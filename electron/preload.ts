@@ -5,7 +5,8 @@ import { ipcRenderer, contextBridge } from 'electron'
 contextBridge.exposeInMainWorld('electronAPI', {
   minimize: () => ipcRenderer.send('window-minimize'),
   maximize: () => ipcRenderer.send('window-maximize'),
-  close: () => ipcRenderer.send('window-close')
+  close: () => ipcRenderer.send('window-close'),
+  getPlatform: () => ipcRenderer.invoke('get-platform'),
 })
 
 // Mantenemos la configuración por defecto que Electron-Vite suele requerir

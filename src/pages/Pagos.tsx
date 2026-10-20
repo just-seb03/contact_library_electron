@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Page } from 'framework7-react';
+import { useState } from 'react';
+import { Block, Page } from 'framework7-react';
 
 // Importamos el contexto y componentes modulares
 import { useApp } from '../context/AppContext';
@@ -32,9 +32,8 @@ export default function PaymentsPage() {
   };
 
   return (
-    <Page style={styles.pageContainer}>
-      <div style={styles.wrapper}>
-        
+    <Page noNavbar noToolbar>
+      <Block className="no-margin-top padding-top-half">
         <PaymentsHeader />
 
         <PaymentsStats 
@@ -55,26 +54,7 @@ export default function PaymentsPage() {
         />
 
         <RegisterPaymentButton onClick={handleRegisterPayment} />
-        
-      </div>
+      </Block>
     </Page>
   );
 }
-
-// Estilos reducidos solo para el layout contenedor principal
-const styles: { [key: string]: React.CSSProperties } = {
-  pageContainer: {
-    overflowY: 'auto',
-    height: '100%',
-    width: '100%',
-    overflowX: 'hidden', // Evita scroll horizontal a nivel de página
-  },
-  wrapper: {
-    // Dejamos un margen superior para evitar que el contenido choque con la parte superior
-    padding: '48px 4% 24px',
-    maxWidth: '100px auto',
-    margin: '0 auto',
-    boxSizing: 'border-box',
-    width: '100%',
-  },
-};

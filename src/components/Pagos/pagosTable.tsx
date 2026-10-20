@@ -1,6 +1,6 @@
-import type { CSSProperties, FC } from 'react';
-import { useApp } from '../../context/AppContext';
-import { Payment } from './types';
+import type { FC } from 'react';
+import { Button, List, ListItem } from 'framework7-react';
+import type { Payment } from './types';
 import { formatCLP } from '../../utils/format';
 
 interface TableProps {
@@ -9,87 +9,37 @@ interface TableProps {
 }
 
 export const PaymentsTable: FC<TableProps> = ({ payments, onStatusChange }) => {
-  const { darkMode } = useApp();
-
-  const tableWrapperStyle: CSSProperties = {
-    background: darkMode ? 'rgba(22, 24, 30, 0.65)' : 'rgba(255, 255, 255, 0.45)',
-    backdropFilter: 'blur(20px) saturate(180%)',
-    WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-    border: darkMode ? 'none' : '1px solid rgba(255, 255, 255, 0.6)',
-    borderRadius: '18px',
-    boxShadow: darkMode
-      ? '0 10px 30px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.08)'
-      : '0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
-    overflowX: 'auto', 
-    width: '100%',
-    color: darkMode ? '#f5f5f7' : 'inherit',
-  };
-
   const nextStatusMap: Record<Payment['status'], Payment['status']> = {
     completed: 'pending',
     pending: 'overdue',
     overdue: 'completed',
   };
+  const statusLabels: Record<Payment['status'], string> = {
+    completed: 'Completado',
+    pending: 'Pendiente',
+    overdue: 'Vencido',
+  };
 
   return (
-    <div className="data-table margin-bottom" style={tableWrapperStyle}>
-      <table>
-        <thead>
-          <tr>
-            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Cliente / Entidad</th>
-            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Concepto</th>
-            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Fecha</th>
-            <th className="numeric-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Monto</th>
-            <th className="label-cell text-color-gray text-uppercase" style={{ fontSize: '11px', letterSpacing: '0.5px' }}>Estado</th>
-          </tr>
-        </thead>
-        <tbody>
-          {payments.map((item) => (
-            <tr key={item.id}>
-              <td className="label-cell font-weight-600" style={{ color: 'inherit' }}>
-                {item.client}
-              </td>
-              <td className="label-cell text-color-gray">{item.concept}</td>
-              <td className="label-cell text-color-gray">{item.date}</td>
-              <td className="numeric-cell font-weight-600" style={{ color: 'inherit' }}>
-                {formatCLP(item.amount)}
-              </td>
-              <td className="label-cell">
-                <span 
-                  className={`badge ${getBadgeColor(item.status)}`} 
-                  onClick={() => onStatusChange && onStatusChange(item.id, nextStatusMap[item.status])}
-                  style={{ 
-                    padding: '4px 10px', 
-                    borderRadius: '12px', 
-                    fontSize: '11px', 
-                    fontWeight: 600,
-                    cursor: onStatusChange ? 'pointer' : 'default',
-                    userSelect: 'none',
-                    transition: 'transform 0.15s ease',
-                  }}
-                  title={onStatusChange ? 'Haz clic para cambiar estado' : undefined}
-                >
-                  {getStatusText(item.status)}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <List mediaList strong inset>
+      {payments.length === 0 && <ListItem title="No hay pagos para mostrar" />}
+      {payments.map((payment) => (
+        <ListItem
+          key={payment.id}
+          title={payment.client}
+          subtitle={payment.concept}
+          text={`${payment.date} · ${formatCLP(payment.amount)}`}
+        >
+          <Button
+            slot="after"
+            small
+            color={payment.status === 'completed' ? 'green' : payment.status === 'pending' ? 'orange' : 'red'}
+            onClick={() => onStatusChange?.(payment.id, nextStatusMap[payment.status])}
+          >
+            {statusLabels[payment.status]}
+          </Button>
+        </ListItem>
+      ))}
+    </List>
   );
-};
-
-// Asigna la clase de color nativa de Framework7
-const getBadgeColor = (status: Payment['status']): string => {
-  if (status === 'completed') return 'color-green';
-  if (status === 'pending') return 'color-orange';
-  return 'color-red';
-};
-
-// Traduce el estado a texto legible
-const getStatusText = (status: Payment['status']): string => {
-  if (status === 'completed') return 'Completado';
-  if (status === 'pending') return 'Pendiente';
-  return 'Vencido';
 };

@@ -1,7 +1,10 @@
-import { App as Framework7App, View, Button } from 'framework7-react';
+import { App as Framework7App, Panel, View, Page } from 'framework7-react';
+import type { CSSProperties } from 'react';
 import routes from './routes';
 import { AppProvider, useApp } from './context/AppContext';
+import { LeftBar } from './components/Home/LeftBar';
 import 'framework7/css/bundle';
+import 'framework7/components/grid/css';
 import 'framework7-icons/css/framework7-icons.css';
 
 declare global {
@@ -10,129 +13,95 @@ declare global {
       minimize: () => void;
       maximize: () => void;
       close: () => void;
+      getPlatform: () => Promise<string>;
     };
   }
 }
 
-interface CustomCSSProperties extends React.CSSProperties {
-  '--f7-theme-color'?: string;
-  '--f7-safe-area-top'?: string;
-  '--f7-card-box-shadow'?: string;
-  '--f7-card-outline-border-color'?: string;
-  '--f7-page-bg-color'?: string;
-  WebkitAppRegion?: 'drag' | 'no-drag';
+interface ElectronRegionStyle extends CSSProperties {
+  WebkitAppRegion: 'drag' | 'no-drag';
 }
 
 function MainApp() {
   const { darkMode } = useApp();
-
-  const f7params = {
-    name: 'Contact Library',
-    theme: 'ios',
-    dark: darkMode,
-    routes,
-    view: {
-      animate: true,
-      transition: 'f7-fade',
-      iosSwipeBack: true,
-    },
-  };
-
-  const appStyle: CustomCSSProperties = {
-    width: '100%',
-    height: '100%',
-    overflow: 'hidden',
-    backgroundColor: darkMode ? '#0e0f13' : '#eeeff0',
-    color: darkMode ? '#f5f5f7' : '#1c1c1e',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-    '--f7-theme-color': '#007aff',
-    '--f7-safe-area-top': '38px',
-    '--f7-card-box-shadow': 'none',
-    '--f7-card-outline-border-color': 'transparent',
-    '--f7-page-bg-color': darkMode ? '#0e0f13' : '#eeeff0',
-  };
-
-  const titlebarStyle: CustomCSSProperties = {
-    height: 38,
-    backgroundColor: darkMode ? '#16171d' : '#fcf9f9',
-    display: 'flex',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    WebkitAppRegion: 'drag',
-    width: '100%',
-    userSelect: 'none',
-    boxSizing: 'border-box',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 10000,
-    borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.1)',
-  };
-
-  const titlebarButtonsStyle: CustomCSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    height: '100%',
-    padding: '0 12px',
-    WebkitAppRegion: 'no-drag',
-  };
-
-  const trafficLightButtonStyle = (bgColor: string): React.CSSProperties => ({
-    width: 12,
-    height: 12,
-    minWidth: 12,
-    padding: 0,
-    backgroundColor: bgColor,
-    border: 'none',
-    borderRadius: '50%',
-    cursor: 'pointer',
-    transition: 'filter 0.15s ease',
-  });
+  const dragRegionStyle: ElectronRegionStyle = { WebkitAppRegion: 'drag' };
 
   return (
-    <Framework7App {...f7params} dark={darkMode} style={appStyle}>
-      {/* Scrollbar estilizada liquid sin archivos css */}
-      <style>{`
-        ::-webkit-scrollbar {
-          width: 6px;
-          height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: ${darkMode ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.14)'};
-          border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: ${darkMode ? 'rgba(255, 255, 255, 0.32)' : 'rgba(0, 0, 0, 0.28)'};
-        }
-      `}</style>
+    <Framework7App
+      name="Contact Library"
+      theme="ios"
+      dark={darkMode}
+      routes={routes}
+      view={{ animate: true, transition: 'f7-fade', iosSwipeBack: true }}
+    >
+      {/* Barra lateral permanente estilo macOS: FULL BLANCA */}
+      <Panel
+        left
+        visibleBreakpoint={0}
+        resizable
+        backdrop={false}
+        style={{
+          backgroundColor: '#ffffff',
+          '--f7-panel-bg-color': '#ffffff',
+          '--f7-page-bg-color': '#ffffff',
+          '--f7-list-strong-bg-color': '#ffffff',
+          '--f7-list-bg-color': '#ffffff',
+        } as CSSProperties}
+      >
+        <View
+          style={{
+            backgroundColor: '#ffffff',
+            '--f7-page-bg-color': '#ffffff',
+          } as CSSProperties}
+        >
+          <Page
+            pageContent={false}
+            noNavbar
+            noToolbar
+            style={{
+              backgroundColor: '#ffffff',
+              '--f7-page-bg-color': '#ffffff',
+            } as CSSProperties}
+          >
+            <LeftBar />
+          </Page>
+        </View>
+      </Panel>
 
-      {/* Barra de título Electron integrada con Framework7 Button */}
-      <div style={titlebarStyle}>
-        <div style={titlebarButtonsStyle}>
-          <Button
-            round
-            style={trafficLightButtonStyle('#ff5f57')}
-            onClick={() => window.electronAPI?.close()}
-          />
-          <Button
-            round
-            style={trafficLightButtonStyle('#febc2e')}
-            onClick={() => window.electronAPI?.minimize()}
-          />
-          <Button
-            round
-            style={trafficLightButtonStyle('#28c840')}
-            onClick={() => window.electronAPI?.maximize()}
-          />
-        </div>
-      </div>
+      {/* Región de arrastre de ventana para Electron (absoluta para no añadir espacio ni empujar las vistas) */}
+      <div
+        style={{
+          ...dragRegionStyle,
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          left: 288,
+          height: 24,
+          zIndex: 500,
+          pointerEvents: 'auto',
+        }}
+      />
 
-      {/* Se mantiene la vista principal con animación habilitada */}
-      <View id="main-view" main url="/" style={{ height: '100vh' }} transition="f7-fade" />
+      {/* Lado derecho: UN SOLO COLOR (GRIS UNIFICADO), sin espacios superiores artificiales */}
+      <View
+        id="content-view"
+        main
+        url="/"
+        routes={routes}
+        style={{
+          backgroundColor: '#f5f5f7',
+          '--f7-page-bg-color': '#f5f5f7',
+          '--f7-bars-bg-color': '#f5f5f7',
+          '--f7-navbar-bg-color': '#f5f5f7',
+          '--f7-toolbar-bg-color': '#f5f5f7',
+          '--f7-card-bg-color': '#f5f5f7',
+          '--f7-list-strong-bg-color': '#f5f5f7',
+          '--f7-list-bg-color': '#f5f5f7',
+          '--f7-page-navbar-offset': '0px',
+          '--f7-page-toolbar-top-offset': '0px',
+          '--f7-page-content-extra-padding-top': '0px',
+        } as CSSProperties}
+      />
     </Framework7App>
   );
 }

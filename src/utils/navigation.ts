@@ -10,6 +10,7 @@ export const APP_TAB_ROUTES: Record<AppTab, string> = {
 };
 
 const APP_TABS_BY_ROUTE: Record<string, AppTab> = {
+  '/': 'inicio',
   '/home-content/': 'inicio',
   '/calendar/': 'calendar',
   '/cliente/': 'cliente',
@@ -23,7 +24,11 @@ export function getAppTabForRoute(path: string): AppTab | null {
 
 export function navigateToTab(tab: AppTab): void {
   const route = APP_TAB_ROUTES[tab];
-  const view = f7.views?.get('#content-view') ?? f7.view?.get('#content-view');
+  const view =
+    f7.views?.get('#content-view') ??
+    f7.view?.get('#content-view') ??
+    f7.views?.main ??
+    f7.view?.main;
   const router = view?.router;
 
   if (!router) {

@@ -1,10 +1,10 @@
-import HomePage from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import contentRoutes from './contentRoutes';
 
 const routes = [
   {
     path: '/',
-    component: HomePage,
+    component: Dashboard,
   },
   ...contentRoutes,
 ];

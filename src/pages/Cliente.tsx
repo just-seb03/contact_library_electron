@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react';
-import { Page } from 'framework7-react';
+import { Block, Page } from 'framework7-react';
 import { useApp } from '../context/AppContext';
 import { ClientList } from '../components/Cliente/ClientList';
 import { ClientDetails } from '../components/Cliente/ClientDetails';
@@ -8,57 +7,19 @@ export default function Cliente() {
   const { clients, selectedClient, setSelectedClientId } = useApp();
 
   return (
-    <Page className="liquid-page" pageContent={false}>
-      <div className="page-content" style={styles.pageContent}>
-        {/* Columna Izquierda: Directorio de Clientes */}
-        <div style={styles.leftColumn}>
-          <ClientList 
-            clients={clients} 
-            selectedClient={selectedClient} 
-            onSelectClient={(c) => setSelectedClientId(c.id)} 
-          />
-        </div>
-
-        {/* Columna Derecha: Detalles del Cliente y Seguimiento de Caso */}
-        <div style={styles.rightColumn}>
-          {selectedClient ? (
-            <ClientDetails client={selectedClient} />
-          ) : (
-            <div style={{ color: '#8e8e93', padding: '24px' }}>
-              Selecciona un cliente para ver sus detalles
-            </div>
-          )}
-        </div>
-      </div>
+    <Page noNavbar noToolbar>
+      <Block className="no-margin-top padding-top-half">
+        <ClientList
+          clients={clients}
+          selectedClient={selectedClient}
+          onSelectClient={(client) => setSelectedClientId(client.id)}
+        />
+        {selectedClient ? (
+          <ClientDetails client={selectedClient} />
+        ) : (
+          <p className="text-color-gray">Selecciona un cliente para ver sus detalles</p>
+        )}
+      </Block>
     </Page>
   );
 }
-
-const styles: Record<string, CSSProperties> = {
-  pageContent: {
-    display: 'flex',
-    flexDirection: 'row',
-    height: '100%',
-    padding: '70px 24px 24px 12px',
-    boxSizing: 'border-box',
-    gap: '18px',
-    overflow: 'hidden',
-    background: 'transparent',
-  },
-  leftColumn: {
-    width: '340px',
-    minWidth: '300px',
-    maxWidth: '380px',
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  rightColumn: {
-    flex: 1,
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    minWidth: 0,
-    minHeight: 0,
-  },
-};

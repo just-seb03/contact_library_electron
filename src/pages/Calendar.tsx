@@ -21,7 +21,7 @@ export default function Calendar() {
   const currentDay = currentDate.getDate();
 
   return (
-    <Page className="liquid-page">
+    <Page noNavbar noToolbar>
       <CalendarHeader
         month={currentMonth}
         year={currentYear}
@@ -29,30 +29,22 @@ export default function Calendar() {
         onSearchChange={setSearchQuery}
       />
 
-      <Block>
-        <div className="row">
-          {/* Columna Izquierda: Calendario y Detalles del Día */}
-          <div className="col-100 medium-65">
-            <CalendarGrid
-              currentYear={currentYear}
-              currentMonthIndex={currentDate.getMonth()}
-              currentDay={currentDay}
-              onSelectDay={setSelectedDay}
-            />
+      <Block className="no-margin-top">
+        <CalendarGrid
+          currentYear={currentYear}
+          currentMonthIndex={currentDate.getMonth()}
+          currentDay={currentDay}
+          onSelectDay={setSelectedDay}
+        />
 
-            <DayDetailsCard
-              month={currentMonth}
-              day={currentDay}
-            />
-          </div>
+        <DayDetailsCard
+          month={currentMonth}
+          day={currentDay}
+        />
 
-          {/* Columna Derecha: Próximas Audiencias */}
-          <div className="col-100 medium-35">
-            <UpcomingHearings />
-          </div>
-        </div>
+        <UpcomingHearings />
       </Block>
-      
+
       {selectedDay !== null && (
         <DayScheduleOverlay 
           date={selectedDay}

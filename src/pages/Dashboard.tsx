@@ -1,4 +1,4 @@
-import { Page } from 'framework7-react';
+import { Block, Page } from 'framework7-react';
 
 import { useDashboard } from '../control/Dashboard/useDashboard';
 import { DashboardHeader } from '../components/Dashboard/dashboardHeader';
@@ -19,21 +19,8 @@ export default function Dashboard() {
   } = useDashboard();
 
   return (
-    <Page className="liquid-page" style={{ overflowX: 'hidden' }}>
-      <div
-        style={{
-          margin: 0,
-          padding: '64px 4% 20px',
-          color: 'inherit',
-          minHeight: '100%',
-          width: '100%',
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'visible',
-          flexShrink: 0,
-        }}
-      >
+    <Page noNavbar noToolbar>
+      <Block className="no-margin-top padding-top-half">
         <DashboardHeader todayLabel={todayLabel} />
 
         <DashboardHero
@@ -53,7 +40,7 @@ export default function Dashboard() {
           openClient={openClient}
           showTab={showTab}
         />
-      </div>
+      </Block>
     </Page>
   );
 }

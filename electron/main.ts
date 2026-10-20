@@ -26,11 +26,18 @@ ipcMain.on('window-maximize', () => {
 })
 ipcMain.on('window-close', () => win?.close())
 
+// Responde al renderer con la plataforma actual
+ipcMain.handle('get-platform', () => process.platform)
+
 function createWindow() {
+  const isMac = process.platform === 'darwin'
+
   win = new BrowserWindow({
     width: 1280,
     height: 720,
     frame: false,
+    titleBarStyle: isMac ? 'hiddenInset' : 'default',
+    trafficLightPosition: isMac ? { x: 12, y: 12 } : undefined,
     show: false,
     backgroundColor: '#f5f5f7',
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),

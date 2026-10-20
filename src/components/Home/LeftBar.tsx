@@ -1,148 +1,214 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, type CSSProperties } from 'react';
+import {
+  List,
+  ListItem,
+  Icon,
+  Badge,
+  BlockTitle,
+  Link,
+  f7,
+  f7ready,
+} from 'framework7-react';
+import type { Router as Framework7Router } from 'framework7/types';
 import { useApp } from '../../context/AppContext';
 import type { AppTab } from '../../context/types';
-import { navigateToTab } from '../../utils/navigation';
-import 'framework7-icons/css/framework7-icons.css';
+import { navigateToTab, getAppTabForRoute } from '../../utils/navigation';
+import { TrafficLights } from '../WindowControls/TrafficLights';
 
 export const LeftBar = () => {
-  const { activeTab, setActiveTab, darkMode } = useApp();
-  const [hoveredTab, setHoveredTab] = useState<AppTab | null>(null);
+  const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
 
-  const navItems: { id: AppTab; label: string; icon: string }[] = [
-    { id: 'inicio', label: 'Inicio', icon: 'house' },
-    { id: 'calendar', label: 'Agenda', icon: 'device_laptop' },
-    { id: 'cliente', label: 'Cliente', icon: 'person_3' },
-    { id: 'pagos', label: 'Pagos', icon: 'creditcard' },
-    { id: 'config', label: 'Ajustes', icon: 'gear_alt_fill' },
-  ];
-
-  const handleSelect = (id: AppTab) => {
-    navigateToTab(id);
-    setActiveTab(id);
+  const handleSelect = (tab: AppTab) => {
+    setActiveTab(tab);
+    navigateToTab(tab);
   };
 
+  const pendingPaymentsCount = payments.filter(
+    (p) => p.status === 'pending' || p.status === 'overdue'
+  ).length;
+
+  useEffect(() => {
+    f7ready(() => {
+      const view =
+        f7.views?.get('#content-view') ??
+        f7.view?.get('#content-view') ??
+        f7.views?.main ??
+        f7.view?.main;
+      const router = view?.router;
+      if (!router) return;
+
+      const syncActiveTab = (route: Framework7Router.Route) => {
+        const tab = getAppTabForRoute(route.path);
+        if (tab && tab !== activeTab) {
+          setActiveTab(tab);
+        }
+      };
+
+      router.on('routeChanged', syncActiveTab);
+      if (router.currentRoute) {
+        syncActiveTab(router.currentRoute);
+      }
+
+      return () => {
+        router.off('routeChanged', syncActiveTab);
+      };
+    });
+  }, [activeTab, setActiveTab]);
+
+  const sidebarContainerStyle: CSSProperties = {
+    backgroundColor: '#ffffff',
+    color: '#000000',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    // La opción seleccionada ahora se vuelve gris (#e5e5ea) y las letras azules (#007aff)
+    '--f7-menu-list-item-selected-bg-color': '#e5e5ea',
+    '--f7-menu-list-item-selected-text-color': '#007aff',
+    '--f7-menu-list-item-text-color': '#1c1c1e',
+    '--f7-list-item-title-text-color': '#1c1c1e',
+    '--f7-list-item-text-text-color': '#1c1c1e',
+    '--f7-text-color': '#1c1c1e',
+  } as CSSProperties;
+
+  const getIconColor = (tab: AppTab) => (activeTab === tab ? '#007aff' : '#1c1c1e');
+
   return (
-    <aside style={{ ...styles.container, ...(darkMode ? styles.containerDark : {}) }}>
-      <nav style={styles.navGroup}>
-        {navItems.map((item) => {
-          const isActive = activeTab === item.id;
-          const isHovered = hoveredTab === item.id;
-          const activeStyle = darkMode ? styles.activeButtonDark : styles.activeButtonLight;
-          
-          let itemBtnStyle: CSSProperties = {
-            ...styles.button,
-            color: darkMode ? 'rgba(255, 255, 255, 0.65)' : 'rgba(0, 0, 0, 0.65)',
-          };
+    <div style={sidebarContainerStyle}>
+      {/* Cabecera estilo macOS con Traffic Lights y controles de ventana */}
+      <div
+        className="display-flex align-items-center justify-content-space-between padding-horizontal padding-vertical-half"
+        style={{ WebkitAppRegion: 'drag', backgroundColor: '#ffffff' } as CSSProperties}
+      >
+        <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
+          <TrafficLights />
+        </div>
+        <div
+          className="display-flex align-items-center"
+          style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}
+        >
+          <Link
+            iconF7="folder_badge_plus"
+            iconSize="16px"
+            className="text-color-gray margin-right-half"
+            aria-label="Nueva carpeta"
+          />
+          <Link
+            iconF7="sidebar_left"
+            iconSize="16px"
+            className="text-color-gray"
+            aria-label="Alternar barra lateral"
+          />
+        </div>
+      </div>
 
-          if (isActive) {
-            itemBtnStyle = {
-              ...itemBtnStyle,
-              ...activeStyle,
-              ...(isHovered && darkMode ? { backgroundColor: 'rgba(255, 255, 255, 0.22)' } : {}),
-            };
-          } else if (isHovered) {
-            itemBtnStyle = {
-              ...itemBtnStyle,
-              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.45)',
-              color: darkMode ? '#ffffff' : '#000000',
-            };
-          }
+      {/* Primer grupo de accesos directos (Inicio, Agenda) */}
+      <List
+        menuList
+        strongIos={false}
+        outlineIos={false}
+        dividersIos={false}
+        className="no-margin-top no-margin-bottom"
+        style={{ backgroundColor: '#ffffff' }}
+      >
+        <ListItem
+          link="#"
+          title="Inicio"
+          selected={activeTab === 'inicio'}
+          onClick={() => handleSelect('inicio')}
+        >
+          <Icon
+            slot="media"
+            f7="house_fill"
+            style={{ color: getIconColor('inicio') }}
+          />
+        </ListItem>
+        <ListItem
+          link="#"
+          title="Agenda"
+          selected={activeTab === 'calendar'}
+          onClick={() => handleSelect('calendar')}
+        >
+          <Icon
+            slot="media"
+            f7="calendar"
+            style={{ color: getIconColor('calendar') }}
+          />
+          {hearings.length > 0 && (
+            <Badge slot="after" color="blue">
+              {hearings.length}
+            </Badge>
+          )}
+        </ListItem>
+      </List>
 
-          return (
-            <button
-              key={item.id}
-              className={`leftbar-button ${isActive ? 'active' : ''}`}
-              onClick={() => handleSelect(item.id)}
-              onMouseEnter={() => setHoveredTab(item.id)}
-              onMouseLeave={() => setHoveredTab(null)}
-              style={itemBtnStyle}
-              title={item.label}
+      {/* Título de sección Biblioteca */}
+      <BlockTitle className="text-color-gray margin-left-half margin-top-half margin-bottom-half">
+        Biblioteca
+      </BlockTitle>
+
+      {/* Segundo grupo: Clientes, Pagos, Ajustes */}
+      <List
+        menuList
+        strongIos={false}
+        outlineIos={false}
+        dividersIos={false}
+        className="no-margin-top no-margin-bottom"
+        style={{ backgroundColor: '#ffffff' }}
+      >
+        <ListItem
+          link="#"
+          title="Clientes"
+          selected={activeTab === 'cliente'}
+          onClick={() => handleSelect('cliente')}
+        >
+          <Icon
+            slot="media"
+            f7="person_2_fill"
+            style={{ color: getIconColor('cliente') }}
+          />
+          <Badge
+            slot="after"
+            color={activeTab === 'cliente' ? 'blue' : 'gray'}
+          >
+            {clients.length}
+          </Badge>
+        </ListItem>
+        <ListItem
+          link="#"
+          title="Pagos"
+          selected={activeTab === 'pagos'}
+          onClick={() => handleSelect('pagos')}
+        >
+          <Icon
+            slot="media"
+            f7="creditcard_fill"
+            style={{ color: getIconColor('pagos') }}
+          />
+          {pendingPaymentsCount > 0 && (
+            <Badge
+              slot="after"
+              color="orange"
             >
-              <i className="f7-icons" style={styles.icon}>
-                {item.icon}
-              </i>
-              <span style={styles.label}>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-    </aside>
+              {pendingPaymentsCount}
+            </Badge>
+          )}
+        </ListItem>
+        <ListItem
+          link="#"
+          title="Ajustes"
+          selected={activeTab === 'config'}
+          onClick={() => handleSelect('config')}
+        >
+          <Icon
+            slot="media"
+            f7="gear_alt_fill"
+            style={{ color: getIconColor('config') }}
+          />
+        </ListItem>
+      </List>
+    </div>
   );
 };
 
 export const Sidebar = LeftBar;
-
-const styles: Record<string, CSSProperties> = {
-  container: {
-    width: '76px',
-    height: 'calc(100% - 124px)',
-    margin: '70px 0 16px 16px',
-    padding: '20px 8px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxSizing: 'border-box',
-    userSelect: 'none',
-    zIndex: 100,
-    background: 'rgba(121, 119, 119, 0.25)',
-    backdropFilter: 'blur(30px) saturate(200%)',
-    WebkitBackdropFilter: 'blur(30px) saturate(200%)',
-    borderRadius: '24px',
-    border: '1px solid rgb(223, 221, 221)',
-    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
-  },
-  containerDark: {
-    background: 'rgba(22, 23, 29, 0.6)',
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-  },
-  navGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    width: '100%',
-    alignItems: 'center',
-  },
-  button: {
-    backgroundColor: 'transparent',
-    border: 'none',
-    outline: 'none',
-    cursor: 'pointer',
-    width: '56px',
-    height: '56px',
-    borderRadius: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'rgba(0, 0, 0, 0.65)',
-    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-    padding: '4px',
-    WebkitAppearance: 'none',
-    margin: 0,
-  },
-  activeButtonLight: {
-    backgroundColor: '#ffffff',
-    color: '#000000',
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-    transform: 'scale(1.04)',
-  },
-  activeButtonDark: {
-    backgroundColor: 'rgba(255, 255, 255, 0.16)',
-    color: '#ffffff',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-    transform: 'scale(1.04)',
-  },
-  icon: {
-    fontSize: '22px',
-    lineHeight: '1',
-    marginBottom: '3px',
-  },
-  label: {
-    fontSize: '9px',
-    fontWeight: '600',
-    letterSpacing: '-0.1px',
-  },
-};
+export default LeftBar;
