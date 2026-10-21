@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, CSSProperties } from 'react';
 import type { Client } from '../types';
 import { ClientBanner } from './ClientBanner';
 import { ClientCaseDetails } from './ClientCaseDetails';
@@ -8,8 +8,15 @@ interface ClientDetailsProps {
 }
 
 export const ClientDetails: FC<ClientDetailsProps> = ({ client }) => {
+  const containerStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+    paddingBottom: 16,
+  };
+
   return (
-    <div className="display-flex flex-direction-column">
+    <div style={containerStyle}>
       <ClientBanner client={client} />
       <ClientCaseDetails client={client} />
     </div>

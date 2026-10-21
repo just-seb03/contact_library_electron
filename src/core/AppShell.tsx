@@ -2,6 +2,7 @@ import { Page, Panel, View } from 'framework7-react';
 import type { CSSProperties } from 'react';
 import routes from '../navigation/routes';
 import { LeftBar } from '../features/home/components/LeftBar';
+import { SIDEBAR_SURFACE_STYLE, CONTENT_VIEW_STYLE } from './theme/style';
 
 interface ElectronRegionStyle extends CSSProperties {
   WebkitAppRegion: 'drag' | 'no-drag';
@@ -17,14 +18,14 @@ export function AppShell() {
         visibleBreakpoint={0}
         resizable
         backdrop={false}
-        className="app-sidebar-surface"
+        style={SIDEBAR_SURFACE_STYLE}
       >
-        <View className="app-sidebar-surface">
+        <View style={SIDEBAR_SURFACE_STYLE}>
           <Page
             pageContent={false}
             noNavbar
             noToolbar
-            className="app-sidebar-surface"
+            style={SIDEBAR_SURFACE_STYLE}
           >
             <LeftBar />
           </Page>
@@ -49,7 +50,7 @@ export function AppShell() {
         main
         url="/"
         routes={routes}
-        className="app-content-view"
+        style={CONTENT_VIEW_STYLE}
       />
     </>
   );

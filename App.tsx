@@ -8,7 +8,6 @@ import { applyAppColors } from './src/core/theme/style';
 import 'framework7/css/bundle';
 import 'framework7/components/grid/css';
 import 'framework7-icons/css/framework7-icons.css';
-import './src/core/theme/style.css';
 
 declare global {
   interface Window {

@@ -14,6 +14,12 @@ import { useApp } from '../../../core/context/AppContext';
 import type { AppTab } from '../../../core/context/types';
 import { navigateToTab, getAppTabForRoute } from '../../../navigation/navigation';
 import { TrafficLights } from '../../../core/windowControls/TrafficLights';
+import {
+  APP_COLORS,
+  SIDEBAR_CONTAINER_STYLE,
+  SIDEBAR_ICON_SELECTED_COLOR,
+  SIDEBAR_ICON_COLOR,
+} from '../../../core/theme/style';
 
 export const LeftBar = () => {
   const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
@@ -59,14 +65,24 @@ export const LeftBar = () => {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
+    ...SIDEBAR_CONTAINER_STYLE,
   };
 
+  /** Reemplaza .app-sidebar-header y .app-sidebar-list */
+  const sidebarElementBg: CSSProperties = {
+    backgroundColor: APP_COLORS.white,
+  };
+
+  const iconStyle = (isActive: boolean): CSSProperties => ({
+    color: isActive ? SIDEBAR_ICON_SELECTED_COLOR : SIDEBAR_ICON_COLOR,
+  });
+
   return (
-    <div className="app-sidebar" style={sidebarContainerStyle}>
+    <div style={sidebarContainerStyle}>
       {/* Cabecera estilo macOS con Traffic Lights y controles de ventana */}
       <div
-        className="app-sidebar-header display-flex align-items-center justify-content-space-between padding-horizontal padding-vertical-half"
-        style={{ WebkitAppRegion: 'drag' } as CSSProperties}
+        className="display-flex align-items-center justify-content-space-between padding-horizontal padding-vertical-half"
+        style={{ ...sidebarElementBg, WebkitAppRegion: 'drag' } as CSSProperties}
       >
         <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
           <TrafficLights />
@@ -96,7 +112,8 @@ export const LeftBar = () => {
         strongIos={false}
         outlineIos={false}
         dividersIos={false}
-        className="app-sidebar-list no-margin-top no-margin-bottom"
+        className="no-margin-top no-margin-bottom"
+        style={sidebarElementBg}
       >
         <ListItem
           link="#"
@@ -107,7 +124,7 @@ export const LeftBar = () => {
           <Icon
             slot="media"
             f7="house_fill"
-            className={activeTab === 'inicio' ? 'app-sidebar-icon-selected' : 'app-sidebar-icon'}
+            style={iconStyle(activeTab === 'inicio')}
           />
         </ListItem>
         <ListItem
@@ -119,7 +136,7 @@ export const LeftBar = () => {
           <Icon
             slot="media"
             f7="calendar"
-            className={activeTab === 'calendar' ? 'app-sidebar-icon-selected' : 'app-sidebar-icon'}
+            style={iconStyle(activeTab === 'calendar')}
           />
           {hearings.length > 0 && (
             <Badge slot="after" color="blue">
@@ -140,7 +157,8 @@ export const LeftBar = () => {
         strongIos={false}
         outlineIos={false}
         dividersIos={false}
-        className="app-sidebar-list no-margin-top no-margin-bottom"
+        className="no-margin-top no-margin-bottom"
+        style={sidebarElementBg}
       >
         <ListItem
           link="#"
@@ -151,7 +169,7 @@ export const LeftBar = () => {
           <Icon
             slot="media"
             f7="person_2_fill"
-            className={activeTab === 'cliente' ? 'app-sidebar-icon-selected' : 'app-sidebar-icon'}
+            style={iconStyle(activeTab === 'cliente')}
           />
           <Badge
             slot="after"
@@ -169,7 +187,7 @@ export const LeftBar = () => {
           <Icon
             slot="media"
             f7="creditcard_fill"
-            className={activeTab === 'pagos' ? 'app-sidebar-icon-selected' : 'app-sidebar-icon'}
+            style={iconStyle(activeTab === 'pagos')}
           />
           {pendingPaymentsCount > 0 && (
             <Badge
@@ -189,7 +207,7 @@ export const LeftBar = () => {
           <Icon
             slot="media"
             f7="gear_alt_fill"
-            className={activeTab === 'config' ? 'app-sidebar-icon-selected' : 'app-sidebar-icon'}
+            style={iconStyle(activeTab === 'config')}
           />
         </ListItem>
       </List>
