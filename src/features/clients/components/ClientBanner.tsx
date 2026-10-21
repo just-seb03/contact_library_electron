@@ -1,29 +1,36 @@
 import type { FC, CSSProperties } from 'react';
 import { Badge, Icon } from 'framework7-react';
-import type { Client } from '../types';
+import type { Client, ClientStatus } from '../types';
 
 interface ClientBannerProps {
   client: Client;
 }
 
-const statusLabels: Record<string, string> = {
+const statusLabels: Record<ClientStatus, string> = {
   activo: 'Activo',
   en_proceso: 'En Proceso',
   completado: 'Completado',
 };
 
-const statusColors: Record<string, string> = {
+const statusColors: Record<ClientStatus, string> = {
   activo: 'green',
   en_proceso: 'blue',
   completado: 'gray',
 };
 
+const isInvalidEmail = (email?: string): boolean => {
+  if (!email) return true;
+  const clean = email.trim().toLowerCase();
+  return clean === '' || clean === 'sin_registro@consultorio.cl';
+};
+
 export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
+  const hasValidEmail = !isInvalidEmail(client.email);
+
   const bannerStyle: CSSProperties = {
     background: 'linear-gradient(135deg, #0a84ff 0%, #30b0ff 100%)',
     borderRadius: 16,
     padding: '20px 24px',
-    margin: 0,
     color: '#ffffff',
   };
 
@@ -31,6 +38,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 16,
   };
 
   const profileAreaStyle: CSSProperties = {
@@ -38,34 +46,36 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     alignItems: 'center',
     gap: 14,
     flex: 1,
+    minWidth: 0,
   };
 
   const avatarStyle: CSSProperties = {
     width: 44,
     height: 44,
+    minWidth: 44,
     borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   };
 
-  const nameStyle: CSSProperties = {
-    fontSize: 20,
-    fontWeight: 700,
-    color: '#ffffff',
+  const nameRowStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: 10,
+    fontSize: 20,
+    fontWeight: 700,
+    color: '#ffffff',
   };
 
   const contactInfoStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: 20,
+    gap: 16,
     marginTop: 4,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.9)',
+    color: 'rgba(255, 255, 255, 0.9)',
   };
 
   const contactItemStyle: CSSProperties = {
@@ -74,29 +84,28 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     gap: 5,
   };
 
+  const noEmailTextStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
+    fontStyle: 'italic',
+    opacity: 0.75,
+    fontSize: 13,
+  };
+
   const actionsStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: 8,
   };
 
+  /** Texto sutil sin fondo ni píldora para no confundir con botones (Heurística #4) */
   const idBadgeStyle: CSSProperties = {
-    backgroundColor: 'rgba(255,255,255,0.2)',
     color: '#ffffff',
-    borderRadius: 20,
-    padding: '4px 14px',
+    opacity: 0.85,
     fontSize: 13,
-    fontWeight: 600,
-  };
-
-  const actionBtnStyle: CSSProperties = {
-    width: 36,
-    height: 36,
-    borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontWeight: 500,
+    letterSpacing: 0.5,
   };
 
   return (
@@ -107,36 +116,40 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
             <Icon f7="person_fill" size="24px" style={{ color: '#ffffff' }} />
           </div>
           <div>
-            <div style={nameStyle}>
-              {client.name}
+            <div style={nameRowStyle}>
+              <span>{client.name}</span>
               {client.status && (
-                <Badge color={statusColors[client.status] ?? 'blue'} style={{ fontSize: 11, fontWeight: 600 }}>
+                <Badge
+                  color={statusColors[client.status] ?? 'blue'}
+                  style={{ fontSize: 11, fontWeight: 600 }}
+                >
                   {statusLabels[client.status] ?? client.status}
                 </Badge>
               )}
             </div>
             <div style={contactInfoStyle}>
               <span style={contactItemStyle}>
-                <Icon f7="phone_fill" size="12px" style={{ color: 'rgba(255,255,255,0.9)' }} />
+                <Icon f7="phone_fill" size="12px" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
                 {client.phone}
               </span>
-              {client.email && (
+              {hasValidEmail ? (
                 <span style={contactItemStyle}>
-                  <Icon f7="envelope_fill" size="12px" style={{ color: 'rgba(255,255,255,0.9)' }} />
+                  <Icon f7="envelope_fill" size="12px" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
                   {client.email}
+                </span>
+              ) : (
+                <span style={noEmailTextStyle}>
+                  <Icon f7="envelope" size="12px" style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                  Sin correo registrado
                 </span>
               )}
             </div>
           </div>
         </div>
+
         <div style={actionsStyle}>
+          {/* Identificador informativo sutil */}
           <span style={idBadgeStyle}>ID #{client.id}</span>
-          <div style={actionBtnStyle}>
-            <Icon f7="phone_fill" size="16px" style={{ color: '#ffffff' }} />
-          </div>
-          <div style={actionBtnStyle}>
-            <Icon f7="envelope_fill" size="16px" style={{ color: '#ffffff' }} />
-          </div>
         </div>
       </div>
     </div>

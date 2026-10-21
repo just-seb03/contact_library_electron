@@ -16,7 +16,6 @@ export function AppShell() {
       <Panel
         left
         visibleBreakpoint={0}
-        resizable
         backdrop={false}
         style={SIDEBAR_SURFACE_STYLE}
       >
@@ -38,7 +37,7 @@ export function AppShell() {
           position: 'absolute',
           top: 0,
           right: 0,
-          left: 288,
+          left: 250,
           height: 24,
           zIndex: 500,
           pointerEvents: 'auto',

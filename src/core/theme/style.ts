@@ -26,7 +26,12 @@ const APP_COLOR_RGB = {
  * Utiliza variables CSS de Framework7 directamente en TypeScript sin archivos .css
  */
 export const SIDEBAR_SURFACE_STYLE: CSSProperties = {
+  width: 250,
+  minWidth: 250,
+  maxWidth: 250,
   backgroundColor: APP_COLORS.white,
+  ['--f7-panel-width' as any]: '250px',
+  ['--f7-panel-left-width' as any]: '250px',
   ['--f7-panel-bg-color' as any]: APP_COLORS.white,
   ['--f7-page-bg-color' as any]: APP_COLORS.white,
   ['--f7-list-strong-bg-color' as any]: APP_COLORS.white,
@@ -55,6 +60,9 @@ export const CONTENT_VIEW_STYLE: CSSProperties = {
  * Estilos para el contenedor de la barra lateral (LeftBar).
  */
 export const SIDEBAR_CONTAINER_STYLE: CSSProperties = {
+  width: 250,
+  minWidth: 250,
+  maxWidth: 250,
   backgroundColor: APP_COLORS.white,
   color: APP_COLORS.black,
   ['--f7-menu-list-item-selected-bg-color' as any]: APP_COLORS.selection,
