@@ -1,70 +1,105 @@
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
-import { ClientList } from '../components/ClientList';
+import { ClientCardGrid } from '../components/ClientCardGrid';
 import { ClientDetails } from '../components/ClientDetails';
+import type { Client } from '../types';
+import type { CSSProperties } from 'react';
 
 export default function Cliente() {
   const { clients, selectedClient, setSelectedClientId } = useApp();
 
+  // Si hay un cliente seleccionado mostramos su detalle,
+  // si no mostramos la grilla de tarjetas.
+  const showDetail = selectedClient !== null;
+
+  const handleSelectClient = (client: Client) => {
+    setSelectedClientId(client.id);
+  };
+
+  const handleBack = () => {
+    // Deseleccionamos volviendo a la grilla
+    setSelectedClientId(null);
+  };
+
+  const pageStyle: CSSProperties = {
+    height: '100%',
+    boxSizing: 'border-box',
+    backgroundColor: 'var(--app-color-background)',
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
+  const backBarStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '14px 20px 6px 20px',
+    flexShrink: 0,
+  };
+
+  const backBtnStyle: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#007aff',
+    fontSize: 15,
+    fontWeight: 500,
+    padding: '4px 0',
+  };
+
+  const detailScrollStyle: CSSProperties = {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '0 16px 16px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
   return (
     <Page noNavbar noToolbar>
-      <div
-        className="display-flex padding"
-        style={{
-          height: '100%',
-          boxSizing: 'border-box',
-          gap: 16,
-          backgroundColor: 'var(--app-color-background)',
-          overflow: 'hidden',
-        }}
-      >
-        {/* Panel izquierdo: Lista de clientes en tarjeta blanca flotante */}
-        <div
-          style={{
-            width: 280,
-            minWidth: 280,
-            maxWidth: 280,
-            height: '100%',
-            backgroundColor: 'var(--app-color-white, #ffffff)',
-            borderRadius: 16,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden',
-            boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
-          }}
-        >
-          <ClientList
-            clients={clients}
-            selectedClient={selectedClient}
-            onSelectClient={(client) => setSelectedClientId(client.id)}
-          />
-        </div>
-
-        {/* Panel derecho: Detalle del cliente sobre el fondo de la app */}
-        <div
-          style={{
-            flex: 1,
-            height: '100%',
-            overflowY: 'auto',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {selectedClient ? (
-            <ClientDetails client={selectedClient} />
-          ) : (
-            <div
-              className="display-flex justify-content-center align-items-center"
-              style={{
-                height: '100%',
-                backgroundColor: 'var(--app-color-white, #ffffff)',
-                borderRadius: 16,
-              }}
-            >
-              <p className="text-color-gray">Selecciona un cliente para ver sus detalles</p>
+      <div style={pageStyle}>
+        {showDetail && selectedClient ? (
+          <>
+            {/* Botón volver */}
+            <div style={backBarStyle}>
+              <button
+                type="button"
+                style={backBtnStyle}
+                onClick={handleBack}
+                aria-label="Volver a clientes"
+              >
+                <svg
+                  width="8"
+                  height="14"
+                  viewBox="0 0 8 14"
+                  fill="none"
+                  style={{ marginRight: 2 }}
+                >
+                  <path
+                    d="M7 1L1 7L7 13"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                Clientes
+              </button>
             </div>
-          )}
-        </div>
+
+            {/* Detalle del cliente seleccionado */}
+            <div style={detailScrollStyle}>
+              <ClientDetails client={selectedClient} />
+            </div>
+          </>
+        ) : (
+          /* Grilla de tarjetas */
+          <ClientCardGrid clients={clients} onSelectClient={handleSelectClient} />
+        )}
       </div>
     </Page>
   );

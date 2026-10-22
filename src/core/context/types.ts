@@ -19,13 +19,13 @@ export type AppTab = 'inicio' | 'calendar' | 'cliente' | 'pagos' | 'config';
 
 export interface AppContextType {
   clients: Client[];
-  selectedClientId: number;
+  selectedClientId: number | null;
   selectedClient: Client | null;
   payments: Payment[];
   hearings: HearingEvent[];
   activeTab: AppTab;
   setActiveTab: (tab: AppTab) => void;
-  setSelectedClientId: (id: number) => void;
+  setSelectedClientId: (id: number | null) => void;
   updateClient: (id: number, data: Partial<Client>) => void;
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;

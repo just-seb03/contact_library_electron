@@ -40,7 +40,7 @@ function parseHearing(client: Client): HearingEvent | null {
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
-  const [selectedClientId, setSelectedClientId] = useState<number>(MOCK_CLIENTS[0]?.id ?? 1);
+  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('contact_library_dark_mode') === 'true';
@@ -63,9 +63,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
-  // Cliente actualmente seleccionado
+  // Cliente actualmente seleccionado (null si no hay ninguno elegido)
   const selectedClient = useMemo(() => {
-    return clients.find((c) => c.id === selectedClientId) || clients[0] || null;
+    if (selectedClientId === null) return null;
+    return clients.find((c) => c.id === selectedClientId) ?? null;
   }, [clients, selectedClientId]);
 
   // Lista de pagos sincronizada de forma reactiva a partir de la fuente de clientes
