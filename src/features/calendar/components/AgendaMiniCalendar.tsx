@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { FC, CSSProperties } from 'react';
 import { Button, Icon } from 'framework7-react';
 import { APP_COLORS } from '../../../core/theme/style';
@@ -49,6 +49,9 @@ const dayCellStyle: CSSProperties = {
   justifyContent: 'center',
   height: 32,
   width: '100%',
+  padding: 0,
+  border: 0,
+  background: 'transparent',
   cursor: 'pointer',
 };
 
@@ -68,15 +71,28 @@ const navButtonStyle: CSSProperties = {
   ['--f7-button-padding-horizontal' as string]: '6px',
 };
 
+interface AgendaMiniCalendarProps {
+  selectedDate: Date;
+  onSelectDate: (date: Date) => void;
+}
+
 function getMondayOffset(year: number, month: number): number {
   const firstDay = new Date(year, month, 1).getDay();
   return firstDay === 0 ? 6 : firstDay - 1;
 }
 
-export const AgendaMiniCalendar: FC = () => {
+export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
+  selectedDate,
+  onSelectDate,
+}) => {
   const today = new Date();
-  const [viewYear, setViewYear] = useState(today.getFullYear());
-  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [viewYear, setViewYear] = useState(selectedDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(selectedDate.getMonth());
+
+  useEffect(() => {
+    setViewYear(selectedDate.getFullYear());
+    setViewMonth(selectedDate.getMonth());
+  }, [selectedDate]);
 
   const monthNames = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -102,7 +118,7 @@ export const AgendaMiniCalendar: FC = () => {
       }
     }
     return result;
-  }, [viewYear, viewMonth, daysInMonth, mondayOffset, prevMonthDays]);
+  }, [daysInMonth, mondayOffset, prevMonthDays]);
 
   const goNext = () => {
     if (viewMonth === 11) {
@@ -151,23 +167,47 @@ export const AgendaMiniCalendar: FC = () => {
       <div style={daysGridStyle}>
         {cells.map((cell, idx) => {
           const todayMatch = isToday(cell.day, cell.isCurrentMonth);
+          const cellDate = new Date(
+            viewYear,
+            viewMonth + (cell.isCurrentMonth ? 0 : idx < mondayOffset ? -1 : 1),
+            cell.day
+          );
+          const selectedMatch = cellDate.toDateString() === selectedDate.toDateString();
           return (
-            <div key={idx} style={dayCellStyle}>
+            <button
+              key={idx}
+              type="button"
+              style={dayCellStyle}
+              aria-label={cellDate.toLocaleDateString('es-ES', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+              aria-pressed={selectedMatch}
+              onClick={() => {
+                onSelectDate(cellDate);
+                if (!cell.isCurrentMonth) {
+                  setViewYear(cellDate.getFullYear());
+                  setViewMonth(cellDate.getMonth());
+                }
+              }}
+            >
               <div
                 style={{
                   ...dayNumberBaseStyle,
-                  backgroundColor: todayMatch ? APP_COLORS.black : 'transparent',
-                  color: todayMatch
+                  backgroundColor: selectedMatch ? APP_COLORS.black : 'transparent',
+                  color: selectedMatch
                     ? APP_COLORS.white
                     : cell.isCurrentMonth
                       ? APP_COLORS.black
                       : 'rgba(0,0,0,0.25)',
-                  fontWeight: todayMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
+                  fontWeight: selectedMatch || todayMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
+                  boxShadow: todayMatch && !selectedMatch ? `inset 0 0 0 1px ${APP_COLORS.primary}` : 'none',
                 }}
               >
                 {cell.day}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

@@ -6,6 +6,7 @@ interface AgendaHeaderProps {
   day: number;
   monthShort: string;
   fullDateLabel: string;
+  onAddEvent: () => void;
 }
 
 const headerStyle: CSSProperties = {
@@ -79,6 +80,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   day,
   monthShort,
   fullDateLabel,
+  onAddEvent,
 }) => (
   <div style={headerStyle}>
     <div style={headerRowStyle}>
@@ -91,7 +93,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
           <span style={dateStyle}>{fullDateLabel}</span>
         </div>
       </div>
-      <Button fill round style={addButtonStyle}>
+      <Button fill round style={addButtonStyle} onClick={onAddEvent}>
         <Icon f7="plus" size="14px" style={{ marginRight: 4 }} />
         Añadir evento
       </Button>

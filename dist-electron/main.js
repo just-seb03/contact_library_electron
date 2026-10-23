@@ -1,48 +1,67 @@
-import { ipcMain as s, app as n, BrowserWindow as r } from "electron";
-import { fileURLToPath as d } from "node:url";
-import o from "node:path";
-const m = {
+import { ipcMain, app, BrowserWindow } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+const APP_COLORS = {
   background: "#f5f5f7"
-}, a = o.dirname(d(import.meta.url));
-process.env.APP_ROOT = o.join(a, "..");
-const i = process.env.VITE_DEV_SERVER_URL, _ = o.join(process.env.APP_ROOT, "dist-electron"), l = o.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = i ? o.join(process.env.APP_ROOT, "public") : l;
-let e;
-s.on("window-minimize", () => e == null ? void 0 : e.minimize());
-s.on("window-maximize", () => {
-  e != null && e.isMaximized() ? e == null || e.restore() : e == null || e.maximize();
+};
+const __dirname$1 = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname$1, "..");
+const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+let win;
+ipcMain.on("window-minimize", () => win == null ? void 0 : win.minimize());
+ipcMain.on("window-maximize", () => {
+  if (win == null ? void 0 : win.isMaximized()) {
+    win == null ? void 0 : win.restore();
+  } else {
+    win == null ? void 0 : win.maximize();
+  }
 });
-s.on("window-close", () => e == null ? void 0 : e.close());
-s.handle("get-platform", () => process.platform);
-function c() {
-  const t = process.platform === "darwin";
-  e = new r({
+ipcMain.on("window-close", () => win == null ? void 0 : win.close());
+ipcMain.handle("get-platform", () => process.platform);
+function createWindow() {
+  const isMac = process.platform === "darwin";
+  win = new BrowserWindow({
     width: 1280,
     height: 720,
-    frame: !1,
-    titleBarStyle: t ? "hiddenInset" : "default",
-    trafficLightPosition: t ? { x: 12, y: 12 } : void 0,
-    show: !1,
-    backgroundColor: m.background,
-    icon: o.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+    frame: false,
+    titleBarStyle: isMac ? "hiddenInset" : "default",
+    trafficLightPosition: isMac ? { x: 12, y: 12 } : void 0,
+    show: false,
+    backgroundColor: APP_COLORS.background,
+    icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
-      preload: o.join(a, "preload.mjs")
+      preload: path.join(__dirname$1, "preload.mjs")
     }
-  }), e.once("ready-to-show", () => {
-    e == null || e.show();
-  }), e.webContents.on("did-finish-load", () => {
-    e == null || e.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  }), i ? e.loadURL(i) : e.loadFile(o.join(l, "index.html"));
+  });
+  win.once("ready-to-show", () => {
+    win == null ? void 0 : win.show();
+  });
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  if (VITE_DEV_SERVER_URL) {
+    win.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    win.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
 }
-n.on("window-all-closed", () => {
-  process.platform !== "darwin" && (n.quit(), e = null);
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
 });
-n.on("activate", () => {
-  r.getAllWindows().length === 0 && c();
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });
-n.whenReady().then(c);
+app.whenReady().then(createWindow);
 export {
-  _ as MAIN_DIST,
-  l as RENDERER_DIST,
-  i as VITE_DEV_SERVER_URL
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
 };

@@ -3,8 +3,10 @@ import type { ReactNode } from 'react';
 import type { Client, ClientPaymentInfo } from '../../features/clients/types';
 import type { Payment } from '../../features/payments/types';
 import { MOCK_CLIENTS } from '../../features/clients/data/clientData';
+import { loadCalendarEvents, saveCalendarEvents } from '../../features/calendar/data/calendarEventStorage';
 import { AppContext } from './useApp';
 import type { AppContextType, HearingEvent } from './types';
+import type { CalendarEvent } from '../../features/calendar/types';
 
 const MONTH_MAP: Record<string, number> = {
   ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5,
@@ -40,6 +42,7 @@ function parseHearing(client: Client): HearingEvent | null {
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -60,6 +63,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       document.body.classList.remove('dark');
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    saveCalendarEvents(calendarEvents);
+  }, [calendarEvents]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
@@ -135,12 +142,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
+  const addCalendarEvent = (event: Omit<CalendarEvent, 'id'>) => {
+    setCalendarEvents((prev) => [
+      ...prev,
+      { ...event, id: `event-${Date.now()}-${Math.random().toString(36).slice(2, 8)}` },
+    ]);
+  };
+
   const value: AppContextType = {
     clients,
     selectedClientId,
     selectedClient,
     payments,
     hearings,
+    calendarEvents,
     activeTab,
     setActiveTab,
     setSelectedClientId,
@@ -148,6 +163,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updatePaymentStatus,
     updateClientPayment,
     addClient,
+    addCalendarEvent,
     darkMode,
     setDarkMode,
     toggleDarkMode,

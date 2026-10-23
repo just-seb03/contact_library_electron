@@ -1,5 +1,6 @@
 import type { Client, ClientPaymentInfo } from '../../features/clients/types';
 import type { Payment } from '../../features/payments/types';
+import type { CalendarEvent } from '../../features/calendar/types';
 
 export interface HearingEvent {
   id: string;
@@ -23,6 +24,7 @@ export interface AppContextType {
   selectedClient: Client | null;
   payments: Payment[];
   hearings: HearingEvent[];
+  calendarEvents: CalendarEvent[];
   activeTab: AppTab;
   setActiveTab: (tab: AppTab) => void;
   setSelectedClientId: (id: number | null) => void;
@@ -30,6 +32,7 @@ export interface AppContextType {
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
+  addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   toggleDarkMode: () => void;

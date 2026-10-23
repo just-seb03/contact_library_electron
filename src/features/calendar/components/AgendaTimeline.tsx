@@ -1,9 +1,13 @@
 import type { FC, CSSProperties } from 'react';
 import { APP_COLORS } from '../../../core/theme/style';
 import type { HearingEvent } from '../../../core/context/types';
+import type { CalendarEvent } from '../types';
+import { getCalendarEventColor } from '../data/eventColors';
 
 interface AgendaTimelineProps {
   todayHearings: HearingEvent[];
+  calendarEvents: CalendarEvent[];
+  onSelectCalendarEvent: (event: CalendarEvent) => void;
 }
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -31,11 +35,23 @@ function parseTimeToHour(timeStr: string): number {
 }
 
 const EVENT_COLORS = [
-  { bg: 'rgba(200, 180, 255, 0.35)', border: '#9b7fd4' },
-  { bg: 'rgba(180, 210, 255, 0.35)', border: '#6ea8e6' },
-  { bg: 'rgba(180, 240, 200, 0.35)', border: '#5ec488' },
-  { bg: 'rgba(255, 220, 180, 0.35)', border: '#e6a85c' },
+  { bg: '#f0eaff', border: '#9b7fd4' },
+  { bg: '#e6f0ff', border: '#6ea8e6' },
+  { bg: '#e5f7ec', border: '#5ec488' },
+  { bg: '#fff0df', border: '#e6a85c' },
 ];
+
+function parseClockTime(time: string): number {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours + minutes / 60;
+}
+
+function formatClockTime(time: string): string {
+  const [hours, minutes] = time.split(':').map(Number);
+  const period = hours < 12 ? 'AM' : 'PM';
+  const displayHour = hours % 12 || 12;
+  return `${String(displayHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
+}
 
 const containerStyle: CSSProperties = {
   position: 'relative',
@@ -121,6 +137,11 @@ const eventBlockBaseStyle: CSSProperties = {
   overflow: 'hidden',
   cursor: 'pointer',
   borderLeft: '3px solid',
+  borderTop: 'none',
+  borderRight: 'none',
+  borderBottom: 'none',
+  textAlign: 'left',
+  fontFamily: 'inherit',
 };
 
 const eventTitleStyle: CSSProperties = {
@@ -140,7 +161,11 @@ const eventTimeStyle: CSSProperties = {
   lineHeight: 1.3,
 };
 
-export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
+export const AgendaTimeline: FC<AgendaTimelineProps> = ({
+  todayHearings,
+  calendarEvents,
+  onSelectCalendarEvent,
+}) => {
   const now = new Date();
   const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
   const nowLineTop = currentHourDecimal * HOUR_HEIGHT;
@@ -170,19 +195,14 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
       {/* Events positioned on the timeline */}
       {todayHearings.map((hearing, idx) => {
         const hourDecimal = parseTimeToHour(hearing.timeStr);
-        const top = hourDecimal * HOUR_HEIGHT;
-        const eventHeight = Math.min(
-          HOUR_HEIGHT * 1.2,
-          (HOURS.length - hourDecimal) * HOUR_HEIGHT
-        );
+        const eventHeight = Math.min(HOUR_HEIGHT * 1.2, (HOURS.length - hourDecimal) * HOUR_HEIGHT);
         const colors = EVENT_COLORS[idx % EVENT_COLORS.length];
-
         return (
           <div
             key={hearing.id}
             style={{
               ...eventBlockBaseStyle,
-              top,
+              top: hourDecimal * HOUR_HEIGHT,
               height: eventHeight,
               backgroundColor: colors.bg,
               borderLeftColor: colors.border,
@@ -191,6 +211,37 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
             <div style={eventTitleStyle}>{hearing.clientName}</div>
             <div style={eventTimeStyle}>{hearing.timeStr}</div>
           </div>
+        );
+      })}
+
+      {calendarEvents.map((event) => {
+        const hourDecimal = parseClockTime(event.startTime);
+        const duration = parseClockTime(event.endTime) - hourDecimal;
+        const eventHeight = Math.min(
+          duration * HOUR_HEIGHT,
+          (HOURS.length - hourDecimal) * HOUR_HEIGHT
+        );
+        const color = getCalendarEventColor(event.colorId);
+
+        return (
+          <button
+            type="button"
+            key={event.id}
+            aria-label={`${event.title}, ${formatClockTime(event.startTime)} a ${formatClockTime(event.endTime)}`}
+            onClick={() => onSelectCalendarEvent(event)}
+            style={{
+              ...eventBlockBaseStyle,
+              top: hourDecimal * HOUR_HEIGHT,
+              height: eventHeight,
+              backgroundColor: color.background,
+              borderLeftColor: color.border,
+            }}
+          >
+            <div style={eventTitleStyle}>{event.title}</div>
+            <div style={eventTimeStyle}>
+              {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
+            </div>
+          </button>
         );
       })}
     </div>

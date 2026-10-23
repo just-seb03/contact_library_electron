@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Page, Block, Card, CardContent } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
@@ -8,6 +8,8 @@ import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
+import { CreateEventPopup } from '../components/CreateEventPopup';
+import type { CalendarEvent } from '../types';
 
 const MONTH_NAMES_FULL = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -69,11 +71,13 @@ const timelineScrollStyle: CSSProperties = {
 };
 
 export default function Calendar() {
-  const { hearings } = useApp();
-  const now = new Date();
-  const currentDay = now.getDate();
-  const currentMonthIndex = now.getMonth();
-  const currentYear = now.getFullYear();
+  const { hearings, calendarEvents, clients, addCalendarEvent } = useApp();
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<CalendarEvent | null>(null);
+  const currentDay = selectedDate.getDate();
+  const currentMonthIndex = selectedDate.getMonth();
+  const currentYear = selectedDate.getFullYear();
 
   const todayHearings = useMemo(
     () =>
@@ -86,8 +90,32 @@ export default function Calendar() {
     [hearings, currentDay, currentMonthIndex, currentYear]
   );
 
+  const selectedDayEvents = useMemo(
+    () => calendarEvents.filter((event) => {
+      const [year, month, day] = event.date.split('-').map(Number);
+      return year === currentYear && month === currentMonthIndex + 1 && day === currentDay;
+    }),
+    [calendarEvents, currentDay, currentMonthIndex, currentYear]
+  );
+
   const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
   const monthShort = MONTH_NAMES_SHORT[currentMonthIndex];
+
+  const handleCreateEvent = (event: Parameters<typeof addCalendarEvent>[0]) => {
+    addCalendarEvent(event);
+    const [year, month, day] = event.date.split('-').map(Number);
+    setSelectedDate(new Date(year, month - 1, day));
+    setSelectedCalendarEvent(null);
+  };
+
+  const handleSelectDate = (date: Date) => {
+    setSelectedDate(date);
+    setSelectedCalendarEvent(null);
+  };
+
+  const selectedEventClient = selectedCalendarEvent?.clientId
+    ? clients.find((client) => client.id === selectedCalendarEvent.clientId)?.name
+    : undefined;
 
   return (
     <Page noNavbar noToolbar>
@@ -98,22 +126,40 @@ export default function Calendar() {
             day={currentDay}
             monthShort={monthShort}
             fullDateLabel={fullDateLabel}
+            onAddEvent={() => setIsCreateEventOpen(true)}
           />
 
           <div style={layoutStyle}>
             <div style={timelinePanelStyle}>
               <CardContent style={timelineScrollStyle}>
-                <AgendaTimeline todayHearings={todayHearings} />
+                <AgendaTimeline
+                  todayHearings={todayHearings}
+                  calendarEvents={selectedDayEvents}
+                  onSelectCalendarEvent={setSelectedCalendarEvent}
+                />
               </CardContent>
             </div>
 
             <div style={sidebarPanelStyle}>
-              <AgendaMiniCalendar />
-              <AgendaEventDetail />
+              <AgendaMiniCalendar
+                selectedDate={selectedDate}
+                onSelectDate={handleSelectDate}
+              />
+              <AgendaEventDetail
+                event={selectedCalendarEvent}
+                clientName={selectedEventClient}
+              />
             </div>
           </div>
         </Card>
       </Block>
+      <CreateEventPopup
+        opened={isCreateEventOpen}
+        selectedDate={selectedDate}
+        clients={clients}
+        onClose={() => setIsCreateEventOpen(false)}
+        onCreate={handleCreateEvent}
+      />
     </Page>
   );
 }
