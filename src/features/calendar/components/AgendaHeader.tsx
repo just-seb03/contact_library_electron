@@ -1,13 +1,17 @@
 import type { FC, CSSProperties } from 'react';
-import { Block, Button, Icon } from 'framework7-react';
+import { Button, Icon } from 'framework7-react';
 import { APP_COLORS } from '../../../core/theme/style';
 
 interface AgendaHeaderProps {
   day: number;
   monthShort: string;
   fullDateLabel: string;
-  weekdayLabel: string;
 }
+
+const headerStyle: CSSProperties = {
+  padding: '16px 20px',
+  borderBottom: '1px solid rgba(0,0,0,0.08)',
+};
 
 const badgeContainerStyle: CSSProperties = {
   display: 'flex',
@@ -51,17 +55,10 @@ const dateTextContainerStyle: CSSProperties = {
   flex: 1,
 };
 
-const fullDateStyle: CSSProperties = {
-  fontSize: 18,
-  fontWeight: 700,
+const dateStyle: CSSProperties = {
+  fontSize: 17,
+  fontWeight: 600,
   color: APP_COLORS.black,
-  lineHeight: 1.2,
-};
-
-const weekdayStyle: CSSProperties = {
-  fontSize: 13,
-  fontWeight: 400,
-  color: APP_COLORS.neutral,
   lineHeight: 1.4,
 };
 
@@ -82,9 +79,8 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   day,
   monthShort,
   fullDateLabel,
-  weekdayLabel,
 }) => (
-  <Block className="no-margin-top no-margin-bottom padding-top-half padding-bottom-half">
+  <div style={headerStyle}>
     <div style={headerRowStyle}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={badgeContainerStyle}>
@@ -92,8 +88,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
           <span style={badgeDayStyle}>{day}</span>
         </div>
         <div style={dateTextContainerStyle}>
-          <span style={fullDateStyle}>{fullDateLabel}</span>
-          <span style={weekdayStyle}>{weekdayLabel}</span>
+          <span style={dateStyle}>{fullDateLabel}</span>
         </div>
       </div>
       <Button fill round style={addButtonStyle}>
@@ -101,5 +96,5 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
         Añadir evento
       </Button>
     </div>
-  </Block>
+  </div>
 );

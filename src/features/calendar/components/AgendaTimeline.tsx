@@ -8,6 +8,9 @@ interface AgendaTimelineProps {
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const HOUR_HEIGHT = 64;
+const HOUR_COLUMN_WIDTH = 80;
+const EVENT_LEFT = HOUR_COLUMN_WIDTH + 12;
+const SECTION_BORDER_COLOR = 'rgba(0,0,0,0.08)';
 
 function formatHour(hour: number): string {
   if (hour === 0) return '12 AM';
@@ -44,17 +47,40 @@ const hourRowStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'flex-start',
   height: HOUR_HEIGHT,
-  borderTop: '1px solid rgba(0,0,0,0.06)',
+};
+
+const hourColumnBackgroundStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  width: HOUR_COLUMN_WIDTH,
+  backgroundColor: '#f7f7f8',
+  zIndex: 0,
+  pointerEvents: 'none',
+};
+
+const hourDividerStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: HOUR_COLUMN_WIDTH,
+  width: 1,
+  backgroundColor: SECTION_BORDER_COLOR,
+  zIndex: 1,
+  pointerEvents: 'none',
 };
 
 const hourLabelStyle: CSSProperties = {
-  width: 56,
+  position: 'relative',
+  zIndex: 2,
+  width: HOUR_COLUMN_WIDTH,
+  boxSizing: 'border-box',
   flexShrink: 0,
   fontSize: 11,
   fontWeight: 500,
-  color: APP_COLORS.neutral,
-  textAlign: 'right',
-  paddingRight: 12,
+  color: '#626267',
+  textAlign: 'center',
   transform: 'translateY(-7px)',
 };
 
@@ -62,11 +88,12 @@ const hourCellStyle: CSSProperties = {
   flex: 1,
   height: '100%',
   position: 'relative',
+  borderTop: '1px solid rgba(0,0,0,0.06)',
 };
 
 const nowLineStyle: CSSProperties = {
   position: 'absolute',
-  left: 56,
+  left: HOUR_COLUMN_WIDTH,
   right: 0,
   height: 2,
   backgroundColor: APP_COLORS.primary,
@@ -75,7 +102,7 @@ const nowLineStyle: CSSProperties = {
 
 const nowDotStyle: CSSProperties = {
   position: 'absolute',
-  left: 50,
+  left: HOUR_COLUMN_WIDTH - 5,
   width: 10,
   height: 10,
   borderRadius: '50%',
@@ -86,7 +113,7 @@ const nowDotStyle: CSSProperties = {
 
 const eventBlockBaseStyle: CSSProperties = {
   position: 'absolute',
-  left: 60,
+  left: EVENT_LEFT,
   right: 8,
   borderRadius: 8,
   padding: '6px 10px',
@@ -121,6 +148,9 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
 
   return (
     <div style={containerStyle}>
+      <div style={hourColumnBackgroundStyle} />
+      <div style={hourDividerStyle} />
+
       {/* Hourly rows */}
       {HOURS.map((hour) => (
         <div key={hour} style={hourRowStyle}>

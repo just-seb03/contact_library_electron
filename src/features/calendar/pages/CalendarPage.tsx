@@ -19,48 +19,51 @@ const MONTH_NAMES_SHORT = [
   'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC',
 ];
 
-const WEEKDAY_NAMES = [
-  'Domingo', 'Lunes', 'Martes', 'Miércoles',
-  'Jueves', 'Viernes', 'Sábado',
-];
+const sectionTitleStyle: CSSProperties = {
+  margin: '0 0 14px',
+  fontSize: 22,
+  fontWeight: 700,
+  lineHeight: 1.2,
+  color: APP_COLORS.black,
+};
+
+const calendarCardStyle: CSSProperties = {
+  ['--f7-card-bg-color' as string]: APP_COLORS.white,
+  ['--f7-card-border-radius' as string]: '16px',
+  display: 'flex',
+  flexDirection: 'column',
+  height: 'calc(100vh - 150px)',
+  minHeight: 320,
+  margin: 0,
+  border: '1px solid rgba(0,0,0,0.08)',
+  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+  overflow: 'hidden',
+};
 
 const layoutStyle: CSSProperties = {
   display: 'flex',
-  gap: 16,
-  alignItems: 'flex-start',
+  flex: 1,
+  minHeight: 0,
 };
 
 const timelinePanelStyle: CSSProperties = {
   flex: 1,
   minWidth: 0,
+  minHeight: 0,
 };
 
 const sidebarPanelStyle: CSSProperties = {
   width: 300,
   minWidth: 300,
   flexShrink: 0,
-};
-
-const sidebarCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: APP_COLORS.white,
-  ['--f7-card-border-radius' as string]: '16px',
-  margin: 0,
-  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-  overflow: 'hidden',
-};
-
-const timelineCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: APP_COLORS.white,
-  ['--f7-card-border-radius' as string]: '16px',
-  margin: 0,
-  boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-  overflow: 'hidden',
+  borderLeft: '1px solid rgba(0,0,0,0.08)',
 };
 
 const timelineScrollStyle: CSSProperties = {
+  height: '100%',
+  boxSizing: 'border-box',
   padding: '8px 0',
-  maxHeight: 'calc(100vh - 220px)',
-  minHeight: 320,
+  minHeight: 0,
   overflowY: 'auto',
   overscrollBehaviorY: 'contain',
 };
@@ -71,7 +74,6 @@ export default function Calendar() {
   const currentDay = now.getDate();
   const currentMonthIndex = now.getMonth();
   const currentYear = now.getFullYear();
-  const currentWeekday = now.getDay();
 
   const todayHearings = useMemo(
     () =>
@@ -84,38 +86,33 @@ export default function Calendar() {
     [hearings, currentDay, currentMonthIndex, currentYear]
   );
 
-  const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentDay}, ${currentYear}`;
-  const weekdayLabel = WEEKDAY_NAMES[currentWeekday];
+  const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
   const monthShort = MONTH_NAMES_SHORT[currentMonthIndex];
 
   return (
     <Page noNavbar noToolbar>
       <Block className="no-margin-top padding-top-half">
-        <AgendaHeader
-          day={currentDay}
-          monthShort={monthShort}
-          fullDateLabel={fullDateLabel}
-          weekdayLabel={weekdayLabel}
-        />
+        <h1 style={sectionTitleStyle}>Calendario</h1>
+        <Card style={calendarCardStyle}>
+          <AgendaHeader
+            day={currentDay}
+            monthShort={monthShort}
+            fullDateLabel={fullDateLabel}
+          />
 
-        <div style={layoutStyle}>
-          {/* Left panel - Timeline */}
-          <div style={timelinePanelStyle}>
-            <Card style={timelineCardStyle}>
+          <div style={layoutStyle}>
+            <div style={timelinePanelStyle}>
               <CardContent style={timelineScrollStyle}>
                 <AgendaTimeline todayHearings={todayHearings} />
               </CardContent>
-            </Card>
-          </div>
+            </div>
 
-          {/* Right panel - Mini Calendar + Event Detail */}
-          <div style={sidebarPanelStyle}>
-            <Card style={sidebarCardStyle}>
+            <div style={sidebarPanelStyle}>
               <AgendaMiniCalendar />
               <AgendaEventDetail />
-            </Card>
+            </div>
           </div>
-        </div>
+        </Card>
       </Block>
     </Page>
   );
