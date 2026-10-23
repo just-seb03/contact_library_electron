@@ -16,11 +16,18 @@ const HOUR_COLUMN_WIDTH = 80;
 const EVENT_LEFT = HOUR_COLUMN_WIDTH + 12;
 const SECTION_BORDER_COLOR = 'rgba(0,0,0,0.08)';
 
-function formatHour(hour: number): string {
-  if (hour === 0) return '12 AM';
-  if (hour < 12) return `${hour} AM`;
-  if (hour === 12) return '12 PM';
-  return `${hour - 12} PM`;
+function formatMinutesOfDay(minutes: number, formatter: Intl.DateTimeFormat): string {
+  const time = new Date(2000, 0, 1);
+  time.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+  return formatter.format(time);
+}
+
+function formatHour(hour: number, formatter: Intl.DateTimeFormat): string {
+  return formatMinutesOfDay(hour * 60, formatter);
+}
+
+function formatHearingTime(time: string, formatter: Intl.DateTimeFormat): string {
+  return formatMinutesOfDay(parseTimeToHour(time) * 60, formatter);
 }
 
 function parseTimeToHour(timeStr: string): number {
@@ -46,11 +53,9 @@ function parseClockTime(time: string): number {
   return hours + minutes / 60;
 }
 
-function formatClockTime(time: string): string {
+function formatClockTime(time: string, formatter: Intl.DateTimeFormat): string {
   const [hours, minutes] = time.split(':').map(Number);
-  const period = hours < 12 ? 'AM' : 'PM';
-  const displayHour = hours % 12 || 12;
-  return `${String(displayHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
+  return formatMinutesOfDay(hours * 60 + minutes, formatter);
 }
 
 const containerStyle: CSSProperties = {
@@ -166,6 +171,15 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   calendarEvents,
   onSelectEvent,
 }) => {
+  const locale = document.documentElement.lang || undefined;
+  const hourFormatter = new Intl.DateTimeFormat(locale, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  const eventTimeFormatter = new Intl.DateTimeFormat(locale, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
   const now = new Date();
   const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
   const nowLineTop = currentHourDecimal * HOUR_HEIGHT;
@@ -179,7 +193,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
       {/* Hourly rows */}
       {HOURS.map((hour) => (
         <div key={hour} style={hourRowStyle}>
-          <div style={hourLabelStyle}>{formatHour(hour)}</div>
+          <div style={hourLabelStyle}>{formatHour(hour, hourFormatter)}</div>
           <div style={hourCellStyle} />
         </div>
       ))}
@@ -212,7 +226,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
             }}
           >
             <div style={eventTitleStyle}>{hearing.clientName}</div>
-            <div style={eventTimeStyle}>{hearing.timeStr}</div>
+            <div style={eventTimeStyle}>{formatHearingTime(hearing.timeStr, eventTimeFormatter)}</div>
           </button>
         );
       })}
@@ -230,7 +244,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           <button
             type="button"
             key={event.id}
-            aria-label={`${event.title}, ${formatClockTime(event.startTime)} a ${formatClockTime(event.endTime)}`}
+            aria-label={`${event.title}, ${formatClockTime(event.startTime, eventTimeFormatter)} a ${formatClockTime(event.endTime, eventTimeFormatter)}`}
             onClick={() => onSelectEvent(event)}
             style={{
               ...eventBlockBaseStyle,
@@ -242,7 +256,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           >
             <div style={eventTitleStyle}>{event.title}</div>
             <div style={eventTimeStyle}>
-              {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
+              {formatClockTime(event.startTime, eventTimeFormatter)} – {formatClockTime(event.endTime, eventTimeFormatter)}
             </div>
           </button>
         );

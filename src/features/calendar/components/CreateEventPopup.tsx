@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
-import { Button, f7, Icon, Popup } from 'framework7-react';
+import { Button, f7, Icon, Input, Popup } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import { APP_COLORS } from '../../../core/theme/style';
 import { CALENDAR_EVENT_COLORS } from '../data/eventColors';
@@ -124,11 +124,123 @@ const actionsStyle: CSSProperties = {
   backgroundColor: APP_COLORS.white,
 };
 
+interface TimePickerFieldProps {
+  id: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+function getTimePickerValues(value: string, uses12HourClock: boolean): string[] {
+  const [hours, minutes] = value.split(':').map(Number);
+  if (!uses12HourClock) return [String(hours), String(minutes).padStart(2, '0')];
+
+  const period = hours < 12 ? 'AM' : 'PM';
+  return [String(hours % 12 || 12), String(minutes).padStart(2, '0'), period];
+}
+
+function getTimeFromPickerValues(values: unknown, uses12HourClock: boolean): string | null {
+  if (!Array.isArray(values) || values.length < 2) return null;
+
+  let hours = Number(values[0]);
+  const minutes = Number(values[1]);
+  if (!Number.isInteger(hours) || !Number.isInteger(minutes) || minutes < 0 || minutes > 59) {
+    return null;
+  }
+
+  if (uses12HourClock) {
+    const period = values[2];
+    if (hours < 1 || hours > 12 || (period !== 'AM' && period !== 'PM')) return null;
+    hours %= 12;
+    if (period === 'PM') hours += 12;
+  } else if (hours < 0 || hours > 23) {
+    return null;
+  }
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+function formatTimeForDisplay(value: string, locale: string | undefined): string {
+  const [hours, minutes] = value.split(':').map(Number);
+  const time = new Date(2000, 0, 1, hours, minutes);
+  return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(time);
+}
+
+function TimePickerField({ id, value, onChange }: TimePickerFieldProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pickerRef = useRef<ReturnType<typeof f7.picker.create> | null>(null);
+  const onChangeRef = useRef(onChange);
+  const valueRef = useRef(value);
+  onChangeRef.current = onChange;
+  valueRef.current = value;
+
+  const locale = document.documentElement.lang || undefined;
+  const uses12HourClock = new Intl.DateTimeFormat(locale, { hour: 'numeric' })
+    .resolvedOptions().hour12 ?? false;
+
+  useEffect(() => {
+    if (!inputRef.current) return;
+
+    const hours = uses12HourClock
+      ? Array.from({ length: 12 }, (_, index) => String(index + 1))
+      : Array.from({ length: 24 }, (_, hour) => String(hour));
+    const minutes = Array.from({ length: 60 }, (_, minute) => String(minute).padStart(2, '0'));
+    const cols = [
+      { values: hours },
+      { divider: true, content: ':' },
+      { values: minutes },
+      ...(uses12HourClock ? [{ values: ['AM', 'PM'] }] : []),
+    ];
+
+    const picker = f7.picker.create({
+      inputEl: inputRef.current,
+      openIn: 'popover',
+      toolbar: true,
+      toolbarCloseText: 'Seleccionar hora',
+      value: getTimePickerValues(valueRef.current, uses12HourClock),
+      cols,
+      on: {
+        change: (_picker, values) => {
+          const time = getTimeFromPickerValues(values, uses12HourClock);
+          if (time) onChangeRef.current(time);
+        },
+      },
+    });
+    pickerRef.current = picker;
+
+    return () => {
+      picker.destroy();
+      pickerRef.current = null;
+    };
+  }, [uses12HourClock]);
+
+  useEffect(() => {
+    pickerRef.current?.setValue(getTimePickerValues(value, uses12HourClock));
+  }, [value, uses12HourClock]);
+
+  return (
+    <input
+      ref={inputRef}
+      id={id}
+      type="text"
+      readOnly
+      required
+      value={formatTimeForDisplay(value, locale)}
+      aria-haspopup="dialog"
+      style={controlStyle}
+    />
+  );
+}
+
 function toDateInputValue(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+function fromDateInputValue(value: string): Date {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
 
 function hearingTimeToMinutes(value: string): number | null {
@@ -364,12 +476,20 @@ export function CreateEventPopup({
 
           <div style={fieldStyle}>
             <label htmlFor="calendar-event-date" style={labelStyle}>Día</label>
-            <input
-              id="calendar-event-date"
-              type="date"
+            <Input
+              inputId="calendar-event-date"
+              type="datepicker"
               required
-              value={date}
-              onChange={(event) => setDate(event.target.value)}
+              value={date ? [fromDateInputValue(date)] : []}
+              placeholder="Seleccionar día"
+              calendarParams={{
+                dateFormat: 'dd M, yyyy',
+                locale: 'es-CL',
+                openIn: 'popover',
+              }}
+              onCalendarChange={(value?: Date[]) => {
+                if (value?.[0]) setDate(toDateInputValue(value[0]));
+              }}
               style={controlStyle}
             />
           </div>
@@ -377,24 +497,18 @@ export function CreateEventPopup({
           <div style={{ ...fieldStyle, ...timeFieldsStyle }}>
             <div style={fieldStyle}>
               <label htmlFor="calendar-event-start" style={labelStyle}>Desde</label>
-              <input
+              <TimePickerField
                 id="calendar-event-start"
-                type="time"
-                required
                 value={startTime}
-                onChange={(event) => setStartTime(event.target.value)}
-                style={controlStyle}
+                onChange={setStartTime}
               />
             </div>
             <div style={fieldStyle}>
               <label htmlFor="calendar-event-end" style={labelStyle}>Hasta</label>
-              <input
+              <TimePickerField
                 id="calendar-event-end"
-                type="time"
-                required
                 value={endTime}
-                onChange={(event) => setEndTime(event.target.value)}
-                style={controlStyle}
+                onChange={setEndTime}
               />
             </div>
           </div>

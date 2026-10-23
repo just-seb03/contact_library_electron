@@ -46,6 +46,10 @@ export function App() {
 
 Framework7.use(Framework7React);
 applyAppColors();
+const systemTimeFormat = new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions();
+document.documentElement.lang = new Intl.Locale(systemTimeFormat.locale, {
+  hourCycle: systemTimeFormat.hour12 ? 'h12' : 'h23',
+}).toString();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
