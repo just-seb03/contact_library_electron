@@ -33,6 +33,9 @@ export interface AppContextType {
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
+  updateCalendarEvent: (event: CalendarEvent) => void;
+  removeCalendarEvent: (id: string) => CalendarEvent | undefined;
+  restoreCalendarEvent: (event: CalendarEvent) => void;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   toggleDarkMode: () => void;

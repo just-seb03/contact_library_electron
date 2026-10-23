@@ -6,6 +6,9 @@ interface AgendaHeaderProps {
   day: number;
   monthShort: string;
   fullDateLabel: string;
+  onPreviousDay: () => void;
+  onToday: () => void;
+  onNextDay: () => void;
   onAddEvent: () => void;
 }
 
@@ -50,6 +53,14 @@ const headerRowStyle: CSSProperties = {
   gap: 12,
 };
 
+const actionsStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  flexWrap: 'wrap',
+  gap: 6,
+};
+
 const dateTextContainerStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -80,6 +91,9 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   day,
   monthShort,
   fullDateLabel,
+  onPreviousDay,
+  onToday,
+  onNextDay,
   onAddEvent,
 }) => (
   <div style={headerStyle}>
@@ -93,10 +107,29 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
           <span style={dateStyle}>{fullDateLabel}</span>
         </div>
       </div>
-      <Button fill round style={addButtonStyle} onClick={onAddEvent}>
-        <Icon f7="plus" size="14px" style={{ marginRight: 4 }} />
-        Añadir evento
-      </Button>
+      <div style={actionsStyle}>
+        <Button
+          small
+          round
+          aria-label="Día anterior"
+          onClick={onPreviousDay}
+        >
+          <Icon f7="chevron_left" size="14px" />
+        </Button>
+        <Button small round onClick={onToday}>Hoy</Button>
+        <Button
+          small
+          round
+          aria-label="Día siguiente"
+          onClick={onNextDay}
+        >
+          <Icon f7="chevron_right" size="14px" />
+        </Button>
+        <Button fill round style={addButtonStyle} onClick={onAddEvent}>
+          <Icon f7="plus" size="14px" style={{ marginRight: 4 }} />
+          Añadir evento
+        </Button>
+      </div>
     </div>
   </div>
 );

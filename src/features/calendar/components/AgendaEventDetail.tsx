@@ -1,10 +1,14 @@
 import type { FC, CSSProperties } from 'react';
+import { Button, Icon } from 'framework7-react';
 import { APP_COLORS } from '../../../core/theme/style';
 import type { CalendarEvent } from '../types';
+import type { HearingEvent } from '../../../core/context/types';
 
 interface AgendaEventDetailProps {
-  event: CalendarEvent | null;
+  event: CalendarEvent | HearingEvent | null;
   clientName?: string;
+  onEdit?: (event: CalendarEvent) => void;
+  onDelete?: (event: CalendarEvent) => void;
 }
 
 const containerStyle: CSSProperties = {
@@ -34,6 +38,12 @@ const detailTextStyle: CSSProperties = {
   overflowWrap: 'anywhere',
 };
 
+const actionsStyle: CSSProperties = {
+  display: 'flex',
+  gap: 8,
+  marginTop: 8,
+};
+
 function formatEventDate(date: string): string {
   const [year, month, day] = date.split('-').map(Number);
   return new Date(year, month - 1, day).toLocaleDateString('es-ES', {
@@ -51,24 +61,54 @@ function formatClockTime(time: string): string {
   return `${String(displayHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
 }
 
-export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({ event, clientName }) => (
+export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
+  event,
+  clientName,
+  onEdit,
+  onDelete,
+}) => (
   <div style={containerStyle}>
     <div style={titleStyle}>Detalle del evento</div>
     {event ? (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <strong style={{ fontSize: 14, color: APP_COLORS.black }}>{event.title}</strong>
-        <span style={detailTextStyle}>{formatEventDate(event.date)}</span>
-        <span style={detailTextStyle}>
-          {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
-        </span>
+        <strong style={{ fontSize: 14, color: APP_COLORS.black }}>
+          {'title' in event ? event.title : event.clientName}
+        </strong>
+        {'date' in event ? (
+          <>
+            <span style={detailTextStyle}>{formatEventDate(event.date)}</span>
+            <span style={detailTextStyle}>
+              {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
+            </span>
+          </>
+        ) : (
+          <>
+            <span style={detailTextStyle}>{event.dateStr}</span>
+            <span style={detailTextStyle}>{event.materia}</span>
+            <span style={detailTextStyle}>{event.juzgado}</span>
+            <span style={detailTextStyle}>Expediente: {event.expediente}</span>
+          </>
+        )}
         {clientName && <span style={detailTextStyle}>Cliente: {clientName}</span>}
-        <span style={detailTextStyle}>
-          {event.alarmMinutes > 0
-            ? `Aviso previo: ${event.alarmMinutes} minutos (no funcional)`
-            : 'Sin aviso previo'}
-        </span>
-        {event.details && (
-          <p style={{ ...detailTextStyle, margin: '4px 0 0' }}>{event.details}</p>
+        {'date' in event && (
+          <>
+            <span style={detailTextStyle}>
+              {event.alarmMinutes > 0
+                ? `Aviso previo: ${event.alarmMinutes} minutos (no funcional)`
+                : 'Sin aviso previo'}
+            </span>
+            {event.details && (
+              <p style={{ ...detailTextStyle, margin: '4px 0 0' }}>{event.details}</p>
+            )}
+            <div style={actionsStyle}>
+              <Button small onClick={() => onEdit?.(event)}>
+                <Icon f7="pencil" size="13px" /> Editar
+              </Button>
+              <Button small color="red" onClick={() => onDelete?.(event)}>
+                <Icon f7="trash" size="13px" /> Eliminar
+              </Button>
+            </div>
+          </>
         )}
       </div>
     ) : (

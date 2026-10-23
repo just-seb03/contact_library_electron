@@ -7,7 +7,7 @@ import { getCalendarEventColor } from '../data/eventColors';
 interface AgendaTimelineProps {
   todayHearings: HearingEvent[];
   calendarEvents: CalendarEvent[];
-  onSelectCalendarEvent: (event: CalendarEvent) => void;
+  onSelectEvent: (event: CalendarEvent | HearingEvent) => void;
 }
 
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -164,7 +164,7 @@ const eventTimeStyle: CSSProperties = {
 export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   todayHearings,
   calendarEvents,
-  onSelectCalendarEvent,
+  onSelectEvent,
 }) => {
   const now = new Date();
   const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
@@ -198,8 +198,11 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
         const eventHeight = Math.min(HOUR_HEIGHT * 1.2, (HOURS.length - hourDecimal) * HOUR_HEIGHT);
         const colors = EVENT_COLORS[idx % EVENT_COLORS.length];
         return (
-          <div
+          <button
+            type="button"
             key={hearing.id}
+            aria-label={`${hearing.clientName}, audiencia ${hearing.timeStr}`}
+            onClick={() => onSelectEvent(hearing)}
             style={{
               ...eventBlockBaseStyle,
               top: hourDecimal * HOUR_HEIGHT,
@@ -210,7 +213,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           >
             <div style={eventTitleStyle}>{hearing.clientName}</div>
             <div style={eventTimeStyle}>{hearing.timeStr}</div>
-          </div>
+          </button>
         );
       })}
 
@@ -228,7 +231,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
             type="button"
             key={event.id}
             aria-label={`${event.title}, ${formatClockTime(event.startTime)} a ${formatClockTime(event.endTime)}`}
-            onClick={() => onSelectCalendarEvent(event)}
+            onClick={() => onSelectEvent(event)}
             style={{
               ...eventBlockBaseStyle,
               top: hourDecimal * HOUR_HEIGHT,

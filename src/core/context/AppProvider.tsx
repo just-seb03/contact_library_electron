@@ -149,6 +149,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     ]);
   };
 
+  const updateCalendarEvent = (event: CalendarEvent) => {
+    setCalendarEvents((prev) => prev.map((item) => (item.id === event.id ? event : item)));
+  };
+
+  const removeCalendarEvent = (id: string) => {
+    const removed = calendarEvents.find((event) => event.id === id);
+    if (removed) {
+      setCalendarEvents((prev) => prev.filter((event) => event.id !== id));
+    }
+    return removed;
+  };
+
+  const restoreCalendarEvent = (event: CalendarEvent) => {
+    setCalendarEvents((prev) => (
+      prev.some((item) => item.id === event.id) ? prev : [...prev, event]
+    ));
+  };
+
   const value: AppContextType = {
     clients,
     selectedClientId,
@@ -164,6 +182,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateClientPayment,
     addClient,
     addCalendarEvent,
+    updateCalendarEvent,
+    removeCalendarEvent,
+    restoreCalendarEvent,
     darkMode,
     setDarkMode,
     toggleDarkMode,

@@ -1,33 +1,37 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
-import { Button, Icon, Popup } from 'framework7-react';
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { Button, f7, Icon, Popup } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import { APP_COLORS } from '../../../core/theme/style';
 import { CALENDAR_EVENT_COLORS } from '../data/eventColors';
 import type { CalendarEvent, CalendarEventColorId } from '../types';
+import type { HearingEvent } from '../../../core/context/types';
 
 interface CreateEventPopupProps {
   opened: boolean;
   selectedDate: Date;
   clients: Client[];
+  existingEvents: CalendarEvent[];
+  existingHearings: HearingEvent[];
+  editingEvent: CalendarEvent | null;
   onClose: () => void;
   onCreate: (event: Omit<CalendarEvent, 'id'>) => void;
+  onUpdate: (event: CalendarEvent) => void;
 }
 
 const popupStyle: CSSProperties = {
   width: '100%',
-  height: '100%',
+  height: 'calc(100% - 32px)',
   overflow: 'hidden',
   backgroundColor: 'transparent',
 };
 
 const contentStyle: CSSProperties = {
   position: 'absolute',
-  top: '50%',
+  top: 16,
+  bottom: 16,
   left: '50%',
-  transform: 'translate(-50%, -50%)',
+  transform: 'translateX(-50%)',
   width: 'min(560px, calc(100vw - 32px))',
-  height: 'min(820px, 90vh)',
-  maxHeight: '90vh',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -41,7 +45,9 @@ const formStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  height: '100%',
   minHeight: 0,
+  boxSizing: 'border-box',
 };
 
 const headerStyle: CSSProperties = {
@@ -110,6 +116,7 @@ const colorOptionsStyle: CSSProperties = {
 const actionsStyle: CSSProperties = {
   display: 'flex',
   justifyContent: 'flex-end',
+  alignItems: 'center',
   gap: 10,
   flexShrink: 0,
   padding: '12px 24px 20px',
@@ -124,12 +131,24 @@ function toDateInputValue(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function hearingTimeToMinutes(value: string): number | null {
+  const match = value.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if (!match) return null;
+  let hour = Number(match[1]) % 12;
+  if (match[3].toUpperCase() === 'PM') hour += 12;
+  return hour * 60 + Number(match[2]);
+}
+
 export function CreateEventPopup({
   opened,
   selectedDate,
   clients,
+  existingEvents,
+  existingHearings,
+  editingEvent,
   onClose,
   onCreate,
+  onUpdate,
 }: CreateEventPopupProps) {
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(toDateInputValue(selectedDate));
@@ -140,19 +159,65 @@ export function CreateEventPopup({
   const [clientId, setClientId] = useState('');
   const [details, setDetails] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const initialValues = useRef('');
+
+  const getFormValues = () => ({
+    title,
+    date,
+    startTime,
+    endTime,
+    colorId,
+    alarmMinutes,
+    clientId,
+    details,
+  });
 
   useEffect(() => {
     if (!opened) return;
-    setTitle('');
-    setDate(toDateInputValue(selectedDate));
-    setStartTime('09:00');
-    setEndTime('10:00');
-    setColorId('lavender');
-    setAlarmMinutes(10);
-    setClientId('');
-    setDetails('');
+    const values = editingEvent
+      ? {
+          title: editingEvent.title,
+          date: editingEvent.date,
+          startTime: editingEvent.startTime,
+          endTime: editingEvent.endTime,
+          colorId: editingEvent.colorId,
+          alarmMinutes: editingEvent.alarmMinutes,
+          clientId: editingEvent.clientId === null ? '' : String(editingEvent.clientId),
+          details: editingEvent.details,
+        }
+      : {
+          title: '',
+          date: toDateInputValue(selectedDate),
+          startTime: '09:00',
+          endTime: '10:00',
+          colorId: 'lavender' as CalendarEventColorId,
+          alarmMinutes: 10,
+          clientId: '',
+          details: '',
+        };
+    setTitle(values.title);
+    setDate(values.date);
+    setStartTime(values.startTime);
+    setEndTime(values.endTime);
+    setColorId(values.colorId);
+    setAlarmMinutes(values.alarmMinutes);
+    setClientId(values.clientId);
+    setDetails(values.details);
     setErrorMessage('');
-  }, [opened, selectedDate]);
+    initialValues.current = JSON.stringify(values);
+  }, [opened, selectedDate, editingEvent]);
+
+  const requestClose = () => {
+    if (JSON.stringify(getFormValues()) === initialValues.current) {
+      onClose();
+      return;
+    }
+    f7.dialog.confirm(
+      'Se perderán los cambios que no hayas guardado.',
+      '¿Descartar cambios?',
+      onClose
+    );
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -169,7 +234,29 @@ export function CreateEventPopup({
       return;
     }
 
-    onCreate({
+    const conflict = existingEvents.find((item) => (
+      item.id !== editingEvent?.id
+      && item.date === date
+      && startTime < item.endTime
+      && endTime > item.startTime
+    ));
+    const eventStart = Number(startTime.slice(0, 2)) * 60 + Number(startTime.slice(3, 5));
+    const eventEnd = Number(endTime.slice(0, 2)) * 60 + Number(endTime.slice(3, 5));
+    const hearingConflict = existingHearings.find((hearing) => {
+      const hearingDate = `${hearing.year}-${String(hearing.monthIndex + 1).padStart(2, '0')}-${String(hearing.day).padStart(2, '0')}`;
+      if (hearingDate !== date) return false;
+      const hearingStart = hearingTimeToMinutes(hearing.timeStr);
+      return hearingStart !== null
+        && eventStart < hearingStart + 60
+        && eventEnd > hearingStart;
+    });
+    if (conflict || hearingConflict) {
+      const conflictTitle = conflict?.title ?? hearingConflict?.clientName;
+      setErrorMessage(`El horario se superpone con «${conflictTitle}».`);
+      return;
+    }
+
+    const updatedFields = {
       title: title.trim(),
       date,
       startTime,
@@ -178,7 +265,12 @@ export function CreateEventPopup({
       alarmMinutes,
       clientId: clientId ? Number(clientId) : null,
       details: details.trim(),
-    });
+    };
+    if (editingEvent) {
+      onUpdate({ ...editingEvent, ...updatedFields });
+    } else {
+      onCreate(updatedFields);
+    }
     onClose();
   };
 
@@ -186,18 +278,17 @@ export function CreateEventPopup({
     <Popup
       opened={opened}
       style={popupStyle}
-      closeByBackdropClick
-      closeOnEscape
-      onPopupClosed={onClose}
+      closeByBackdropClick={false}
+      closeOnEscape={false}
     >
       <div style={contentStyle}>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={headerStyle}>
-            <h2 style={titleStyle}>Nuevo evento</h2>
+            <h2 style={titleStyle}>{editingEvent ? 'Editar evento' : 'Nuevo evento'}</h2>
             <Button
               type="button"
               aria-label="Cerrar"
-              onClick={onClose}
+              onClick={requestClose}
               style={{
                 color: APP_COLORS.neutral,
                 width: 36,
@@ -218,7 +309,6 @@ export function CreateEventPopup({
             <label htmlFor="calendar-event-title" style={labelStyle}>Título</label>
             <input
               id="calendar-event-title"
-              autoFocus
               required
               maxLength={80}
               value={title}
@@ -362,9 +452,9 @@ export function CreateEventPopup({
           </div>
 
           <div style={actionsStyle}>
-            <Button type="button" onClick={onClose}>Cancelar</Button>
+            <Button type="button" onClick={requestClose}>Cancelar</Button>
             <Button type="submit" fill round style={{ backgroundColor: APP_COLORS.black }}>
-              Guardar evento
+              {editingEvent ? 'Guardar cambios' : 'Guardar evento'}
             </Button>
           </div>
         </form>
