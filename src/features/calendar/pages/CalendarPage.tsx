@@ -57,6 +57,14 @@ const timelineCardStyle: CSSProperties = {
   overflow: 'hidden',
 };
 
+const timelineScrollStyle: CSSProperties = {
+  padding: '8px 0',
+  maxHeight: 'calc(100vh - 220px)',
+  minHeight: 320,
+  overflowY: 'auto',
+  overscrollBehaviorY: 'contain',
+};
+
 export default function Calendar() {
   const { hearings } = useApp();
   const now = new Date();
@@ -94,7 +102,7 @@ export default function Calendar() {
           {/* Left panel - Timeline */}
           <div style={timelinePanelStyle}>
             <Card style={timelineCardStyle}>
-              <CardContent style={{ padding: '8px 0' }}>
+              <CardContent style={timelineScrollStyle}>
                 <AgendaTimeline todayHearings={todayHearings} />
               </CardContent>
             </Card>

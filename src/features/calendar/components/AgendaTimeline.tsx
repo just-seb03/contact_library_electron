@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import type { FC, CSSProperties } from 'react';
 import { APP_COLORS } from '../../../core/theme/style';
 import type { HearingEvent } from '../../../core/context/types';
@@ -7,7 +6,7 @@ interface AgendaTimelineProps {
   todayHearings: HearingEvent[];
 }
 
-const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16];
+const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const HOUR_HEIGHT = 64;
 
 function formatHour(hour: number): string {
@@ -117,13 +116,8 @@ const eventTimeStyle: CSSProperties = {
 export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
   const now = new Date();
   const currentHourDecimal = now.getHours() + now.getMinutes() / 60;
-
-  const nowLineTop = useMemo(() => {
-    const startHour = HOURS[0];
-    return (currentHourDecimal - startHour) * HOUR_HEIGHT;
-  }, [currentHourDecimal]);
-
-  const showNowLine = currentHourDecimal >= HOURS[0] && currentHourDecimal <= HOURS[HOURS.length - 1] + 1;
+  const nowLineTop = currentHourDecimal * HOUR_HEIGHT;
+  const showNowLine = currentHourDecimal >= 0 && currentHourDecimal <= HOURS.length;
 
   return (
     <div style={containerStyle}>
@@ -146,9 +140,11 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({ todayHearings }) => {
       {/* Events positioned on the timeline */}
       {todayHearings.map((hearing, idx) => {
         const hourDecimal = parseTimeToHour(hearing.timeStr);
-        const startHour = HOURS[0];
-        const top = (hourDecimal - startHour) * HOUR_HEIGHT;
-        const eventHeight = HOUR_HEIGHT * 1.2;
+        const top = hourDecimal * HOUR_HEIGHT;
+        const eventHeight = Math.min(
+          HOUR_HEIGHT * 1.2,
+          (HOURS.length - hourDecimal) * HOUR_HEIGHT
+        );
         const colors = EVENT_COLORS[idx % EVENT_COLORS.length];
 
         return (
