@@ -68,9 +68,9 @@ export const LeftBar = () => {
     ...SIDEBAR_CONTAINER_STYLE,
   };
 
-  /** Reemplaza .app-sidebar-header y .app-sidebar-list */
+  /** Reemplaza .app-sidebar-header y .app-sidebar-list con el fondo tenue anterior del home */
   const sidebarElementBg: CSSProperties = {
-    backgroundColor: APP_COLORS.white,
+    backgroundColor: APP_COLORS.background,
   };
 
   const iconStyle = (isActive: boolean): CSSProperties => ({

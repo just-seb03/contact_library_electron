@@ -29,13 +29,13 @@ export const SIDEBAR_SURFACE_STYLE: CSSProperties = {
   width: 250,
   minWidth: 250,
   maxWidth: 250,
-  backgroundColor: APP_COLORS.white,
+  backgroundColor: APP_COLORS.background,
   ['--f7-panel-width' as any]: '250px',
   ['--f7-panel-left-width' as any]: '250px',
-  ['--f7-panel-bg-color' as any]: APP_COLORS.white,
-  ['--f7-page-bg-color' as any]: APP_COLORS.white,
-  ['--f7-list-strong-bg-color' as any]: APP_COLORS.white,
-  ['--f7-list-bg-color' as any]: APP_COLORS.white,
+  ['--f7-panel-bg-color' as any]: APP_COLORS.background,
+  ['--f7-page-bg-color' as any]: APP_COLORS.background,
+  ['--f7-list-strong-bg-color' as any]: APP_COLORS.background,
+  ['--f7-list-bg-color' as any]: APP_COLORS.background,
 };
 
 /**
@@ -43,14 +43,14 @@ export const SIDEBAR_SURFACE_STYLE: CSSProperties = {
  * Configura las variables de Framework7 para fondos y offsets.
  */
 export const CONTENT_VIEW_STYLE: CSSProperties = {
-  backgroundColor: APP_COLORS.background,
-  ['--f7-page-bg-color' as any]: APP_COLORS.background,
-  ['--f7-bars-bg-color' as any]: APP_COLORS.background,
-  ['--f7-navbar-bg-color' as any]: APP_COLORS.background,
-  ['--f7-toolbar-bg-color' as any]: APP_COLORS.background,
-  ['--f7-card-bg-color' as any]: APP_COLORS.background,
-  ['--f7-list-strong-bg-color' as any]: APP_COLORS.background,
-  ['--f7-list-bg-color' as any]: APP_COLORS.background,
+  backgroundColor: APP_COLORS.white,
+  ['--f7-page-bg-color' as any]: APP_COLORS.white,
+  ['--f7-bars-bg-color' as any]: APP_COLORS.white,
+  ['--f7-navbar-bg-color' as any]: APP_COLORS.white,
+  ['--f7-toolbar-bg-color' as any]: APP_COLORS.white,
+  ['--f7-card-bg-color' as any]: 'transparent',
+  ['--f7-list-strong-bg-color' as any]: APP_COLORS.white,
+  ['--f7-list-bg-color' as any]: APP_COLORS.white,
   ['--f7-page-navbar-offset' as any]: '0px',
   ['--f7-page-toolbar-top-offset' as any]: '0px',
   ['--f7-page-content-extra-padding-top' as any]: '0px',
@@ -63,7 +63,7 @@ export const SIDEBAR_CONTAINER_STYLE: CSSProperties = {
   width: 250,
   minWidth: 250,
   maxWidth: 250,
-  backgroundColor: APP_COLORS.white,
+  backgroundColor: APP_COLORS.background,
   color: APP_COLORS.black,
   ['--f7-menu-list-item-selected-bg-color' as any]: APP_COLORS.selection,
   ['--f7-menu-list-item-selected-text-color' as any]: APP_COLORS.primary,
@@ -71,6 +71,18 @@ export const SIDEBAR_CONTAINER_STYLE: CSSProperties = {
   ['--f7-list-item-title-text-color' as any]: APP_COLORS.sidebarText,
   ['--f7-list-item-text-text-color' as any]: APP_COLORS.sidebarText,
   ['--f7-text-color' as any]: APP_COLORS.sidebarText,
+};
+
+/**
+ * Estilo con efecto translúcido / glassmorphism para las cartas.
+ */
+export const GLASS_CARD_STYLE: CSSProperties = {
+  backgroundColor: 'rgba(245, 245, 247, 0.65)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  border: '1px solid rgba(0, 0, 0, 0.06)',
+  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.06), 0 2px 12px rgba(0, 0, 0, 0.04)',
+  borderRadius: '14px',
 };
 
 /**
@@ -110,11 +122,11 @@ export function applyAppColors(): void {
   root.style.setProperty('--f7-color-red-rgb', 'var(--app-color-danger-rgb)');
   root.style.setProperty('--f7-color-gray-rgb', 'var(--app-color-neutral-rgb)');
 
-  root.style.setProperty('--f7-page-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-bars-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-navbar-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-toolbar-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-card-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-list-strong-bg-color', APP_COLORS.background);
-  root.style.setProperty('--f7-list-bg-color', APP_COLORS.background);
+  root.style.setProperty('--f7-page-bg-color', APP_COLORS.white);
+  root.style.setProperty('--f7-bars-bg-color', APP_COLORS.white);
+  root.style.setProperty('--f7-navbar-bg-color', APP_COLORS.white);
+  root.style.setProperty('--f7-toolbar-bg-color', APP_COLORS.white);
+  root.style.setProperty('--f7-card-bg-color', 'transparent');
+  root.style.setProperty('--f7-list-strong-bg-color', APP_COLORS.white);
+  root.style.setProperty('--f7-list-bg-color', APP_COLORS.white);
 }
