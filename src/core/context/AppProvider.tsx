@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { Client, ClientPaymentInfo } from '../../features/clients/types';
+import type { Client, ClientCase, ClientPaymentInfo } from '../../features/clients/types';
 import type { Payment } from '../../features/payments/types';
 import { MOCK_CLIENTS } from '../../features/clients/data/clientData';
 import { loadCalendarEvents, saveCalendarEvents } from '../../features/calendar/data/calendarEventStorage';
@@ -13,23 +13,93 @@ const MONTH_MAP: Record<string, number> = {
   jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11,
 };
 
+const CLIENTS_STORAGE_KEY = 'contact_library_clients';
 const REGISTERED_PAYMENTS_STORAGE_KEY = 'contact_library_registered_payments';
 
-function loadRegisteredPayments(): Payment[] {
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isClientCase(value: unknown): value is ClientCase {
+  if (!isRecord(value)) return false;
+  return typeof value.expediente === 'string'
+    && typeof value.juzgado === 'string'
+    && typeof value.materia === 'string'
+    && typeof value.estado === 'string'
+    && (value.proximaAudiencia === undefined || typeof value.proximaAudiencia === 'string');
+}
+
+function isClientPayment(value: unknown): value is ClientPaymentInfo {
+  if (!isRecord(value)) return false;
+  return typeof value.monto === 'number'
+    && typeof value.concepto === 'string'
+    && typeof value.fecha === 'string'
+    && ['completed', 'pending', 'overdue'].includes(String(value.estado));
+}
+
+function isClient(value: unknown): value is Client {
+  if (!isRecord(value)) return false;
+  const client = value;
+  const validStatus = client.status === undefined
+    || (
+      typeof client.status === 'string'
+      && ['activo', 'en_proceso', 'completado'].includes(client.status)
+    );
+
+  return Number.isSafeInteger(client.id)
+    && typeof client.name === 'string'
+    && typeof client.phone === 'string'
+    && (client.email === undefined || typeof client.email === 'string')
+    && (client.rut === undefined || typeof client.rut === 'string')
+    && validStatus
+    && (client.caso === undefined || isClientCase(client.caso))
+    && (client.pago === undefined || isClientPayment(client.pago));
+}
+
+function loadClients(): Client[] {
+  try {
+    const stored = localStorage.getItem(CLIENTS_STORAGE_KEY);
+    if (!stored) return MOCK_CLIENTS;
+    const parsed: unknown = JSON.parse(stored);
+    if (
+      !Array.isArray(parsed)
+      || !parsed.every(isClient)
+      || new Set(parsed.map((client) => client.id)).size !== parsed.length
+    ) {
+      throw new Error('Los datos guardados de clientes no son válidos.');
+    }
+    return parsed;
+  } catch (error) {
+    console.error('No se pudieron cargar los clientes guardados.', error);
+    return MOCK_CLIENTS;
+  }
+}
+
+function loadRegisteredPayments(clients: Client[]): Payment[] {
   try {
     const stored = localStorage.getItem(REGISTERED_PAYMENTS_STORAGE_KEY);
     if (!stored) return [];
     const parsed: unknown = JSON.parse(stored);
     if (!Array.isArray(parsed)) throw new Error('El contenido guardado no es una lista.');
-    return parsed.filter(
+    const validPayments = parsed.filter(
       (payment): payment is Payment =>
         typeof payment?.id === 'string' &&
         typeof payment?.client === 'string' &&
+        (payment?.clientId === undefined || Number.isSafeInteger(payment.clientId)) &&
         typeof payment?.concept === 'string' &&
         typeof payment?.amount === 'number' &&
         typeof payment?.date === 'string' &&
         ['completed', 'pending', 'overdue'].includes(payment?.status)
     );
+    const linkedPayments = validPayments.filter((payment) => (
+      payment.clientId !== undefined
+        ? clients.some((client) => client.id === payment.clientId)
+        : clients.some((client) => client.name === payment.client)
+    ));
+    if (linkedPayments.length !== validPayments.length) {
+      console.info('Se eliminaron pagos registrados que no pertenecen a ningún cliente.');
+    }
+    return linkedPayments;
   } catch (error) {
     console.error('No se pudieron cargar los pagos registrados.', error);
     return [];
@@ -64,8 +134,10 @@ function parseHearing(client: Client): HearingEvent | null {
 }
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
-  const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(loadRegisteredPayments);
+  const [clients, setClients] = useState<Client[]>(loadClients);
+  const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(
+    () => loadRegisteredPayments(clients)
+  );
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
@@ -94,6 +166,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   useEffect(() => {
     try {
+      localStorage.setItem(CLIENTS_STORAGE_KEY, JSON.stringify(clients));
+    } catch (error) {
+      console.error('No se pudieron guardar los clientes.', error);
+    }
+  }, [clients]);
+
+  useEffect(() => {
+    try {
       localStorage.setItem(REGISTERED_PAYMENTS_STORAGE_KEY, JSON.stringify(registeredPayments));
     } catch (error) {
       console.error('No se pudieron guardar los pagos registrados.', error);
@@ -116,6 +196,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         .map((client) => ({
           id: String(client.id),
           client: client.name,
+          clientId: client.id,
           concept: client.pago!.concepto,
           amount: client.pago!.monto,
           date: client.pago!.fecha,

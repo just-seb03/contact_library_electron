@@ -1,35 +1,15 @@
 import { useState, type FC, type CSSProperties } from 'react';
-import { Badge, Icon, f7 } from 'framework7-react';
+import { Icon, f7 } from 'framework7-react';
 import type { Client } from '../types';
-import { formatCLP } from '../../../core/utils/format';
 
 interface ClientCaseDetailsProps {
   client: Client;
 }
 
-const paymentStatusColor = (estado: string): string => {
-  switch (estado) {
-    case 'completed': return 'green';
-    case 'pending': return 'orange';
-    case 'overdue': return 'red';
-    default: return 'gray';
-  }
-};
-
-const paymentStatusLabel = (estado: string): string => {
-  switch (estado) {
-    case 'completed': return 'Cobrado';
-    case 'pending': return 'Pendiente';
-    case 'overdue': return 'Vencido';
-    default: return estado;
-  }
-};
-
 export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
-  const { caso, pago } = client;
+  const { caso } = client;
   const [copied, setCopied] = useState(false);
 
-  const isCompleted = client.status === 'completado';
 
   const sectionStyle: CSSProperties = {
     backgroundColor: 'var(--app-color-white, #ffffff)',
@@ -138,107 +118,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
     whiteSpace: 'nowrap',
   };
 
-  const paymentCardStyle: CSSProperties = {
-    backgroundColor: '#f9f9fb',
-    borderRadius: 10,
-    padding: '12px 16px',
-    marginBottom: 10,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  };
-
-  const paymentLeftStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-  };
-
-  const paymentLabelStyle: CSSProperties = {
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#8e8e93',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  };
-
-  const paymentAmountStyle: CSSProperties = {
-    fontSize: 15,
-    fontWeight: 600,
-    color: '#1c1c1e',
-  };
-
-  const paymentDateStyle: CSSProperties = {
-    fontSize: 12,
-    color: '#8e8e93',
-  };
-
   /** Tarjeta de audiencia: Colores neutros si está completado, azul activo si está en curso (Heurística #1) */
-  const hearingCardStyle: CSSProperties = isCompleted
-    ? {
-        backgroundColor: '#f2f2f7',
-        borderRadius: 10,
-        padding: '14px 16px',
-        marginBottom: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-        border: '1px solid #e5e5ea',
-      }
-    : {
-        background: 'linear-gradient(135deg, #e8f4fd 0%, #f0f7ff 100%)',
-        borderRadius: 10,
-        padding: '14px 16px',
-        marginBottom: 10,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 12,
-      };
-
-  const hearingIconContainerStyle: CSSProperties = isCompleted
-    ? {
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        backgroundColor: 'rgba(142, 142, 147, 0.15)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }
-    : {
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        backgroundColor: 'rgba(0,122,255,0.12)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      };
-
-  const hearingLabelStyle: CSSProperties = isCompleted
-    ? {
-        fontSize: 11,
-        fontWeight: 700,
-        color: '#8e8e93',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-        marginBottom: 2,
-      }
-    : {
-        fontSize: 11,
-        fontWeight: 700,
-        color: 'var(--app-color-primary, #007aff)',
-        textTransform: 'uppercase',
-        letterSpacing: 0.5,
-        marginBottom: 2,
-      };
-
-  const hearingDateStyle: CSSProperties = {
-    fontSize: 15,
-    fontWeight: 700,
-    color: '#1c1c1e',
-  };
-
   const handleCopyExpediente = () => {
     if (caso?.expediente) {
       navigator.clipboard.writeText(caso.expediente);
@@ -339,40 +219,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
         <div style={fieldValueStyle}>{caso.materia}</div>
       </div>
 
-      {/* Bloque: Gestión de pagos */}
-      {pago && (
-        <div style={paymentCardStyle}>
-          <div style={paymentLeftStyle}>
-            <div style={paymentLabelStyle}>ESTADO EN GESTIÓN DE PAGOS</div>
-            <div style={paymentAmountStyle}>
-              {pago.concepto} · {formatCLP(pago.monto)}
-            </div>
-            <div style={paymentDateStyle}>Fecha de registro: {pago.fecha}</div>
-          </div>
-          <Badge color={paymentStatusColor(pago.estado)}>
-            {paymentStatusLabel(pago.estado)}
-          </Badge>
-        </div>
-      )}
-
       {/* Bloque: Audiencia dinámica según estado completado o activo (Heurística #1) */}
-      {caso.proximaAudiencia && (
-        <div style={hearingCardStyle}>
-          <div style={hearingIconContainerStyle}>
-            <Icon
-              f7="calendar"
-              size="20px"
-              style={{ color: isCompleted ? '#8e8e93' : '#007aff' }}
-            />
-          </div>
-          <div>
-            <div style={hearingLabelStyle}>
-              {isCompleted ? 'ÚLTIMA AUDIENCIA REALIZADA' : 'PRÓXIMA AUDIENCIA PROGRAMADA'}
-            </div>
-            <div style={hearingDateStyle}>{caso.proximaAudiencia}</div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

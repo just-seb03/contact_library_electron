@@ -2,14 +2,33 @@ import { useState, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
 import { ClientCard } from './ClientCard';
+import type { CalendarEvent } from '../../calendar/types';
+import type { Payment } from '../../payments/types';
+
+function getLocalDateValue(): string {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${today.getFullYear()}-${month}-${day}`;
+}
 
 interface ClientCardGridProps {
   clients: Client[];
   onSelectClient: (client: Client) => void;
+  onAddClient: () => void;
+  payments: Payment[];
+  events: CalendarEvent[];
 }
 
-export const ClientCardGrid: FC<ClientCardGridProps> = ({ clients, onSelectClient }) => {
+export const ClientCardGrid: FC<ClientCardGridProps> = ({
+  clients,
+  onSelectClient,
+  onAddClient,
+  payments,
+  events,
+}) => {
   const [filterText, setFilterText] = useState('');
+  const today = getLocalDateValue();
 
   const filteredClients = clients.filter(
     (client) =>
@@ -51,6 +70,19 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({ clients, onSelectClien
     fontSize: 15,
     fontWeight: 500,
     color: '#8e8e93',
+  };
+
+  const addClientButtonStyle: CSSProperties = {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 36,
+    height: 36,
+    border: 'none',
+    borderRadius: 10,
+    backgroundColor: '#007aff',
+    color: '#ffffff',
+    cursor: 'pointer',
   };
 
   const searchWrapperStyle: CSSProperties = {
@@ -133,6 +165,15 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({ clients, onSelectClien
           <span style={titleStyle}>Clientes</span>
           <span style={counterStyle}>({filteredClients.length})</span>
         </div>
+        <button
+          type="button"
+          onClick={onAddClient}
+          style={addClientButtonStyle}
+          title="Añadir cliente"
+          aria-label="Añadir cliente"
+        >
+          <Icon f7="plus" size="18px" />
+        </button>
       </div>
 
       {/* Buscador */}
@@ -165,7 +206,26 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({ clients, onSelectClien
         {filteredClients.length > 0 ? (
           <div style={gridStyle}>
             {filteredClients.map((client) => (
-              <ClientCard key={client.id} client={client} onSelect={onSelectClient} />
+              <ClientCard
+                key={client.id}
+                client={client}
+                onSelect={onSelectClient}
+                payment={
+                  payments.filter((payment) => (
+                    payment.clientId === client.id
+                    || (!payment.clientId && payment.client === client.name)
+                  )).slice(-1)[0] ?? null
+                }
+                event={
+                  events
+                    .filter((event) => event.clientId === client.id)
+                    .sort((first, second) => (
+                      `${first.date}T${first.startTime}`.localeCompare(`${second.date}T${second.startTime}`)
+                    ))
+                    .find((event) => event.date >= today)
+                    ?? null
+                }
+              />
             ))}
           </div>
         ) : (

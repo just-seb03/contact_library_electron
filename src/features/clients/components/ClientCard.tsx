@@ -1,10 +1,15 @@
 import type { FC, CSSProperties } from 'react';
-import { Icon } from 'framework7-react';
+import { Badge, Icon } from 'framework7-react';
 import type { Client } from '../types';
+import type { CalendarEvent } from '../../calendar/types';
+import type { Payment } from '../../payments/types';
+import { formatCLP } from '../../../core/utils/format';
 
 interface ClientCardProps {
   client: Client;
   onSelect: (client: Client) => void;
+  payment: Payment | null;
+  event: CalendarEvent | null;
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -13,7 +18,27 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   completado: { label: 'Completado', color: '#007aff', bg: 'rgba(0, 122, 255, 0.1)' },
 };
 
-export const ClientCard: FC<ClientCardProps> = ({ client, onSelect }) => {
+const PAYMENT_STATUS_LABELS: Record<Payment['status'], string> = {
+  completed: 'Cobrado',
+  pending: 'Pendiente',
+  overdue: 'Vencido',
+};
+
+const PAYMENT_STATUS_COLORS: Record<Payment['status'], string> = {
+  completed: 'green',
+  pending: 'orange',
+  overdue: 'red',
+};
+
+function formatEventDate(value: string): string {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Intl.DateTimeFormat('es-CL', {
+    day: 'numeric',
+    month: 'short',
+  }).format(new Date(year, month - 1, day));
+}
+
+export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, event }) => {
   const status = client.status ? STATUS_CONFIG[client.status] : null;
 
   const cardStyle: CSSProperties = {
@@ -116,6 +141,29 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect }) => {
     whiteSpace: 'nowrap',
   };
 
+  const activityStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  };
+
+  const activityRowStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    minWidth: 0,
+    color: '#636366',
+    fontSize: 12,
+  };
+
+  const activityTextStyle: CSSProperties = {
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    minWidth: 0,
+  };
+
   return (
     <div
       style={cardStyle}
@@ -180,6 +228,28 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect }) => {
           <Icon f7="phone_fill" size="13px" color="blue" />
         </div>
         <span style={infoTextStyle}>{client.phone}</span>
+      </div>
+
+      {(payment || event) && <div style={dividerStyle} />}
+      <div style={activityStyle}>
+        {payment && (
+          <div style={activityRowStyle}>
+            <span style={activityTextStyle}>
+              {payment.concept} · {formatCLP(payment.amount)}
+            </span>
+            <Badge color={PAYMENT_STATUS_COLORS[payment.status]}>
+              {PAYMENT_STATUS_LABELS[payment.status]}
+            </Badge>
+          </div>
+        )}
+        {event && (
+          <div style={activityRowStyle}>
+            <Icon f7="calendar" size="14px" color="blue" />
+            <span style={activityTextStyle}>
+              {event.title} · {formatEventDate(event.date)} {event.startTime}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -110,6 +110,7 @@ export function RegisterPaymentPopup({
 
     onRegister({
       client: client.name,
+      clientId: client.id,
       concept: concept.trim(),
       amount: numericAmount,
       date: formatPaymentDate(date),

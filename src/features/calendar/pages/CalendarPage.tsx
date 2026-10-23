@@ -58,8 +58,11 @@ const timelinePanelStyle: CSSProperties = {
 const sidebarPanelStyle: CSSProperties = {
   width: 300,
   minWidth: 300,
+  minHeight: 0,
   flexShrink: 0,
   borderLeft: '1px solid rgba(0,0,0,0.08)',
+  overflowY: 'auto',
+  overscrollBehaviorY: 'contain',
 };
 
 const undoBannerStyle: CSSProperties = {

@@ -1,12 +1,22 @@
+import { useState, type CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { ClientCardGrid } from '../components/ClientCardGrid';
 import { ClientDetails } from '../components/ClientDetails';
+import { AddClientPopup } from '../components/AddClientPopup';
 import type { Client } from '../types';
-import type { CSSProperties } from 'react';
 
 export default function Cliente() {
-  const { clients, selectedClient, setSelectedClientId } = useApp();
+  const {
+    clients,
+    selectedClient,
+    payments,
+    calendarEvents,
+    hearings,
+    setSelectedClientId,
+    addClient,
+  } = useApp();
+  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
 
   // Si hay un cliente seleccionado mostramos su detalle,
   // si no mostramos la grilla de tarjetas.
@@ -94,14 +104,34 @@ export default function Cliente() {
 
             {/* Detalle del cliente seleccionado */}
             <div style={detailScrollStyle}>
-              <ClientDetails client={selectedClient} />
+              <ClientDetails
+                client={selectedClient}
+                payments={payments.filter((payment) => (
+                  payment.clientId === selectedClient.id
+                  || (!payment.clientId && payment.client === selectedClient.name)
+                ))}
+                events={calendarEvents.filter((event) => event.clientId === selectedClient.id)}
+                legacyHearing={hearings.find((hearing) => hearing.clientId === selectedClient.id) ?? null}
+              />
             </div>
           </>
         ) : (
           /* Grilla de tarjetas */
-          <ClientCardGrid clients={clients} onSelectClient={handleSelectClient} />
+          <ClientCardGrid
+            clients={clients}
+            onSelectClient={handleSelectClient}
+            onAddClient={() => setIsAddClientOpen(true)}
+            payments={payments}
+            events={calendarEvents}
+          />
         )}
       </div>
+      <AddClientPopup
+        opened={isAddClientOpen}
+        clients={clients}
+        onClose={() => setIsAddClientOpen(false)}
+        onAdd={addClient}
+      />
     </Page>
   );
 }
