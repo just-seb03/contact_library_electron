@@ -4,20 +4,29 @@ import type { HearingEvent } from '../../../core/context/types';
 import { GLASS_CARD_STYLE } from '../../../core/theme/style';
 
 interface UpcomingMeetingCardProps {
-  lawyerName?: string;
-  greeting?: string;
-  todayLabel: string;
   nextMeeting: HearingEvent | null;
   onOpenClient?: (clientId: number) => void;
-  onViewSchedule?: () => void;
 }
 
 export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
-  lawyerName = 'Abogado Titular',
-  todayLabel,
   nextMeeting,
   onOpenClient,
 }) => {
+  const meetingDateParts = nextMeeting
+    ? new Intl.DateTimeFormat('es-CL', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).formatToParts(new Date(nextMeeting.year, nextMeeting.monthIndex, nextMeeting.day))
+    : [];
+  const nextMeetingDate = meetingDateParts
+    .map((part) => {
+      if (part.type !== 'weekday' && part.type !== 'month') return part.value;
+      return `${part.value.charAt(0).toLocaleUpperCase('es-CL')}${part.value.slice(1)}`;
+    })
+    .join('');
+
   return (
     <Card
       outline
@@ -35,11 +44,6 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
           <h3 className="no-margin" style={{ fontSize: '15px', fontWeight: 600, color: '#1c1c1e' }}>
             Próxima reunión
           </h3>
-          {nextMeeting && (
-            <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px' }}>
-              {nextMeeting.timeStr}
-            </Badge>
-          )}
         </div>
       </CardHeader>
 
@@ -54,17 +58,30 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
               border: '1px solid rgba(0, 122, 255, 0.12)',
             }}
           >
+            <div
+              className="display-flex align-items-center margin-bottom-half"
+              style={{ flexWrap: 'wrap', gap: '8px' }}
+            >
+              <Icon f7="calendar" size="18px" className="text-color-blue margin-right-half" />
+              <span style={{ fontSize: '15px' }}>
+                {nextMeetingDate}
+              </span>
+              <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px' }}>
+                {nextMeeting.timeStr}
+              </Badge>
+            </div>
+
             <div className="display-flex align-items-center margin-bottom-half">
               <Icon f7="person_fill" size="18px" className="text-color-blue margin-right-half" />
               <span style={{ fontSize: '15px' }}>
-                <strong>Cliente:</strong> {nextMeeting.clientName}
+                {nextMeeting.clientName}
               </span>
             </div>
 
             <div className="display-flex align-items-center">
               <Icon f7="briefcase_fill" size="18px" className="text-color-gray margin-right-half" />
               <span style={{ fontSize: '15px' }}>
-                <strong>Materia:</strong> {nextMeeting.materia}
+                {nextMeeting.materia}
               </span>
             </div>
           </div>
@@ -81,7 +98,7 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
               round
               fill
               onClick={() => onOpenClient(nextMeeting.clientId)}
-              style={{ fontSize: '12px' }}
+              style={{ fontSize: '14px' }}
             >
               Ver expediente
             </Button>

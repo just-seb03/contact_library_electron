@@ -38,8 +38,8 @@ export default function Configuration() {
   // Objetos de estilo en línea tipados con React.CSSProperties
   const pageContainerStyle: CSSProperties = {
     maxWidth: 680,
-    margin: '0 auto',
-    padding: '28px 20px 48px 20px',
+    margin: '0',
+    padding: '48px 20px 48px 20px',
     boxSizing: 'border-box',
   };
 

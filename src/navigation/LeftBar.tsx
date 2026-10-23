@@ -10,16 +10,16 @@ import {
   f7ready,
 } from 'framework7-react';
 import type { Router as Framework7Router } from 'framework7/types';
-import { useApp } from '../../../core/context/AppContext';
-import type { AppTab } from '../../../core/context/types';
-import { navigateToTab, getAppTabForRoute } from '../../../navigation/navigation';
-import { TrafficLights } from '../../../core/windowControls/TrafficLights';
+import { useApp } from '../core/context/AppContext';
+import type { AppTab } from '../core/context/types';
+import { navigateToTab, getAppTabForRoute } from './navigation';
+import { TrafficLights } from '../core/windowControls/TrafficLights';
 import {
   APP_COLORS,
   SIDEBAR_CONTAINER_STYLE,
   SIDEBAR_ICON_SELECTED_COLOR,
   SIDEBAR_ICON_COLOR,
-} from '../../../core/theme/style';
+} from '../core/theme/style';
 
 export const LeftBar = () => {
   const { activeTab, setActiveTab, clients, hearings, payments } = useApp();

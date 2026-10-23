@@ -31,6 +31,7 @@ export interface AppContextType {
   updateClient: (id: number, data: Partial<Client>) => void;
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
+  registerPayment: (payment: Omit<Payment, 'id'>) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   updateCalendarEvent: (event: CalendarEvent) => void;

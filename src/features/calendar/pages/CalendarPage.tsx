@@ -190,6 +190,7 @@ export default function Calendar() {
         style={{
           width: '100%',
           minWidth: 0,
+          paddingTop: '48px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}

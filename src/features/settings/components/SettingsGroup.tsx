@@ -22,7 +22,7 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
-    color: '#8E8E93',
+    color: darkMode ? '#AEAEB2' : '#48484A',
     marginBottom: 8,
     paddingLeft: 12,
     userSelect: 'none',

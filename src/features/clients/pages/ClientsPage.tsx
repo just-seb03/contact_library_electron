@@ -24,6 +24,7 @@ export default function Cliente() {
   const pageStyle: CSSProperties = {
     height: '100%',
     boxSizing: 'border-box',
+    paddingTop: 48,
     backgroundColor: 'var(--app-color-background)',
     overflow: 'hidden',
     display: 'flex',

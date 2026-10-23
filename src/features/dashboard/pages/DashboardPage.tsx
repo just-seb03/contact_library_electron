@@ -1,18 +1,19 @@
 import { Page, Card, CardContent, CardHeader, Icon, Badge, Button } from 'framework7-react';
 import { useDashboard } from '../hooks/useDashboard';
-import { useHomeData } from '../../home/hooks/useHomeData';
-import { UpcomingMeetingCard } from '../../home/components/UpcomingMeetingCard';
+import { useHomeData } from '../hooks/useHomeData';
+import { UpcomingMeetingCard } from '../components/UpcomingMeetingCard';
+import { DailyProgressCard } from '../components/DailyProgressCard';
 import { GLASS_CARD_STYLE } from '../../../core/theme/style';
 
 export default function Dashboard() {
   const { lawyerName, todayLabel, nextMeeting, openClient: openClientHome, showTab } = useHomeData();
-  const { todayHearings, openClient, paymentsToReviewCount, clientsCount } = useDashboard();
+  const { todayHearings, openClient } = useDashboard();
 
   return (
     <Page noNavbar noToolbar>
       <div
         style={{
-          padding: '28px 24px',
+          padding: '48px 24px 28px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
@@ -78,47 +79,11 @@ export default function Dashboard() {
           }}
         >
           <UpcomingMeetingCard
-            lawyerName={lawyerName}
-            todayLabel={todayLabel}
             nextMeeting={nextMeeting}
             onOpenClient={openClientHome}
-            onViewSchedule={() => showTab('calendar')}
           />
 
-          {/* Resumen del día */}
-          <Card outline className="no-margin" style={{ ...GLASS_CARD_STYLE, height: '100%' }}>
-            <CardHeader style={{ padding: '14px 16px 8px 16px' }}>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#8e8e93', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                Resumen del día
-              </span>
-            </CardHeader>
-            <CardContent style={{ padding: '0 16px 16px 16px' }}>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {[
-                  {
-                    icon: 'person_2_fill',
-                    color: '#007aff',
-                    text: `${clientsCount} ${clientsCount === 1 ? 'cliente registrado' : 'clientes registrados'}`,
-                  },
-                  {
-                    icon: 'calendar_fill',
-                    color: '#34c759',
-                    text: `${todayHearings.length} ${todayHearings.length === 1 ? 'audiencia hoy' : 'audiencias hoy'}`,
-                  },
-                  {
-                    icon: 'exclamationmark_circle_fill',
-                    color: paymentsToReviewCount > 0 ? '#ff9500' : '#34c759',
-                    text: `${paymentsToReviewCount} ${paymentsToReviewCount === 1 ? 'pago pendiente' : 'pagos pendientes'}`,
-                  },
-                ].map(({ icon, color, text }) => (
-                  <li key={text} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <Icon f7={icon} size="18px" style={{ color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '15px', color: '#1c1c1e' }}>{text}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          <DailyProgressCard />
         </div>
 
         {/* ── FILA INFERIOR: Audiencias de hoy ── */}

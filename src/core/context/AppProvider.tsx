@@ -13,6 +13,29 @@ const MONTH_MAP: Record<string, number> = {
   jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11,
 };
 
+const REGISTERED_PAYMENTS_STORAGE_KEY = 'contact_library_registered_payments';
+
+function loadRegisteredPayments(): Payment[] {
+  try {
+    const stored = localStorage.getItem(REGISTERED_PAYMENTS_STORAGE_KEY);
+    if (!stored) return [];
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) throw new Error('El contenido guardado no es una lista.');
+    return parsed.filter(
+      (payment): payment is Payment =>
+        typeof payment?.id === 'string' &&
+        typeof payment?.client === 'string' &&
+        typeof payment?.concept === 'string' &&
+        typeof payment?.amount === 'number' &&
+        typeof payment?.date === 'string' &&
+        ['completed', 'pending', 'overdue'].includes(payment?.status)
+    );
+  } catch (error) {
+    console.error('No se pudieron cargar los pagos registrados.', error);
+    return [];
+  }
+}
+
 function parseHearing(client: Client): HearingEvent | null {
   if (!client.caso?.proximaAudiencia) return null;
   const raw = client.caso.proximaAudiencia;
@@ -42,6 +65,7 @@ function parseHearing(client: Client): HearingEvent | null {
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(MOCK_CLIENTS);
+  const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(loadRegisteredPayments);
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
@@ -68,6 +92,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     saveCalendarEvents(calendarEvents);
   }, [calendarEvents]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(REGISTERED_PAYMENTS_STORAGE_KEY, JSON.stringify(registeredPayments));
+    } catch (error) {
+      console.error('No se pudieron guardar los pagos registrados.', error);
+    }
+  }, [registeredPayments]);
+
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
   // Cliente actualmente seleccionado (null si no hay ninguno elegido)
@@ -77,18 +109,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [clients, selectedClientId]);
 
   // Lista de pagos sincronizada de forma reactiva a partir de la fuente de clientes
-  const payments: Payment[] = useMemo(() => {
-    return clients
-      .filter((c) => c.pago !== undefined)
-      .map((c) => ({
-        id: String(c.id),
-        client: c.name,
-        concept: c.pago!.concepto,
-        amount: c.pago!.monto,
-        date: c.pago!.fecha,
-        status: c.pago!.estado,
-      }));
-  }, [clients]);
+  const payments: Payment[] = useMemo(
+    () => [
+      ...clients
+        .filter((client) => client.pago !== undefined)
+        .map((client) => ({
+          id: String(client.id),
+          client: client.name,
+          concept: client.pago!.concepto,
+          amount: client.pago!.monto,
+          date: client.pago!.fecha,
+          status: client.pago!.estado,
+        })),
+      ...registeredPayments,
+    ],
+    [clients, registeredPayments]
+  );
 
   // Audiencias programadas derivadas directamente de los casos de los clientes
   const hearings: HearingEvent[] = useMemo(() => {
@@ -109,6 +145,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     clientIdOrPaymentId: string | number,
     status: 'completed' | 'pending' | 'overdue'
   ) => {
+    const paymentId = String(clientIdOrPaymentId);
+    setRegisteredPayments((previous) =>
+      previous.map((payment) => (payment.id === paymentId ? { ...payment, status } : payment))
+    );
     const idNum = Number(clientIdOrPaymentId);
     setClients((prev) =>
       prev.map((c) => {
@@ -131,6 +171,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setClients((prev) =>
       prev.map((c) => (c.id === clientId ? { ...c, pago } : c))
     );
+  };
+
+  const registerPayment = (payment: Omit<Payment, 'id'>) => {
+    setRegisteredPayments((previous) => [
+      ...previous,
+      {
+        ...payment,
+        id: `payment-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      },
+    ]);
   };
 
   // Agregar nuevo cliente
@@ -180,6 +230,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateClient,
     updatePaymentStatus,
     updateClientPayment,
+    registerPayment,
     addClient,
     addCalendarEvent,
     updateCalendarEvent,
