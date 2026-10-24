@@ -1,6 +1,14 @@
-import { useRef, useState, type CSSProperties, type FC } from 'react';
+import { useRef, useState, type FC } from 'react';
 import { Icon } from 'framework7-react';
 import type { ClientDocument } from '../types';
+import {
+  ACTION_BUTTON_STYLE,
+  APP_COLORS,
+  EMPTY_TEXT_STYLE,
+  MUTED_ITEM_STYLE,
+  SECTION_HEADING_STYLE,
+  SECTION_STYLE,
+} from '../../../core/theme/style';
 
 interface ClientDocumentsSectionProps {
   documents: ClientDocument[];
@@ -44,50 +52,19 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
     }
   };
 
-  const itemStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    padding: '12px 14px',
-    borderRadius: 10,
-    backgroundColor: '#f9f9fb',
-  };
-
   return (
     <section
-      style={{
-        backgroundColor: 'var(--app-color-white, #ffffff)',
-        borderRadius: 16,
-        padding: 24,
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
-      }}
+      style={SECTION_STYLE}
       aria-labelledby="client-documents-heading"
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
-        <h2 id="client-documents-heading" style={{ margin: 0, color: '#1c1c1e', fontSize: 18, fontWeight: 600 }}>
+        <h2 id="client-documents-heading" style={{ ...SECTION_HEADING_STYLE, margin: 0 }}>
           Documentos del cliente
         </h2>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            marginLeft: 'auto',
-            width: 130,
-            height: 36,
-            padding: '6px 6px',
-            border: '1px solid #d1d1d6',
-            borderRadius: 8,
-            backgroundColor: '#f2f2f7',
-            color: '#007aff',
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-          }}
+          style={ACTION_BUTTON_STYLE}
         >
           <Icon f7="plus" size="13px" />
           Subir PDF
@@ -104,19 +81,19 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
       {documents.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {documents.map((document) => (
-            <div key={document.id} style={itemStyle}>
+            <div key={document.id} style={MUTED_ITEM_STYLE}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                <Icon f7="doc_text_fill" size="20px" style={{ color: '#ff3b30', flexShrink: 0 }} />
+                <Icon f7="doc_text_fill" size="20px" style={{ color: APP_COLORS.danger, flexShrink: 0 }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
                   <a
                     href={document.dataUrl}
                     download={document.name}
-                    style={{ color: '#1c1c1e', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    style={{ color: APP_COLORS.sidebarText, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                     title={`Descargar ${document.name}`}
                   >
                     {document.name}
                   </a>
-                  <span style={{ color: '#8e8e93', fontSize: 12 }}>{formatFileSize(document.size)}</span>
+                  <span style={{ color: APP_COLORS.secondaryText, fontSize: 12 }}>{formatFileSize(document.size)}</span>
                 </div>
               </div>
               <button
@@ -124,7 +101,7 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
                 onClick={() => onDelete(document)}
                 aria-label={`Eliminar ${document.name}`}
                 title="Eliminar documento"
-                style={{ border: 'none', background: 'transparent', color: '#c62820', cursor: 'pointer', padding: 6 }}
+                style={{ border: 'none', background: 'transparent', color: APP_COLORS.danger, cursor: 'pointer', padding: 6 }}
               >
                 <Icon f7="trash" size="16px" />
               </button>
@@ -132,9 +109,9 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
           ))}
         </div>
       ) : (
-        <p style={{ margin: 0, color: '#8e8e93', fontSize: 13 }}>Este cliente aún no tiene documentos asociados.</p>
+        <p style={EMPTY_TEXT_STYLE}>Este cliente aún no tiene documentos asociados.</p>
       )}
-      {error && <p role="alert" style={{ margin: '12px 0 0', color: '#c62820', fontSize: 13 }}>{error}</p>}
+      {error && <p role="alert" style={{ margin: '12px 0 0', color: APP_COLORS.danger, fontSize: 13 }}>{error}</p>}
     </section>
   );
 };

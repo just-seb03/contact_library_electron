@@ -1,6 +1,7 @@
 import type { FC, CSSProperties } from 'react';
 import { Badge, Icon } from 'framework7-react';
 import type { Client, ClientStatus } from '../types';
+import { APP_COLORS } from '../../../core/theme/style';
 
 interface ClientBannerProps {
   client: Client;
@@ -28,10 +29,10 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
   const hasValidEmail = !isInvalidEmail(client.email);
 
   const bannerStyle: CSSProperties = {
-    background: 'linear-gradient(135deg, #0a84ff 0%, #30b0ff 100%)',
+    background: `linear-gradient(135deg, ${APP_COLORS.primaryStrong} 0%, ${APP_COLORS.primaryLight} 100%)`,
     borderRadius: 16,
     padding: '20px 24px',
-    color: '#ffffff',
+    color: APP_COLORS.white,
   };
 
   const topRowStyle: CSSProperties = {
@@ -54,7 +55,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     height: 44,
     minWidth: 44,
     borderRadius: '50%',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: APP_COLORS.whiteOverlay,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -66,7 +67,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     gap: 10,
     fontSize: 20,
     fontWeight: 700,
-    color: '#ffffff',
+    color: APP_COLORS.white,
   };
 
   const contactInfoStyle: CSSProperties = {
@@ -75,7 +76,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     gap: 16,
     marginTop: 4,
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: APP_COLORS.whiteTextMuted,
   };
 
   const contactItemStyle: CSSProperties = {
@@ -101,7 +102,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
 
   /** Texto sutil sin fondo ni píldora para no confundir con botones (Heurística #4) */
   const idBadgeStyle: CSSProperties = {
-    color: '#ffffff',
+    color: APP_COLORS.white,
     opacity: 0.85,
     fontSize: 13,
     fontWeight: 500,
@@ -113,7 +114,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
       <div style={topRowStyle}>
         <div style={profileAreaStyle}>
           <div style={avatarStyle}>
-            <Icon f7="person_fill" size="24px" style={{ color: '#ffffff' }} />
+            <Icon f7="person_fill" size="24px" style={{ color: APP_COLORS.white }} />
           </div>
           <div>
             <div style={nameRowStyle}>
@@ -129,17 +130,17 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
             </div>
             <div style={contactInfoStyle}>
               <span style={contactItemStyle}>
-                <Icon f7="phone_fill" size="12px" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+                <Icon f7="phone_fill" size="12px" style={{ color: APP_COLORS.whiteTextMuted }} />
                 {client.phone}
               </span>
               {hasValidEmail ? (
                 <span style={contactItemStyle}>
-                  <Icon f7="envelope_fill" size="12px" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+                  <Icon f7="envelope_fill" size="12px" style={{ color: APP_COLORS.whiteTextMuted }} />
                   {client.email}
                 </span>
               ) : (
                 <span style={noEmailTextStyle}>
-                  <Icon f7="envelope" size="12px" style={{ color: 'rgba(255, 255, 255, 0.6)' }} />
+                  <Icon f7="envelope" size="12px" style={{ color: APP_COLORS.whiteTextFaint }} />
                   Sin correo registrado
                 </span>
               )}

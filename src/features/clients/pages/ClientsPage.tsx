@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { ClientCardGrid } from '../components/ClientCardGrid';
@@ -8,6 +8,11 @@ import { RegisterPaymentPopup } from '../../payments/components/RegisterPaymentP
 import type { Client } from '../types';
 import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
+import {
+  BACK_BUTTON_STYLE,
+  PAGE_CONTENT_STYLE,
+  PAGE_SCROLL_CONTENT_STYLE,
+} from '../../../core/theme/style';
 
 export default function Cliente() {
   const {
@@ -68,55 +73,16 @@ export default function Cliente() {
     setEditingClient(null);
   };
 
-  const pageStyle: CSSProperties = {
-    height: '100%',
-    boxSizing: 'border-box',
-    paddingTop: 48,
-    backgroundColor: 'var(--app-color-background)',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  const backBarStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    padding: '14px 20px 6px 20px',
-    flexShrink: 0,
-  };
-
-  const backBtnStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    color: '#007aff',
-    fontSize: 15,
-    fontWeight: 500,
-    padding: '4px 0',
-  };
-
-  const detailScrollStyle: CSSProperties = {
-    flex: 1,
-    overflowY: 'auto',
-    padding: '0 16px 16px 16px',
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
   return (
     <Page noNavbar noToolbar>
-      <div style={pageStyle}>
+      <div style={PAGE_CONTENT_STYLE}>
         {showDetail && selectedClient ? (
           <>
             {/* Botón volver */}
-            <div style={backBarStyle}>
+            <div>
               <button
                 type="button"
-                style={backBtnStyle}
+                style={BACK_BUTTON_STYLE}
                 onClick={handleBack}
                 aria-label="Volver a clientes"
               >
@@ -140,7 +106,7 @@ export default function Cliente() {
             </div>
 
             {/* Detalle del cliente seleccionado */}
-            <div style={detailScrollStyle}>
+            <div style={PAGE_SCROLL_CONTENT_STYLE}>
               <ClientDetails
                 client={selectedClient}
                 payments={payments.filter((payment) => (

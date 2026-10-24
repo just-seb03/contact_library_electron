@@ -9,6 +9,7 @@ import type { PaymentFilters } from '../components/pagosFilter';
 import { PaymentsTable } from '../components/pagosTable';
 import { RegisterPaymentPopup } from '../components/RegisterPaymentPopup';
 import type { Payment } from '../types';
+import { PAGE_CONTENT_STYLE } from '../../../core/theme/style';
 
 function parsePaymentDate(value: string): Date | null {
   const match = value.match(/^(\d{1,2})\s+([A-Za-z]{3}),\s+(\d{4})$/);
@@ -61,18 +62,7 @@ export default function PaymentsPage() {
 
   return (
     <Page noNavbar noToolbar>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '24px',
-          maxWidth: '1200px',
-          margin: '0 auto',
-          width: '100%',
-          padding: '48px 24px 28px',
-          boxSizing: 'border-box',
-        }}
-      >
+      <div style={PAGE_CONTENT_STYLE}>
         <PaymentsHeader onRegisterPayment={() => setIsRegisterPopupOpen(true)} />
         <PaymentsStats
           totalIngresos={totalIngresos}

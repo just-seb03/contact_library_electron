@@ -4,6 +4,7 @@ import type { Client } from '../types';
 import { ClientCard } from './ClientCard';
 import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
+import { APP_COLORS } from '../../../core/theme/style';
 
 function getLocalDateValue(): string {
   const today = new Date();
@@ -62,14 +63,14 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const titleStyle: CSSProperties = {
     fontSize: 22,
     fontWeight: 700,
-    color: '#1c1c1e',
+    color: APP_COLORS.sidebarText,
     lineHeight: 1.2,
   };
 
   const counterStyle: CSSProperties = {
     fontSize: 15,
     fontWeight: 500,
-    color: '#8e8e93',
+    color: APP_COLORS.secondaryText,
   };
 
   const addClientButtonStyle: CSSProperties = {
@@ -80,8 +81,8 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     height: 36,
     border: 'none',
     borderRadius: 10,
-    backgroundColor: '#007aff',
-    color: '#ffffff',
+    backgroundColor: APP_COLORS.primary,
+    color: APP_COLORS.white,
     cursor: 'pointer',
   };
 
@@ -99,7 +100,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const searchIconStyle: CSSProperties = {
     position: 'absolute',
     left: 12,
-    color: '#8e8e93',
+    color: APP_COLORS.secondaryText,
     pointerEvents: 'none',
     zIndex: 1,
   };
@@ -110,9 +111,9 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     paddingLeft: 38,
     paddingRight: filterText.length > 0 ? 36 : 14,
     fontSize: 14,
-    color: '#1c1c1e',
-    backgroundColor: '#ffffff',
-    border: '1px solid #e5e5ea',
+    color: APP_COLORS.sidebarText,
+    backgroundColor: APP_COLORS.white,
+    border: `1px solid ${APP_COLORS.borderSubtle}`,
     borderRadius: 10,
     outline: 'none',
     boxSizing: 'border-box',
@@ -131,7 +132,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: '#8e8e93',
+    color: APP_COLORS.secondaryText,
   };
 
   const gridScrollStyle: CSSProperties = {
@@ -153,7 +154,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     justifyContent: 'center',
     padding: 48,
     gap: 12,
-    color: '#8e8e93',
+    color: APP_COLORS.secondaryText,
     textAlign: 'center',
   };
 
@@ -230,7 +231,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
           </div>
         ) : (
           <div style={emptyStateStyle}>
-            <Icon f7="person_2_slash" size="40px" style={{ color: '#c7c7cc' }} />
+            <Icon f7="person_2_slash" size="40px" style={{ color: APP_COLORS.iconMuted }} />
             <p style={{ margin: 0, fontSize: 14 }}>No se encontraron clientes</p>
           </div>
         )}

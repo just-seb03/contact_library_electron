@@ -40,7 +40,7 @@ const controlStyle: CSSProperties = {
   boxSizing: 'border-box',
   minHeight: 40,
   padding: '9px 11px',
-  border: '1px solid #d1d1d6',
+  border: `1px solid ${APP_COLORS.border}`,
   borderRadius: 8,
   backgroundColor: APP_COLORS.white,
   color: APP_COLORS.black,
@@ -236,7 +236,7 @@ export function AddClientPopup({
               justifyContent: 'flex-end',
               gap: 10,
               padding: '12px 24px 20px',
-              borderTop: '1px solid rgba(0,0,0,0.08)',
+              borderTop: `1px solid ${APP_COLORS.borderSubtle}`,
             }}
           >
             <Button type="button" onClick={onClose}>Cancelar</Button>

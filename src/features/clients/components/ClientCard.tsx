@@ -5,6 +5,7 @@ import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
+import { APP_COLORS } from '../../../core/theme/style';
 
 interface ClientCardProps {
   client: Client;
@@ -14,9 +15,9 @@ interface ClientCardProps {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  activo: { label: 'Activo', color: '#34c759', bg: 'rgba(52, 199, 89, 0.1)' },
-  en_proceso: { label: 'En proceso', color: '#ff9500', bg: 'rgba(255, 149, 0, 0.1)' },
-  completado: { label: 'Completado', color: '#007aff', bg: 'rgba(0, 122, 255, 0.1)' },
+  activo: { label: 'Activo', color: APP_COLORS.success, bg: APP_COLORS.successTint },
+  en_proceso: { label: 'En proceso', color: APP_COLORS.warning, bg: APP_COLORS.warningTint },
+  completado: { label: 'Completado', color: APP_COLORS.primary, bg: APP_COLORS.primaryStatusTint },
 };
 
 function formatEventDate(value: string): string {
@@ -31,7 +32,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
   const status = client.status ? STATUS_CONFIG[client.status] : null;
 
   const cardStyle: CSSProperties = {
-    backgroundColor: '#ffffff',
+    backgroundColor: APP_COLORS.white,
     borderRadius: 14,
     padding: '20px 20px 16px 20px',
     boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04)',
@@ -41,7 +42,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
     flexDirection: 'column',
     gap: 12,
     boxSizing: 'border-box',
-    border: '1px solid rgba(0,0,0,0.05)',
+    border: `1px solid ${APP_COLORS.cardBorder}`,
   };
 
   const headerStyle: CSSProperties = {
@@ -62,7 +63,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
   const nameStyle: CSSProperties = {
     fontSize: 16,
     fontWeight: 700,
-    color: '#1c1c1e',
+    color: APP_COLORS.sidebarText,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -80,15 +81,15 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
     borderRadius: 20,
     fontSize: 11,
     fontWeight: 600,
-    backgroundColor: status?.bg ?? 'rgba(142,142,147,0.1)',
-    color: status?.color ?? '#8e8e93',
+    backgroundColor: status?.bg ?? APP_COLORS.neutralTint,
+    color: status?.color ?? APP_COLORS.secondaryText,
     flexShrink: 0,
     alignSelf: 'flex-start',
   };
 
   const dividerStyle: CSSProperties = {
     height: 1,
-    backgroundColor: '#f2f2f7',
+    backgroundColor: APP_COLORS.controlBackground,
     margin: '0 -20px',
   };
 
@@ -102,7 +103,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
     width: 28,
     height: 28,
     borderRadius: 8,
-    backgroundColor: 'rgba(0,122,255,0.08)',
+    backgroundColor: APP_COLORS.primaryTint,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -111,7 +112,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
 
   const infoTextStyle: CSSProperties = {
     fontSize: 13,
-    color: '#3c3c43',
+    color: APP_COLORS.bodyText,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -121,8 +122,8 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
 
   const casoStyle: CSSProperties = {
     fontSize: 12,
-    color: '#8e8e93',
-    backgroundColor: '#f2f2f7',
+    color: APP_COLORS.secondaryText,
+    backgroundColor: APP_COLORS.controlBackground,
     borderRadius: 6,
     padding: '5px 10px',
     overflow: 'hidden',
@@ -142,7 +143,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
     justifyContent: 'space-between',
     gap: 8,
     minWidth: 0,
-    color: '#636366',
+    color: APP_COLORS.bodyText,
     fontSize: 12,
   };
 
