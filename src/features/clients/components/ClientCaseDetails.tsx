@@ -4,9 +4,10 @@ import type { Client } from '../types';
 
 interface ClientCaseDetailsProps {
   client: Client;
+  onEdit: () => void;
 }
 
-export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
+export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }) => {
   const { caso } = client;
   const [copied, setCopied] = useState(false);
 
@@ -136,6 +137,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
           <p className="text-color-gray" style={{ margin: 0 }}>
             Aún no se ha registrado un expediente judicial para {client.name}.
           </p>
+          <button
+            type="button"
+            style={{ ...editBtnStyle, marginTop: 12 }}
+            onClick={onEdit}
+          >
+            <Icon f7="pencil" size="13px" style={{ marginRight: 5 }} />
+            Editar cliente
+          </button>
         </div>
       </div>
     );
@@ -153,15 +162,11 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
           <button
             type="button"
             style={editBtnStyle}
-            title="Editar expediente"
-            onClick={() => {
-              if (f7?.dialog) {
-                f7.dialog.alert(`Editar datos del expediente: ${caso.expediente}`, 'Editar Expediente');
-              }
-            }}
+            title="Editar cliente"
+            onClick={onEdit}
           >
             <Icon f7="pencil" size="13px" style={{ marginRight: 5 }} />
-            Editar
+            Editar cliente
           </button>
           <button
             type="button"

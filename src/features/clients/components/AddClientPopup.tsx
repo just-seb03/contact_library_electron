@@ -6,8 +6,10 @@ import type { Client } from '../types';
 interface AddClientPopupProps {
   opened: boolean;
   clients: Client[];
+  client?: Client | null;
   onClose: () => void;
   onAdd: (client: Omit<Client, 'id'>) => void;
+  onUpdate: (id: number, data: Partial<Client>) => void;
 }
 
 const popupStyle: CSSProperties = {
@@ -72,7 +74,14 @@ function generateExpediente(clients: Client[]): string {
   return `${prefix}${String(highestNumber + 1).padStart(3, '0')}`;
 }
 
-export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPopupProps) {
+export function AddClientPopup({
+  opened,
+  clients,
+  client,
+  onClose,
+  onAdd,
+  onUpdate,
+}: AddClientPopupProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
@@ -81,12 +90,12 @@ export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPop
 
   useEffect(() => {
     if (!opened) return;
-    setName('');
-    setPhone('');
-    setEmail('');
-    setCaseType('');
+    setName(client?.name ?? '');
+    setPhone(client?.phone ?? '');
+    setEmail(client?.email ?? '');
+    setCaseType(client?.caso?.materia ?? '');
     setErrorMessage('');
-  }, [opened]);
+  }, [opened, client]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,23 +104,49 @@ export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPop
     const trimmedEmail = email.trim();
     const trimmedCaseType = caseType.trim();
 
-    if (!trimmedName || !trimmedPhone || !trimmedEmail || !trimmedCaseType) {
+    if (
+      !trimmedName
+      || !trimmedPhone
+      || !trimmedEmail
+      || (!client && !trimmedCaseType)
+      || (client?.caso && !trimmedCaseType)
+    ) {
       setErrorMessage('Completa todos los campos antes de guardar el cliente.');
       return;
     }
 
-    onAdd({
-      name: trimmedName,
-      phone: trimmedPhone,
-      email: trimmedEmail,
-      status: 'activo',
-      caso: {
-        expediente: generateExpediente(clients),
-        juzgado: 'Por asignar',
-        materia: trimmedCaseType,
-        estado: 'Caso registrado',
-      },
-    });
+    if (client) {
+      onUpdate(client.id, {
+        name: trimmedName,
+        phone: trimmedPhone,
+        email: trimmedEmail,
+        ...(trimmedCaseType
+          ? {
+              caso: client.caso
+                ? { ...client.caso, materia: trimmedCaseType }
+                : {
+                    expediente: generateExpediente(clients),
+                    juzgado: 'Por asignar',
+                    materia: trimmedCaseType,
+                    estado: 'Caso registrado',
+                  },
+            }
+          : {}),
+      });
+    } else {
+      onAdd({
+        name: trimmedName,
+        phone: trimmedPhone,
+        email: trimmedEmail,
+        status: 'activo',
+        caso: {
+          expediente: generateExpediente(clients),
+          juzgado: 'Por asignar',
+          materia: trimmedCaseType,
+          estado: 'Caso registrado',
+        },
+      });
+    }
     onClose();
   };
 
@@ -124,10 +159,12 @@ export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPop
         >
           <div style={{ padding: '20px 24px 12px' }}>
             <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
-              Añadir cliente
+              {client ? 'Editar cliente' : 'Añadir cliente'}
             </h2>
             <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
-              Completa todos los datos para agregarlo a la lista.
+              {client
+                ? 'Actualiza los datos que quieras cambiar.'
+                : 'Completa todos los datos para agregarlo a la lista.'}
             </p>
           </div>
 
@@ -177,7 +214,7 @@ export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPop
               <label htmlFor="new-client-case-type" style={labelStyle}>Tipo de caso</label>
               <input
                 id="new-client-case-type"
-                required
+                required={!client || Boolean(client.caso)}
                 maxLength={120}
                 value={caseType}
                 onChange={(event) => setCaseType(event.target.value)}
@@ -208,8 +245,8 @@ export function AddClientPopup({ opened, clients, onClose, onAdd }: AddClientPop
               fill
               style={{ backgroundColor: APP_COLORS.primary, borderRadius: 7 }}
             >
-              <Icon f7="plus" size="14px" className="margin-right-half" />
-              Guardar cliente
+              <Icon f7={client ? 'checkmark_alt' : 'plus'} size="14px" className="margin-right-half" />
+              {client ? 'Guardar cambios' : 'Guardar cliente'}
             </Button>
           </div>
         </form>

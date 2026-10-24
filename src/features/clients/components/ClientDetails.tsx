@@ -12,6 +12,7 @@ interface ClientDetailsProps {
   payments: Payment[];
   events: CalendarEvent[];
   legacyHearing: HearingEvent | null;
+  onEdit: () => void;
 }
 
 export const ClientDetails: FC<ClientDetailsProps> = ({
@@ -19,6 +20,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   payments,
   events,
   legacyHearing,
+  onEdit,
 }) => {
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -30,7 +32,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   return (
     <div style={containerStyle}>
       <ClientBanner client={client} />
-      <ClientCaseDetails client={client} />
+      <ClientCaseDetails client={client} onEdit={onEdit} />
       <ClientActivityDetails
         payments={payments}
         events={events}

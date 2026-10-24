@@ -15,8 +15,10 @@ export default function Cliente() {
     hearings,
     setSelectedClientId,
     addClient,
+    updateClient,
   } = useApp();
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
 
   // Si hay un cliente seleccionado mostramos su detalle,
   // si no mostramos la grilla de tarjetas.
@@ -29,6 +31,11 @@ export default function Cliente() {
   const handleBack = () => {
     // Deseleccionamos volviendo a la grilla
     setSelectedClientId(null);
+  };
+
+  const handleCloseClientPopup = () => {
+    setIsAddClientOpen(false);
+    setEditingClient(null);
   };
 
   const pageStyle: CSSProperties = {
@@ -112,6 +119,7 @@ export default function Cliente() {
                 ))}
                 events={calendarEvents.filter((event) => event.clientId === selectedClient.id)}
                 legacyHearing={hearings.find((hearing) => hearing.clientId === selectedClient.id) ?? null}
+                onEdit={() => setEditingClient(selectedClient)}
               />
             </div>
           </>
@@ -127,10 +135,12 @@ export default function Cliente() {
         )}
       </div>
       <AddClientPopup
-        opened={isAddClientOpen}
+        opened={isAddClientOpen || editingClient !== null}
         clients={clients}
-        onClose={() => setIsAddClientOpen(false)}
+        client={editingClient}
+        onClose={handleCloseClientPopup}
         onAdd={addClient}
+        onUpdate={updateClient}
       />
     </Page>
   );
