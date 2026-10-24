@@ -5,9 +5,10 @@ import type { Client } from '../types';
 interface ClientCaseDetailsProps {
   client: Client;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }) => {
+export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, onDelete }) => {
   const { caso } = client;
   const [copied, setCopied] = useState(false);
 
@@ -128,6 +129,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }
     }
   };
 
+  const handleDeleteClient = () => {
+    f7.dialog.confirm(
+      `Se eliminará a ${client.name}, sus pagos y se desvinculará de sus eventos. Los eventos se conservarán. Esta acción no se puede deshacer.`,
+      'Eliminar cliente',
+      onDelete
+    );
+  };
+
   if (!caso) {
     return (
       <div style={sectionStyle}>
@@ -145,6 +154,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }
             <Icon f7="pencil" size="13px" style={{ marginRight: 5 }} />
             Editar cliente
           </button>
+          <button
+            type="button"
+            style={{ ...deleteBtnStyle, marginTop: 12, marginLeft: 8 }}
+            onClick={handleDeleteClient}
+          >
+            <Icon f7="trash" size="13px" style={{ marginRight: 5 }} />
+            Eliminar cliente
+          </button>
         </div>
       </div>
     );
@@ -152,7 +169,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }
 
   return (
     <div style={sectionStyle}>
-      {/* Cabecera: Título con juzgado y botones de acción Editar/Archivar (Heurística #3, #4, #8) */}
+      {/* Cabecera: Título con juzgado y acciones del cliente */}
       <div style={headerRowStyle}>
         <div>
           <h2 style={titleStyle}>Expediente y Seguimiento Jurídico</h2>
@@ -171,18 +188,11 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit }
           <button
             type="button"
             style={deleteBtnStyle}
-            title="Archivar o eliminar expediente"
-            onClick={() => {
-              if (f7?.dialog) {
-                f7.dialog.confirm(
-                  `¿Estás seguro de archivar o eliminar el expediente ${caso.expediente}?`,
-                  'Confirmar acción'
-                );
-              }
-            }}
+            title="Eliminar cliente"
+            onClick={handleDeleteClient}
           >
             <Icon f7="trash" size="13px" style={{ marginRight: 5 }} />
-            Archivar/Eliminar
+            Eliminar cliente
           </button>
         </div>
       </div>

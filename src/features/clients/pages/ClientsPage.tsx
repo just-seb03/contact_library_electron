@@ -16,6 +16,7 @@ export default function Cliente() {
     setSelectedClientId,
     addClient,
     updateClient,
+    deleteClient,
   } = useApp();
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -120,6 +121,7 @@ export default function Cliente() {
                 events={calendarEvents.filter((event) => event.clientId === selectedClient.id)}
                 legacyHearing={hearings.find((hearing) => hearing.clientId === selectedClient.id) ?? null}
                 onEdit={() => setEditingClient(selectedClient)}
+                onDelete={() => deleteClient(selectedClient.id)}
               />
             </div>
           </>

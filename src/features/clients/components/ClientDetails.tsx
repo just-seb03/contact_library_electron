@@ -13,6 +13,7 @@ interface ClientDetailsProps {
   events: CalendarEvent[];
   legacyHearing: HearingEvent | null;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
 export const ClientDetails: FC<ClientDetailsProps> = ({
@@ -21,6 +22,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   events,
   legacyHearing,
   onEdit,
+  onDelete,
 }) => {
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -32,7 +34,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   return (
     <div style={containerStyle}>
       <ClientBanner client={client} />
-      <ClientCaseDetails client={client} onEdit={onEdit} />
+      <ClientCaseDetails client={client} onEdit={onEdit} onDelete={onDelete} />
       <ClientActivityDetails
         payments={payments}
         events={events}

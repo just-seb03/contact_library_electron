@@ -33,6 +33,7 @@ export interface AppContextType {
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
   registerPayment: (payment: Omit<Payment, 'id'>) => void;
   addClient: (client: Omit<Client, 'id'>) => void;
+  deleteClient: (id: number) => void;
   addCalendarEvent: (event: Omit<CalendarEvent, 'id'>) => void;
   updateCalendarEvent: (event: CalendarEvent) => void;
   removeCalendarEvent: (id: string) => CalendarEvent | undefined;

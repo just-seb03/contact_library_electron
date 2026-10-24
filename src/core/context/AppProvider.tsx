@@ -273,6 +273,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
+  const deleteClient = (id: number) => {
+    const deletedClient = clients.find((client) => client.id === id);
+    if (!deletedClient) return;
+
+    setClients((previous) => previous.filter((client) => client.id !== id));
+    setRegisteredPayments((previous) => previous.filter((payment) => (
+      payment.clientId !== id
+      && (payment.clientId !== undefined || payment.client !== deletedClient.name)
+    )));
+    setCalendarEvents((previous) => previous.map((event) => (
+      event.clientId === id ? { ...event, clientId: null } : event
+    )));
+    setSelectedClientId((previous) => (previous === id ? null : previous));
+  };
+
   const addCalendarEvent = (event: Omit<CalendarEvent, 'id'>) => {
     setCalendarEvents((prev) => [
       ...prev,
@@ -313,6 +328,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateClientPayment,
     registerPayment,
     addClient,
+    deleteClient,
     addCalendarEvent,
     updateCalendarEvent,
     removeCalendarEvent,
