@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { Client, ClientCase, ClientPaymentInfo } from '../../features/clients/types';
+import type { Client, ClientCase, ClientDocument, ClientPaymentInfo } from '../../features/clients/types';
 import type { Payment } from '../../features/payments/types';
 import { MOCK_CLIENTS } from '../../features/clients/data/clientData';
 import { loadCalendarEvents, saveCalendarEvents } from '../../features/calendar/data/calendarEventStorage';
@@ -37,6 +37,15 @@ function isClientPayment(value: unknown): value is ClientPaymentInfo {
     && ['completed', 'pending', 'overdue'].includes(String(value.estado));
 }
 
+function isClientDocument(value: unknown): value is ClientDocument {
+  if (!isRecord(value)) return false;
+  return typeof value.id === 'string'
+    && typeof value.name === 'string'
+    && typeof value.dataUrl === 'string'
+    && typeof value.size === 'number'
+    && typeof value.uploadedAt === 'string';
+}
+
 function isClient(value: unknown): value is Client {
   if (!isRecord(value)) return false;
   const client = value;
@@ -53,7 +62,9 @@ function isClient(value: unknown): value is Client {
     && (client.rut === undefined || typeof client.rut === 'string')
     && validStatus
     && (client.caso === undefined || isClientCase(client.caso))
-    && (client.pago === undefined || isClientPayment(client.pago));
+    && (client.pago === undefined || isClientPayment(client.pago))
+    && (client.documentos === undefined
+      || (Array.isArray(client.documentos) && client.documentos.every(isClientDocument)));
 }
 
 function loadClients(): Client[] {
@@ -254,6 +265,56 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
   };
 
+  const updatePayment = (
+    payment: Payment,
+    data: Omit<Payment, 'id' | 'client' | 'clientId'>
+  ) => {
+    setRegisteredPayments((previous) => previous.map((item) => (
+      item.id === payment.id ? { ...item, ...data } : item
+    )));
+    const clientId = payment.clientId ?? Number(payment.id);
+    setClients((previous) => previous.map((client) => (
+      client.id === clientId && client.pago
+        ? {
+            ...client,
+            pago: {
+              ...client.pago,
+              monto: data.amount,
+              concepto: data.concept,
+              fecha: data.date,
+              estado: data.status,
+            },
+          }
+        : client
+    )));
+  };
+
+  const deletePayment = (payment: Payment) => {
+    setRegisteredPayments((previous) => previous.filter((item) => item.id !== payment.id));
+    const clientId = payment.clientId ?? Number(payment.id);
+    setClients((previous) => previous.map((client) => (
+      client.id === clientId && client.pago
+        ? { ...client, pago: undefined }
+        : client
+    )));
+  };
+
+  const addClientDocument = (clientId: number, document: ClientDocument) => {
+    setClients((previous) => previous.map((client) => (
+      client.id === clientId
+        ? { ...client, documentos: [...(client.documentos ?? []), document] }
+        : client
+    )));
+  };
+
+  const deleteClientDocument = (clientId: number, documentId: string) => {
+    setClients((previous) => previous.map((client) => (
+      client.id === clientId
+        ? { ...client, documentos: (client.documentos ?? []).filter((document) => document.id !== documentId) }
+        : client
+    )));
+  };
+
   const registerPayment = (payment: Omit<Payment, 'id'>) => {
     setRegisteredPayments((previous) => [
       ...previous,
@@ -326,6 +387,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateClient,
     updatePaymentStatus,
     updateClientPayment,
+    updatePayment,
+    deletePayment,
+    addClientDocument,
+    deleteClientDocument,
     registerPayment,
     addClient,
     deleteClient,

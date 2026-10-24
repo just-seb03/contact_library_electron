@@ -1,5 +1,5 @@
 import type { FC, CSSProperties } from 'react';
-import type { Client } from '../types';
+import type { Client, ClientDocument } from '../types';
 import { ClientBanner } from './ClientBanner';
 import { ClientCaseDetails } from './ClientCaseDetails';
 import { ClientActivityDetails } from './ClientActivityDetails';
@@ -14,6 +14,10 @@ interface ClientDetailsProps {
   legacyHearing: HearingEvent | null;
   onEdit: () => void;
   onDelete: () => void;
+  onEditPayment: (payment: Payment) => void;
+  onDeletePayment: (payment: Payment) => void;
+  onUploadDocument: (file: File) => Promise<void>;
+  onDeleteDocument: (document: ClientDocument) => void;
 }
 
 export const ClientDetails: FC<ClientDetailsProps> = ({
@@ -23,6 +27,10 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   legacyHearing,
   onEdit,
   onDelete,
+  onEditPayment,
+  onDeletePayment,
+  onUploadDocument,
+  onDeleteDocument,
 }) => {
   const containerStyle: CSSProperties = {
     display: 'flex',
@@ -39,6 +47,11 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
         payments={payments}
         events={events}
         legacyHearing={legacyHearing}
+        onEditPayment={onEditPayment}
+        onDeletePayment={onDeletePayment}
+        documents={client.documentos ?? []}
+        onUploadDocument={onUploadDocument}
+        onDeleteDocument={onDeleteDocument}
       />
     </div>
   );

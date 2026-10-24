@@ -8,6 +8,7 @@ import { PaymentsFilterBar } from '../components/pagosFilter';
 import type { PaymentFilters } from '../components/pagosFilter';
 import { PaymentsTable } from '../components/pagosTable';
 import { RegisterPaymentPopup } from '../components/RegisterPaymentPopup';
+import type { Payment } from '../types';
 
 function parsePaymentDate(value: string): Date | null {
   const match = value.match(/^(\d{1,2})\s+([A-Za-z]{3}),\s+(\d{4})$/);
@@ -18,8 +19,15 @@ function parsePaymentDate(value: string): Date | null {
 }
 
 export default function PaymentsPage() {
-  const { clients, payments, registerPayment } = useApp();
+  const {
+    clients,
+    payments,
+    registerPayment,
+    updatePayment,
+    deletePayment,
+  } = useApp();
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
   const [filters, setFilters] = useState<PaymentFilters>({
     invoiceId: '',
     startDate: '',
@@ -74,13 +82,25 @@ export default function PaymentsPage() {
         <PaymentsFilterBar
           onApplyFilters={setFilters}
         />
-        <PaymentsTable payments={filteredPayments} />
+        <PaymentsTable
+          payments={filteredPayments}
+          onEdit={setEditingPayment}
+          onDelete={deletePayment}
+        />
       </div>
       <RegisterPaymentPopup
         opened={isRegisterPopupOpen}
         clients={clients}
         onClose={() => setIsRegisterPopupOpen(false)}
         onRegister={registerPayment}
+      />
+      <RegisterPaymentPopup
+        opened={editingPayment !== null}
+        clients={clients}
+        payment={editingPayment}
+        onClose={() => setEditingPayment(null)}
+        onRegister={registerPayment}
+        onUpdate={updatePayment}
       />
     </Page>
   );

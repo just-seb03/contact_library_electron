@@ -15,6 +15,14 @@ export interface ClientPaymentInfo {
   estado: 'completed' | 'pending' | 'overdue';
 }
 
+export interface ClientDocument {
+  id: string;
+  name: string;
+  dataUrl: string;
+  size: number;
+  uploadedAt: string;
+}
+
 export interface Client {
   id: number;
   name: string;
@@ -24,4 +32,5 @@ export interface Client {
   status?: ClientStatus;
   caso?: ClientCase;
   pago?: ClientPaymentInfo;
+  documentos?: ClientDocument[];
 }

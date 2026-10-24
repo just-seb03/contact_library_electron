@@ -1,4 +1,4 @@
-import type { Client, ClientPaymentInfo } from '../../features/clients/types';
+import type { Client, ClientDocument, ClientPaymentInfo } from '../../features/clients/types';
 import type { Payment } from '../../features/payments/types';
 import type { CalendarEvent } from '../../features/calendar/types';
 
@@ -30,6 +30,10 @@ export interface AppContextType {
   setSelectedClientId: (id: number | null) => void;
   updateClient: (id: number, data: Partial<Client>) => void;
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
+  updatePayment: (payment: Payment, data: Omit<Payment, 'id' | 'client' | 'clientId'>) => void;
+  deletePayment: (payment: Payment) => void;
+  addClientDocument: (clientId: number, document: ClientDocument) => void;
+  deleteClientDocument: (clientId: number, documentId: string) => void;
   updateClientPayment: (clientId: number, pago: ClientPaymentInfo) => void;
   registerPayment: (payment: Omit<Payment, 'id'>) => void;
   addClient: (client: Omit<Client, 'id'>) => void;

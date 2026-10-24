@@ -7,8 +7,10 @@ import { APP_COLORS } from '../../../core/theme/style';
 interface RegisterPaymentPopupProps {
   opened: boolean;
   clients: Client[];
+  payment?: Payment | null;
   onClose: () => void;
   onRegister: (payment: Omit<Payment, 'id'>) => void;
+  onUpdate?: (payment: Payment, data: Omit<Payment, 'id' | 'client' | 'clientId'>) => void;
 }
 
 const popupStyle: CSSProperties = {
@@ -63,11 +65,22 @@ function formatPaymentDate(value: string): string {
   }).format(new Date(year, month - 1, day));
 }
 
+function toDateInputValue(value: string): string {
+  const match = value.match(/^(\d{1,2})\s+([A-Za-z]{3}),\s+(\d{4})$/);
+  if (match) {
+    const month = new Date(`${match[2]} 1, ${match[3]}`).getMonth() + 1;
+    return `${match[3]}-${String(month).padStart(2, '0')}-${String(Number(match[1])).padStart(2, '0')}`;
+  }
+  return value;
+}
+
 export function RegisterPaymentPopup({
   opened,
   clients,
+  payment = null,
   onClose,
   onRegister,
+  onUpdate,
 }: RegisterPaymentPopupProps) {
   const [clientId, setClientId] = useState('');
   const [concept, setConcept] = useState('');
@@ -78,13 +91,13 @@ export function RegisterPaymentPopup({
 
   useEffect(() => {
     if (!opened) return;
-    setClientId(clients[0] ? String(clients[0].id) : '');
-    setConcept('');
-    setAmount('');
-    setDate(getTodayInputValue());
-    setStatus('pending');
+    setClientId(payment?.clientId ? String(payment.clientId) : clients[0] ? String(clients[0].id) : '');
+    setConcept(payment?.concept ?? '');
+    setAmount(payment ? String(payment.amount) : '');
+    setDate(payment ? toDateInputValue(payment.date) : getTodayInputValue());
+    setStatus(payment?.status ?? 'pending');
     setErrorMessage('');
-  }, [opened, clients]);
+  }, [opened, clients, payment]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -108,14 +121,17 @@ export function RegisterPaymentPopup({
       return;
     }
 
-    onRegister({
-      client: client.name,
-      clientId: client.id,
+    const data = {
       concept: concept.trim(),
       amount: numericAmount,
       date: formatPaymentDate(date),
       status,
-    });
+    };
+    if (payment && onUpdate) {
+      onUpdate(payment, data);
+    } else {
+      onRegister({ client: client.name, clientId: client.id, ...data });
+    }
     onClose();
   };
 
@@ -128,29 +144,31 @@ export function RegisterPaymentPopup({
         >
           <div style={{ padding: '20px 24px 12px' }}>
             <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
-              Registrar pago
+              {payment ? 'Editar pago' : 'Registrar pago'}
             </h2>
             <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
-              Agrega una nueva transacción sin modificar los pagos existentes.
+              {payment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
             </p>
           </div>
 
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '8px 24px 16px' }}>
-            <div style={fieldStyle}>
-              <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
-              <select
-                id="payment-client"
-                required
-                value={clientId}
-                onChange={(event) => setClientId(event.target.value)}
-                style={controlStyle}
-              >
-                <option value="" disabled>Seleccionar cliente</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id}>{client.name}</option>
-                ))}
-              </select>
-            </div>
+            {!payment && (
+              <div style={fieldStyle}>
+                <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
+                <select
+                  id="payment-client"
+                  required
+                  value={clientId}
+                  onChange={(event) => setClientId(event.target.value)}
+                  style={controlStyle}
+                >
+                  <option value="" disabled>Seleccionar cliente</option>
+                  {clients.map((client) => (
+                    <option key={client.id} value={client.id}>{client.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div style={fieldStyle}>
               <label htmlFor="payment-concept" style={labelStyle}>Concepto</label>
@@ -201,7 +219,7 @@ export function RegisterPaymentPopup({
                 style={controlStyle}
               >
                 <option value="pending">Pendiente</option>
-                <option value="completed">Pagado</option>
+                <option value="completed">Cobrado</option>
                 <option value="overdue">Vencido</option>
               </select>
             </div>
@@ -229,8 +247,8 @@ export function RegisterPaymentPopup({
               disabled={clients.length === 0}
               style={{ backgroundColor: APP_COLORS.primary, borderRadius: 7 }}
             >
-              <Icon f7="plus" size="14px" className="margin-right-half" />
-              Guardar pago
+              <Icon f7={payment ? 'checkmark' : 'plus'} size="14px" className="margin-right-half" />
+              {payment ? 'Guardar cambios' : 'Guardar pago'}
             </Button>
           </div>
         </form>

@@ -1,9 +1,10 @@
 import type { FC, CSSProperties } from 'react';
-import { Badge, Icon } from 'framework7-react';
+import { Icon } from 'framework7-react';
 import type { Client } from '../types';
 import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
 import { formatCLP } from '../../../core/utils/format';
+import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
 
 interface ClientCardProps {
   client: Client;
@@ -16,18 +17,6 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   activo: { label: 'Activo', color: '#34c759', bg: 'rgba(52, 199, 89, 0.1)' },
   en_proceso: { label: 'En proceso', color: '#ff9500', bg: 'rgba(255, 149, 0, 0.1)' },
   completado: { label: 'Completado', color: '#007aff', bg: 'rgba(0, 122, 255, 0.1)' },
-};
-
-const PAYMENT_STATUS_LABELS: Record<Payment['status'], string> = {
-  completed: 'Cobrado',
-  pending: 'Pendiente',
-  overdue: 'Vencido',
-};
-
-const PAYMENT_STATUS_COLORS: Record<Payment['status'], string> = {
-  completed: 'green',
-  pending: 'orange',
-  overdue: 'red',
 };
 
 function formatEventDate(value: string): string {
@@ -237,9 +226,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
             <span style={activityTextStyle}>
               {payment.concept} · {formatCLP(payment.amount)}
             </span>
-            <Badge color={PAYMENT_STATUS_COLORS[payment.status]}>
-              {PAYMENT_STATUS_LABELS[payment.status]}
-            </Badge>
+            <PaymentStatusIndicator status={payment.status} />
           </div>
         )}
         {event && (

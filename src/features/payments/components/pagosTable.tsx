@@ -1,23 +1,14 @@
 import type { FC } from 'react';
-import { Icon } from 'framework7-react';
 import type { Payment } from '../types';
 import { formatCLP } from '../../../core/utils/format';
+import { PaymentActionsMenu } from './PaymentActionsMenu';
+import { PaymentStatusIndicator } from './PaymentStatusIndicator';
 
 interface TableProps {
   payments: Payment[];
+  onEdit: (payment: Payment) => void;
+  onDelete: (payment: Payment) => void;
 }
-
-const STATUS_LABELS: Record<Payment['status'], string> = {
-  completed: 'Pagado',
-  pending: 'Pendiente',
-  overdue: 'Vencido',
-};
-
-const STATUS_COLORS: Record<Payment['status'], { background: string; color: string }> = {
-  completed: { background: 'rgba(52, 199, 89, 0.14)', color: '#248a3d' },
-  pending: { background: 'rgba(255, 149, 0, 0.14)', color: '#a85d00' },
-  overdue: { background: 'rgba(255, 59, 48, 0.12)', color: '#c62820' },
-};
 
 function formatPaymentDate(value: string): string {
   const date = new Date(value);
@@ -25,7 +16,7 @@ function formatPaymentDate(value: string): string {
   return new Intl.DateTimeFormat('es-CL').format(date);
 }
 
-export const PaymentsTable: FC<TableProps> = ({ payments }) => {
+export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) => {
   const headerCellStyle = {
     padding: '12px 14px',
     color: '#6e6e73',
@@ -63,12 +54,13 @@ export const PaymentsTable: FC<TableProps> = ({ payments }) => {
             <th style={headerCellStyle}>Fecha</th>
             <th style={{ ...headerCellStyle, textAlign: 'right' }}>Monto</th>
             <th style={headerCellStyle}>Estado</th>
+            <th style={{ ...headerCellStyle, width: 44 }} aria-label="Acciones" />
           </tr>
         </thead>
         <tbody>
           {payments.length === 0 ? (
             <tr>
-              <td colSpan={5} style={{ ...cellStyle, padding: '28px 14px', textAlign: 'center', color: '#8e8e93' }}>
+              <td colSpan={6} style={{ ...cellStyle, padding: '28px 14px', textAlign: 'center', color: '#8e8e93' }}>
                 No hay pagos que coincidan con los filtros.
               </td>
             </tr>
@@ -82,27 +74,13 @@ export const PaymentsTable: FC<TableProps> = ({ payments }) => {
                   {formatCLP(payment.amount)}
                 </td>
                 <td style={cellStyle}>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      borderRadius: '999px',
-                      padding: '4px 9px',
-                      backgroundColor: STATUS_COLORS[payment.status].background,
-                      color: STATUS_COLORS[payment.status].color,
-                      fontSize: '12px',
-                      fontWeight: 600,
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    <Icon
-                      f7="circle_fill"
-                      size="7px"
-                      style={{ color: STATUS_COLORS[payment.status].color }}
-                    />
-                    {STATUS_LABELS[payment.status]}
-                  </span>
+                  <PaymentStatusIndicator status={payment.status} />
+                </td>
+                <td style={{ ...cellStyle, width: 44, paddingLeft: 4, paddingRight: 8 }}>
+                  <PaymentActionsMenu
+                    onEdit={() => onEdit(payment)}
+                    onDelete={() => onDelete(payment)}
+                  />
                 </td>
               </tr>
             ))

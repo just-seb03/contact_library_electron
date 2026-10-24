@@ -1,32 +1,25 @@
 import type { CSSProperties, FC } from 'react';
-import { Badge, Icon } from 'framework7-react';
+import { Icon } from 'framework7-react';
 import type { CalendarEvent } from '../../calendar/types';
+import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
 import type { HearingEvent } from '../../../core/context/types';
 import { formatCLP } from '../../../core/utils/format';
 import { navigateToTab } from '../../../navigation/navigation';
+import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
+import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
+import { ClientDocumentsSection } from './ClientDocumentsSection';
 
 interface ClientActivityDetailsProps {
   payments: Payment[];
   events: CalendarEvent[];
   legacyHearing: HearingEvent | null;
+  onEditPayment: (payment: Payment) => void;
+  onDeletePayment: (payment: Payment) => void;
+  documents: ClientDocument[];
+  onUploadDocument: (file: File) => Promise<void>;
+  onDeleteDocument: (document: ClientDocument) => void;
 }
-
-const paymentStatusColor = (status: Payment['status']): string => {
-  switch (status) {
-    case 'completed': return 'green';
-    case 'pending': return 'orange';
-    case 'overdue': return 'red';
-  }
-};
-
-const paymentStatusLabel = (status: Payment['status']): string => {
-  switch (status) {
-    case 'completed': return 'Cobrado';
-    case 'pending': return 'Pendiente';
-    case 'overdue': return 'Vencido';
-  }
-};
 
 function formatEventDate(value: string): string {
   const [year, month, day] = value.split('-').map(Number);
@@ -78,6 +71,11 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
   payments,
   events,
   legacyHearing,
+  onEditPayment,
+  onDeletePayment,
+  documents,
+  onUploadDocument,
+  onDeleteDocument,
 }) => {
   const today = getLocalDateValue();
   const orderedEvents = [...events].sort((first, second) => {
@@ -107,10 +105,13 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
             type="button"
             onClick={() => navigateToTab('pagos')}
             style={{
-              width: 'auto',
               display: 'inline-flex',
               alignItems: 'center',
-              padding: '6px 12px',
+              gap: 6,
+              marginLeft: 'auto',
+              width: 130,
+              height: 36,
+              padding: '6px 6px',
               border: '1px solid #d1d1d6',
               borderRadius: 8,
               backgroundColor: '#f2f2f7',
@@ -134,9 +135,13 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
                   </span>
                   <span style={{ color: '#8e8e93', fontSize: 12 }}>Fecha: {payment.date}</span>
                 </div>
-                <Badge color={paymentStatusColor(payment.status)}>
-                  {paymentStatusLabel(payment.status)}
-                </Badge>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  <PaymentStatusIndicator status={payment.status} />
+                  <PaymentActionsMenu
+                    onEdit={() => onEditPayment(payment)}
+                    onDelete={() => onDeletePayment(payment)}
+                  />
+                </div>
               </div>
             ))}
           </div>
@@ -195,6 +200,11 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
           <p style={emptyStyle}>Este cliente aún no tiene eventos asociados.</p>
         )}
       </section>
+      <ClientDocumentsSection
+        documents={documents}
+        onUpload={onUploadDocument}
+        onDelete={onDeleteDocument}
+      />
     </>
   );
 };
