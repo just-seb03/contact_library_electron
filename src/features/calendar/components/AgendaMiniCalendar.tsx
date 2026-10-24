@@ -47,12 +47,19 @@ const dayCellStyle: CSSProperties = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  height: 32,
+  height: 36,
   width: '100%',
   padding: 0,
   border: 0,
   background: 'transparent',
   cursor: 'pointer',
+};
+
+const dayContentStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 1,
 };
 
 const dayNumberBaseStyle: CSSProperties = {
@@ -67,12 +74,20 @@ const dayNumberBaseStyle: CSSProperties = {
   transition: 'background-color 0.15s, color 0.15s',
 };
 
+const eventIndicatorStyle: CSSProperties = {
+  width: 14,
+  height: 2,
+  borderRadius: 1,
+  backgroundColor: '#8ecbff',
+};
+
 const navButtonStyle: CSSProperties = {
   ['--f7-button-padding-horizontal' as string]: '6px',
 };
 
 interface AgendaMiniCalendarProps {
   selectedDate: Date;
+  eventDates: ReadonlySet<string>;
   onSelectDate: (date: Date) => void;
 }
 
@@ -81,8 +96,16 @@ function getMondayOffset(year: number, month: number): number {
   return firstDay === 0 ? 6 : firstDay - 1;
 }
 
+function toDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   selectedDate,
+  eventDates,
   onSelectDate,
 }) => {
   const today = new Date();
@@ -173,16 +196,17 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
             cell.day
           );
           const selectedMatch = cellDate.toDateString() === selectedDate.toDateString();
+          const hasEvents = eventDates.has(toDateKey(cellDate));
           return (
             <button
               key={idx}
               type="button"
               style={dayCellStyle}
-              aria-label={cellDate.toLocaleDateString('es-ES', {
+              aria-label={`${cellDate.toLocaleDateString('es-ES', {
                 day: 'numeric',
                 month: 'long',
                 year: 'numeric',
-              })}
+              })}${hasEvents ? ', tiene eventos' : ''}`}
               aria-pressed={selectedMatch}
               onClick={() => {
                 onSelectDate(cellDate);
@@ -192,20 +216,23 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                 }
               }}
             >
-              <div
-                style={{
-                  ...dayNumberBaseStyle,
-                  backgroundColor: selectedMatch ? APP_COLORS.black : 'transparent',
-                  color: selectedMatch
-                    ? APP_COLORS.white
-                    : cell.isCurrentMonth
-                      ? APP_COLORS.black
-                      : 'rgba(0,0,0,0.25)',
-                  fontWeight: selectedMatch || todayMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
-                  boxShadow: todayMatch && !selectedMatch ? `inset 0 0 0 1px ${APP_COLORS.primary}` : 'none',
-                }}
-              >
-                {cell.day}
+              <div style={dayContentStyle}>
+                <div
+                  style={{
+                    ...dayNumberBaseStyle,
+                    backgroundColor: selectedMatch ? APP_COLORS.black : 'transparent',
+                    color: selectedMatch
+                      ? APP_COLORS.white
+                      : cell.isCurrentMonth
+                        ? APP_COLORS.black
+                        : 'rgba(0,0,0,0.25)',
+                    fontWeight: selectedMatch || todayMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
+                    boxShadow: todayMatch && !selectedMatch ? `inset 0 0 0 1px ${APP_COLORS.primary}` : 'none',
+                  }}
+                >
+                  {cell.day}
+                </div>
+                {hasEvents && <div style={eventIndicatorStyle} aria-hidden="true" />}
               </div>
             </button>
           );

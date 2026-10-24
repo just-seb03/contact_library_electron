@@ -140,6 +140,16 @@ export default function Calendar() {
     [calendarEvents, currentDay, currentMonthIndex, currentYear]
   );
 
+  const eventDates = useMemo(
+    () => new Set([
+      ...calendarEvents.map((event) => event.date),
+      ...hearings.map((hearing) => (
+        `${hearing.year}-${String(hearing.monthIndex + 1).padStart(2, '0')}-${String(hearing.day).padStart(2, '0')}`
+      )),
+    ]),
+    [calendarEvents, hearings]
+  );
+
   const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
   const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
@@ -304,6 +314,7 @@ export default function Calendar() {
             }}>
               <AgendaMiniCalendar
                 selectedDate={selectedDate}
+                eventDates={eventDates}
                 onSelectDate={handleSelectDate}
               />
               <AgendaEventDetail
