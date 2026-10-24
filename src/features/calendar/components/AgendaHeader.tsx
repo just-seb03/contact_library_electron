@@ -6,8 +6,9 @@ interface AgendaHeaderProps {
   day: number;
   monthShort: string;
   fullDateLabel: string;
+  isWeekView: boolean;
   onPreviousDay: () => void;
-  onToday: () => void;
+  onToggleWeekView: () => void;
   onNextDay: () => void;
   onAddEvent: () => void;
 }
@@ -91,8 +92,9 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   day,
   monthShort,
   fullDateLabel,
+  isWeekView,
   onPreviousDay,
-  onToday,
+  onToggleWeekView,
   onNextDay,
   onAddEvent,
 }) => (
@@ -116,7 +118,14 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
         >
           <Icon f7="chevron_left" size="14px" />
         </Button>
-        <Button small round onClick={onToday}>Hoy</Button>
+        <Button
+          small
+          round
+          onClick={onToggleWeekView}
+          aria-pressed={isWeekView}
+        >
+          {isWeekView ? 'Semana' : 'Día'}
+        </Button>
         <Button
           small
           round

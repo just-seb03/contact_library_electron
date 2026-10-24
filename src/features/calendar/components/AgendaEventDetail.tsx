@@ -7,6 +7,7 @@ import type { HearingEvent } from '../../../core/context/types';
 interface AgendaEventDetailProps {
   event: CalendarEvent | HearingEvent | null;
   clientName?: string;
+  hearingEndTime?: string;
   onEdit?: (event: CalendarEvent) => void;
   onDelete?: (event: CalendarEvent) => void;
 }
@@ -61,9 +62,16 @@ function formatClockTime(time: string): string {
   return `${String(displayHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
 }
 
+function formatHearingTime(time: string): string {
+  const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return time;
+  return `${match[1].padStart(2, '0')}:${match[2]} ${match[3].toUpperCase()}`;
+}
+
 export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
   event,
   clientName,
+  hearingEndTime,
   onEdit,
   onDelete,
 }) => (
@@ -77,13 +85,24 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
         {'date' in event ? (
           <>
             <span style={detailTextStyle}>{formatEventDate(event.date)}</span>
-            <span style={detailTextStyle}>
-              {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
-            </span>
+            <span style={detailTextStyle}>Hora de inicio: {formatClockTime(event.startTime)}</span>
+            <span style={detailTextStyle}>Hora de término: {formatClockTime(event.endTime)}</span>
           </>
         ) : (
           <>
-            <span style={detailTextStyle}>{event.dateStr}</span>
+            <span style={detailTextStyle}>
+              Fecha: {event.dateStr.split(' - ')[0]}
+            </span>
+            <span style={detailTextStyle}>
+              Hora de inicio: {formatHearingTime(event.timeStr)}
+            </span>
+            <span style={detailTextStyle}>
+              Hora de término: {
+                hearingEndTime
+                  ? formatClockTime(hearingEndTime)
+                  : 'No hay un evento de calendario asociado'
+              }
+            </span>
             <span style={detailTextStyle}>{event.materia}</span>
             <span style={detailTextStyle}>{event.juzgado}</span>
             <span style={detailTextStyle}>Expediente: {event.expediente}</span>

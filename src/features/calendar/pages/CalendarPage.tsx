@@ -7,6 +7,7 @@ import type { HearingEvent } from '../../../core/context/types';
 
 import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
+import { AgendaWeekView } from '../components/AgendaWeekView';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
 import { CreateEventPopup } from '../components/CreateEventPopup';
@@ -21,6 +22,18 @@ const MONTH_NAMES_SHORT = [
   'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN',
   'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC',
 ];
+
+function to24HourTime(time: string): string | null {
+  const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return null;
+
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (hours < 1 || hours > 12 || minutes > 59) return null;
+  if (match[3].toUpperCase() === 'PM' && hours !== 12) hours += 12;
+  if (match[3].toUpperCase() === 'AM' && hours === 12) hours = 0;
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
 
 const sectionTitleStyle: CSSProperties = {
   margin: '0 0 14px',
@@ -101,6 +114,7 @@ export default function Calendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
+  const [isWeekView, setIsWeekView] = useState(false);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentDay = selectedDate.getDate();
@@ -127,6 +141,18 @@ export default function Calendar() {
   );
 
   const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
+  const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const weekDateLabel = `Semana del ${weekStart.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+  })} al ${weekEnd.toLocaleDateString('es-ES', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })}`;
   const monthShort = MONTH_NAMES_SHORT[currentMonthIndex];
 
   useEffect(() => {
@@ -185,6 +211,19 @@ export default function Calendar() {
   const selectedEventClient = selectedEvent && 'clientId' in selectedEvent
     ? clients.find((client) => client.id === selectedEvent.clientId)?.name
     : undefined;
+  const selectedHearingEndTime = selectedEvent && !('date' in selectedEvent)
+    ? (() => {
+        const startTime = to24HourTime(selectedEvent.timeStr);
+        if (!startTime) return undefined;
+
+        const date = `${selectedEvent.year}-${String(selectedEvent.monthIndex + 1).padStart(2, '0')}-${String(selectedEvent.day).padStart(2, '0')}`;
+        return calendarEvents.find((event) => (
+          event.clientId === selectedEvent.clientId
+          && event.date === date
+          && event.startTime === startTime
+        ))?.endTime;
+      })()
+    : undefined;
 
   return (
     <Page noNavbar noToolbar style={{ overflowX: 'hidden' }}>
@@ -203,10 +242,22 @@ export default function Calendar() {
           <AgendaHeader
             day={currentDay}
             monthShort={monthShort}
-            fullDateLabel={fullDateLabel}
-            onPreviousDay={() => handleSelectDate(new Date(currentYear, currentMonthIndex, currentDay - 1))}
-            onToday={() => handleSelectDate(new Date())}
-            onNextDay={() => handleSelectDate(new Date(currentYear, currentMonthIndex, currentDay + 1))}
+            fullDateLabel={isWeekView ? weekDateLabel : fullDateLabel}
+            isWeekView={isWeekView}
+            onPreviousDay={() => handleSelectDate(new Date(
+              currentYear,
+              currentMonthIndex,
+              currentDay - (isWeekView ? 7 : 1)
+            ))}
+            onToggleWeekView={() => {
+              setIsWeekView((previous) => !previous);
+              setSelectedEvent(null);
+            }}
+            onNextDay={() => handleSelectDate(new Date(
+              currentYear,
+              currentMonthIndex,
+              currentDay + (isWeekView ? 7 : 1)
+            ))}
             onAddEvent={() => {
               setEditingEvent(null);
               setIsCreateEventOpen(true);
@@ -224,13 +275,24 @@ export default function Calendar() {
               ...timelinePanelStyle,
               height: compactLayout ? '50vh' : '100%',
             }}>
-              <CardContent style={timelineScrollStyle}>
-                <AgendaTimeline
-                  todayHearings={todayHearings}
-                  calendarEvents={selectedDayEvents}
-                  onSelectEvent={setSelectedEvent}
-                />
-              </CardContent>
+              {isWeekView ? (
+                <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
+                  <AgendaWeekView
+                    selectedDate={selectedDate}
+                    calendarEvents={calendarEvents}
+                    hearings={hearings}
+                    onSelectEvent={setSelectedEvent}
+                  />
+                </CardContent>
+              ) : (
+                <CardContent style={timelineScrollStyle}>
+                  <AgendaTimeline
+                    todayHearings={todayHearings}
+                    calendarEvents={selectedDayEvents}
+                    onSelectEvent={setSelectedEvent}
+                  />
+                </CardContent>
+              )}
             </div>
 
             <div style={{
@@ -247,6 +309,7 @@ export default function Calendar() {
               <AgendaEventDetail
                 event={selectedEvent}
                 clientName={selectedEventClient}
+                hearingEndTime={selectedHearingEndTime}
                 onEdit={(event) => {
                   setEditingEvent(event);
                   setIsCreateEventOpen(true);
