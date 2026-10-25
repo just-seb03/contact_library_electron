@@ -62,7 +62,7 @@ export default function PaymentsPage() {
 
   return (
     <Page noNavbar noToolbar>
-      <div style={PAGE_CONTENT_STYLE}>
+      <div style={{ ...PAGE_CONTENT_STYLE, backgroundColor: '#f5f5f7' }}>
         <PaymentsHeader onRegisterPayment={() => setIsRegisterPopupOpen(true)} />
         <PaymentsStats
           totalIngresos={totalIngresos}

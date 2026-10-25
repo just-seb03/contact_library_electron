@@ -1,8 +1,9 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
-import { Button, Icon, Popup } from 'framework7-react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { Popup } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import type { Payment } from '../types';
 import { APP_COLORS } from '../../../core/theme/style';
+import { PaymentForm } from './PaymentForm';
 
 interface RegisterPaymentPopupProps {
   opened: boolean;
@@ -18,70 +19,75 @@ const popupStyle: CSSProperties = {
   height: '100%',
   top: 0,
   left: 0,
+  right: 0,
+  bottom: 0,
+  margin: 0,
+  maxWidth: 'none',
+  maxHeight: 'none',
   position: 'fixed',
-  backgroundColor: 'rgba(0, 0, 0, 0.45)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
+  backgroundColor: 'rgba(28, 28, 30, 0.32)',
+  backdropFilter: 'blur(18px) saturate(140%)',
+  WebkitBackdropFilter: 'blur(18px) saturate(140%)',
+  overflow: 'hidden',
+  zIndex: 10500,
+};
+
+const popupCenterStyle: CSSProperties = {
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '16px',
   boxSizing: 'border-box',
-  overflow: 'hidden',
-  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
   position: 'relative',
+  margin: 'auto',
   width: '100%',
-  maxWidth: 500,
+  maxWidth: 520,
   maxHeight: 'min(640px, calc(100vh - 40px))',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  borderRadius: 14,
+  borderRadius: 16,
   backgroundColor: APP_COLORS.white,
-  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+  boxShadow: '0 24px 60px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08)',
   boxSizing: 'border-box',
 };
 
-const controlStyle: CSSProperties = {
-  width: '100%',
-  boxSizing: 'border-box',
-  minHeight: 40,
-  padding: '9px 11px',
-  border: '1px solid #d1d1d6',
-  borderRadius: 8,
-  backgroundColor: APP_COLORS.white,
-  color: APP_COLORS.black,
-  fontSize: 14,
-  fontFamily: 'inherit',
-};
-
-function getTodayInputValue(): string {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${today.getFullYear()}-${month}-${day}`;
-}
-
-function formatPaymentDate(value: string): string {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Intl.DateTimeFormat('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(year, month - 1, day));
-}
-
-function toDateInputValue(value: string): string {
-  const match = value.match(/^(\d{1,2})\s+([A-Za-z]{3}),\s+(\d{4})$/);
-  if (match) {
-    const month = new Date(`${match[2]} 1, ${match[3]}`).getMonth() + 1;
-    return `${match[3]}-${String(month).padStart(2, '0')}-${String(Number(match[1])).padStart(2, '0')}`;
+// Framework7 anima los popups con las clases `modal-in` / `modal-out` (no
+// `popup-in` / `popup-out`) y con `transform`. Aquí se anula el desplazamiento
+// y se anima solo la opacidad. Se usa la clase `popup-tablet-fullscreen` en el
+// selector para ganar en especificidad a las reglas de F7.
+//
+// Con `prefers-reduced-motion` la duración es 1ms (no `none`): F7 espera el
+// evento `transitionend` para disparar `onPopupClosed`, y sin transición ese
+// evento nunca llegaría y el popup se quedaría "abierto" a medias.
+const FADE_CSS = `
+  .popup.popup-tablet-fullscreen.f7-fade {
+    transform: none !important;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 220ms;
+    transition-timing-function: ease;
   }
-  return value;
-}
+
+  .popup.popup-tablet-fullscreen.f7-fade.modal-in {
+    opacity: 1;
+  }
+
+  .popup.popup-tablet-fullscreen.f7-fade.modal-out {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .popup.popup-tablet-fullscreen.f7-fade {
+      transition-duration: 1ms;
+    }
+  }
+`;
 
 export function RegisterPaymentPopup({
   opened,
@@ -91,219 +97,40 @@ export function RegisterPaymentPopup({
   onRegister,
   onUpdate,
 }: RegisterPaymentPopupProps) {
-  const [clientId, setClientId] = useState('');
-  const [concept, setConcept] = useState('');
-  const [amount, setAmount] = useState('');
-  const [date, setDate] = useState(getTodayInputValue);
-  const [status, setStatus] = useState<Payment['status']>('pending');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [contentMounted, setContentMounted] = useState(opened);
+  const lastPayment = useRef<Payment | null>(payment);
+  if (opened) lastPayment.current = payment;
+  const viewPayment = opened ? payment : lastPayment.current;
 
   useEffect(() => {
-    if (!opened) return;
-    setClientId(payment?.clientId ? String(payment.clientId) : clients[0] ? String(clients[0].id) : '');
-    setConcept(payment?.concept ?? '');
-    setAmount(payment ? String(payment.amount) : '');
-    setDate(payment ? toDateInputValue(payment.date) : getTodayInputValue());
-    setStatus(payment?.status ?? 'pending');
-    setErrorMessage('');
-  }, [opened, clients, payment]);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const client = clients.find((item) => String(item.id) === clientId);
-    const numericAmount = Number(amount);
-
-    if (!client) {
-      setErrorMessage('Selecciona un cliente para registrar el pago.');
-      return;
-    }
-    if (!concept.trim()) {
-      setErrorMessage('Ingresa el concepto del pago.');
-      return;
-    }
-    if (!Number.isSafeInteger(numericAmount) || numericAmount <= 0) {
-      setErrorMessage('Ingresa un monto entero mayor a cero.');
-      return;
-    }
-    if (!date) {
-      setErrorMessage('Selecciona la fecha del pago.');
-      return;
-    }
-
-    const data = {
-      concept: concept.trim(),
-      amount: numericAmount,
-      date: formatPaymentDate(date),
-      status,
-    };
-    if (payment && onUpdate) {
-      onUpdate(payment, data);
-    } else {
-      onRegister({ client: client.name, clientId: client.id, ...data });
-    }
-    onClose();
-  };
+    if (opened) setContentMounted(true);
+  }, [opened]);
 
   return (
-    <Popup opened={opened} className="popup-tablet-fullscreen" style={popupStyle} closeByBackdropClick={false}>
-      <div style={contentStyle}>
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'min(640px, calc(100vh - 40px))', minHeight: 0, overflow: 'hidden' }}
-        >
-          <div style={{ padding: '20px 24px 12px', flexShrink: 0 }}>
-            <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
-              {payment ? 'Editar pago' : 'Registrar pago'}
-            </h2>
-            <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
-              {payment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
-            </p>
+    <Popup
+      opened={opened}
+      className="popup-tablet-fullscreen f7-fade"
+      style={popupStyle}
+      // El popup ya trae su propio fondo difuminado; el backdrop de F7 se
+      // oscurecería encima y con otra duración de animación.
+      backdrop={false}
+      closeByBackdropClick={false}
+      onPopupClosed={() => setContentMounted(false)}
+    >
+      <style>{FADE_CSS}</style>
+      {contentMounted && (
+        <div style={popupCenterStyle}>
+          <div style={contentStyle}>
+            <PaymentForm
+              clients={clients}
+              payment={viewPayment}
+              onClose={onClose}
+              onRegister={onRegister}
+              onUpdate={onUpdate}
+            />
           </div>
-
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '8px 24px 16px' }}>
-            {!payment && (
-              <div style={fieldStyle}>
-                <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
-                <select
-                  id="payment-client"
-                  required
-                  value={clientId}
-                  onChange={(event) => setClientId(event.target.value)}
-                  style={controlStyle}
-                >
-                  <option value="" disabled>Seleccionar cliente</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>{client.name}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            <div style={fieldStyle}>
-              <label htmlFor="payment-concept" style={labelStyle}>Concepto</label>
-              <input
-                id="payment-concept"
-                required
-                maxLength={120}
-                value={concept}
-                onChange={(event) => setConcept(event.target.value)}
-                placeholder="Ej.: Asesoría jurídica"
-                style={controlStyle}
-              />
-            </div>
-
-            <div style={fieldStyle}>
-              <label htmlFor="payment-amount" style={labelStyle}>Monto (CLP)</label>
-              <input
-                id="payment-amount"
-                required
-                type="number"
-                min="1"
-                step="1"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
-                placeholder="Ej.: 150000"
-                style={controlStyle}
-              />
-            </div>
-
-            <div style={fieldStyle}>
-              <label htmlFor="payment-date" style={labelStyle}>Fecha</label>
-              <input
-                id="payment-date"
-                required
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-                style={controlStyle}
-              />
-            </div>
-
-            <div style={{ ...fieldStyle, marginBottom: 0 }}>
-              <label htmlFor="payment-status" style={labelStyle}>Estado</label>
-              <select
-                id="payment-status"
-                value={status}
-                onChange={(event) => setStatus(event.target.value as Payment['status'])}
-                style={controlStyle}
-              >
-                <option value="pending">Pendiente</option>
-                <option value="completed">Cobrado</option>
-                <option value="overdue">Vencido</option>
-              </select>
-            </div>
-
-            {errorMessage && (
-              <p role="alert" style={{ color: APP_COLORS.danger, fontSize: 13, margin: '14px 0 0' }}>
-                {errorMessage}
-              </p>
-            )}
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              alignItems: 'center',
-              gap: 10,
-              padding: '14px 24px',
-              borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-              backgroundColor: APP_COLORS.white,
-              position: 'sticky',
-              bottom: 0,
-              zIndex: 10,
-              flexShrink: 0,
-            }}
-          >
-            <Button
-              type="button"
-              onClick={onClose}
-              style={{
-                borderRadius: 7,
-                border: '1px solid #d1d1d6',
-                color: '#1c1c1e',
-                fontSize: 13,
-                fontWeight: 500,
-                padding: '0 16px',
-                height: 34,
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              fill
-              disabled={clients.length === 0}
-              style={{
-                backgroundColor: '#007aff',
-                borderRadius: 7,
-                color: '#ffffff',
-                fontSize: 13,
-                fontWeight: 600,
-                padding: '0 18px',
-                height: 34,
-                boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
-              }}
-            >
-              <Icon f7={payment ? 'checkmark' : 'plus'} size="14px" className="margin-right-half" />
-              {payment ? 'Guardar cambios' : 'Guardar pago'}
-            </Button>
-          </div>
-        </form>
-      </div>
+        </div>
+      )}
     </Popup>
   );
 }
-
-const fieldStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 7,
-  marginBottom: 16,
-};
-
-const labelStyle: CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: APP_COLORS.sidebarText,
-};

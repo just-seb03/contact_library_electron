@@ -39,13 +39,19 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: 12,
   };
 
   const profileAreaStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     gap: 14,
+    flex: '1 1 240px',
+    minWidth: 0,
+  };
+
+  const profileTextStyle: CSSProperties = {
     flex: 1,
     minWidth: 0,
   };
@@ -64,6 +70,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
   const nameRowStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 10,
     fontSize: 20,
     fontWeight: 700,
@@ -73,7 +80,9 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
   const contactInfoStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: 16,
+    flexWrap: 'wrap',
+    columnGap: 16,
+    rowGap: 4,
     marginTop: 4,
     fontSize: 13,
     color: APP_COLORS.whiteTextMuted,
@@ -83,6 +92,17 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     display: 'flex',
     alignItems: 'center',
     gap: 5,
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+  };
+
+  const emailItemStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 5,
+    minWidth: 0,
+    maxWidth: '100%',
+    overflowWrap: 'anywhere',
   };
 
   const noEmailTextStyle: CSSProperties = {
@@ -99,7 +119,6 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     alignItems: 'center',
     gap: 8,
   };
-
   /** Texto sutil sin fondo ni píldora para no confundir con botones (Heurística #4) */
   const idBadgeStyle: CSSProperties = {
     color: APP_COLORS.white,
@@ -107,6 +126,8 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: 0.5,
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
   };
 
   return (
@@ -116,7 +137,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
           <div style={avatarStyle}>
             <Icon f7="person_fill" size="24px" style={{ color: APP_COLORS.white }} />
           </div>
-          <div>
+          <div style={profileTextStyle}>
             <div style={nameRowStyle}>
               <span>{client.name}</span>
               {client.status && (
@@ -134,7 +155,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
                 {client.phone}
               </span>
               {hasValidEmail ? (
-                <span style={contactItemStyle}>
+                <span style={emailItemStyle}>
                   <Icon f7="envelope_fill" size="12px" style={{ color: APP_COLORS.whiteTextMuted }} />
                   {client.email}
                 </span>
@@ -149,7 +170,6 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
         </div>
 
         <div style={actionsStyle}>
-          {/* Identificador informativo sutil */}
           <span style={idBadgeStyle}>ID #{client.id}</span>
         </div>
       </div>

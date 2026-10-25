@@ -3,6 +3,7 @@ import type { Payment } from '../types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from './PaymentActionsMenu';
 import { PaymentStatusIndicator } from './PaymentStatusIndicator';
+import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface TableProps {
   payments: Payment[];
@@ -39,14 +40,12 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) =>
   return (
     <div
       style={{
+        ...PAYMENT_SURFACE_STYLE,
         width: '100%',
         overflowX: 'auto',
-        border: '1px solid rgba(60, 60, 67, 0.14)',
-        borderRadius: '12px',
-        backgroundColor: '#fff',
       }}
     >
-      <table style={{ width: '100%', minWidth: '680px', borderCollapse: 'collapse' }}>
+        <table style={{ width: '100%', minWidth: '680px', borderCollapse: 'separate', borderSpacing: 0 }}>
         <thead>
           <tr>
             <th style={headerCellStyle}>Cliente</th>

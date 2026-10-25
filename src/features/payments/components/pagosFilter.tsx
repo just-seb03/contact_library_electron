@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Button, Icon, Input } from 'framework7-react';
+import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 export interface PaymentFilters {
   invoiceId: string;
@@ -32,8 +33,14 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
   };
 
   return (
-    <section aria-label="Filtros de pagos">
-      <h2 style={{ color: '#1c1c1e', fontSize: '18px', margin: '0 0 12px' }}>
+    <section
+      aria-label="Filtros de pagos"
+      style={{
+        ...PAYMENT_SURFACE_STYLE,
+        padding: 16,
+      }}
+    >
+      <h2 style={{ color: '#1c1c1e', fontSize: '16px', fontWeight: 650, margin: '0 0 12px' }}>
         Filtrar pagos
       </h2>
       <form
@@ -140,9 +147,9 @@ const fieldStyle = {
   boxSizing: 'border-box' as const,
   padding: '0 10px',
   color: '#1c1c1e',
-  backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  border: '1px solid rgba(0, 0, 0, 0.08)',
-  borderRadius: '7px',
+  backgroundColor: '#f2f2f7',
+  border: '1px solid #e5e5ea',
+  borderRadius: '8px',
   outline: 'none',
   fontSize: '13px',
 };
