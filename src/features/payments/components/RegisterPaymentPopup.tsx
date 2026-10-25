@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { Button, Icon, Popup } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import type { Payment } from '../types';
@@ -18,21 +18,32 @@ const popupStyle: CSSProperties = {
   height: '100%',
   top: 0,
   left: 0,
+  right: 0,
+  bottom: 0,
+  margin: 0,
+  maxWidth: 'none',
+  maxHeight: 'none',
   position: 'fixed',
   backgroundColor: 'rgba(0, 0, 0, 0.45)',
   backdropFilter: 'blur(8px)',
   WebkitBackdropFilter: 'blur(8px)',
+  overflow: 'hidden',
+  zIndex: 10500,
+};
+
+const popupCenterStyle: CSSProperties = {
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '16px',
   boxSizing: 'border-box',
-  overflow: 'hidden',
-  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
   position: 'relative',
+  margin: 'auto',
   width: '100%',
   maxWidth: 500,
   maxHeight: 'min(640px, calc(100vh - 40px))',
@@ -97,6 +108,14 @@ export function RegisterPaymentPopup({
   const [date, setDate] = useState(getTodayInputValue);
   const [status, setStatus] = useState<Payment['status']>('pending');
   const [errorMessage, setErrorMessage] = useState('');
+  const [contentMounted, setContentMounted] = useState(opened);
+  const lastPayment = useRef<Payment | null>(payment);
+  if (opened) lastPayment.current = payment;
+  const viewPayment = opened ? payment : lastPayment.current;
+
+  useEffect(() => {
+    if (opened) setContentMounted(true);
+  }, [opened]);
 
   useEffect(() => {
     if (!opened) return;
@@ -145,7 +164,15 @@ export function RegisterPaymentPopup({
   };
 
   return (
-    <Popup opened={opened} className="popup-tablet-fullscreen" style={popupStyle} closeByBackdropClick={false}>
+    <Popup
+      opened={opened}
+      className="popup-tablet-fullscreen"
+      style={popupStyle}
+      closeByBackdropClick={false}
+      onPopupClosed={() => setContentMounted(false)}
+    >
+      {contentMounted && (
+      <div style={popupCenterStyle}>
       <div style={contentStyle}>
         <form
           onSubmit={handleSubmit}
@@ -153,15 +180,15 @@ export function RegisterPaymentPopup({
         >
           <div style={{ padding: '20px 24px 12px', flexShrink: 0 }}>
             <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
-              {payment ? 'Editar pago' : 'Registrar pago'}
+              {viewPayment ? 'Editar pago' : 'Registrar pago'}
             </h2>
             <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
-              {payment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
+              {viewPayment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
             </p>
           </div>
 
           <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '8px 24px 16px' }}>
-            {!payment && (
+            {!viewPayment && (
               <div style={fieldStyle}>
                 <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
                 <select
@@ -285,12 +312,14 @@ export function RegisterPaymentPopup({
                 boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
               }}
             >
-              <Icon f7={payment ? 'checkmark' : 'plus'} size="14px" className="margin-right-half" />
-              {payment ? 'Guardar cambios' : 'Guardar pago'}
+              <Icon f7={viewPayment ? 'checkmark' : 'plus'} size="14px" className="margin-right-half" />
+              {viewPayment ? 'Guardar cambios' : 'Guardar pago'}
             </Button>
           </div>
         </form>
       </div>
+      </div>
+      )}
     </Popup>
   );
 }

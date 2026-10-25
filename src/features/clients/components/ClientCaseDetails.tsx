@@ -22,17 +22,24 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    flexWrap: 'wrap',
+    gap: 12,
     marginBottom: 16,
+  };
+
+  const titleBlockStyle: CSSProperties = {
+    flex: '1 1 220px',
+    minWidth: 0,
   };
 
   const titleStyle: CSSProperties = {
     fontSize: 18,
     fontWeight: 600,
+    lineHeight: 1.25,
     color: APP_COLORS.sidebarText,
     margin: 0,
   };
 
-  /** Subtítulo simplificado: únicamente juzgado/tribunal (Heurística #8) */
   const subtitleStyle: CSSProperties = {
     fontSize: 13,
     color: APP_COLORS.secondaryText,
@@ -43,6 +50,8 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
   const actionButtonsGroupStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    flex: '0 0 auto',
     gap: 8,
   };
 
@@ -50,6 +59,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
     width: 'auto',
     display: 'inline-flex',
     alignItems: 'center',
+    whiteSpace: 'nowrap',
     backgroundColor: APP_COLORS.controlBackground,
     color: APP_COLORS.primary,
     border: `1px solid ${APP_COLORS.border}`,
@@ -64,6 +74,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
     width: 'auto',
     display: 'inline-flex',
     alignItems: 'center',
+    whiteSpace: 'nowrap',
     backgroundColor: APP_COLORS.dangerSurface,
     color: APP_COLORS.danger,
     border: `1px solid ${APP_COLORS.borderDanger}`,
@@ -101,6 +112,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
     fontSize: 15,
     fontWeight: 600,
     color: APP_COLORS.sidebarText,
+    overflowWrap: 'anywhere',
+  };
+
+  const expedienteValueStyle: CSSProperties = {
+    ...fieldValueStyle,
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   };
 
@@ -117,8 +136,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
     flexShrink: 0,
     whiteSpace: 'nowrap',
   };
-
-  /** Tarjeta de audiencia: Colores neutros si está completado, azul activo si está en curso (Heurística #1) */
+  /** Tarjeta de audiencia: Colores neutros si está completado, azul activo si está en curso*/
   const handleCopyExpediente = () => {
     if (caso?.expediente) {
       navigator.clipboard.writeText(caso.expediente);
@@ -167,9 +185,8 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
 
   return (
     <div style={sectionStyle}>
-      {/* Cabecera: Título con juzgado y acciones del cliente */}
       <div style={headerRowStyle}>
-        <div>
+        <div style={titleBlockStyle}>
           <h2 style={titleStyle}>Expediente y Seguimiento Jurídico</h2>
           <div style={subtitleStyle}>{caso.juzgado}</div>
         </div>
@@ -195,11 +212,10 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
         </div>
       </div>
 
-      {/* Bloque: N° de Expediente con botón de copiar al portapapeles (Heurística #1) */}
       <div style={fieldCardStyle}>
         <div style={fieldLabelStyle}>N° DE EXPEDIENTE</div>
         <div style={expedienteRowStyle}>
-          <span style={fieldValueStyle}>{caso.expediente}</span>
+          <span style={expedienteValueStyle} title={caso.expediente}>{caso.expediente}</span>
           <button
             type="button"
             style={copyBtnStyle}
@@ -226,13 +242,11 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
         </div>
       </div>
 
-      {/* Bloque: Materia principal */}
       <div style={fieldCardStyle}>
         <div style={fieldLabelStyle}>MATERIA PRINCIPAL</div>
         <div style={fieldValueStyle}>{caso.materia}</div>
       </div>
 
-      {/* Bloque: Audiencia dinámica según estado completado o activo (Heurística #1) */}
     </div>
   );
 };

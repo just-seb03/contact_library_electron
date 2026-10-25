@@ -17,21 +17,32 @@ const popupStyle: CSSProperties = {
   height: '100%',
   top: 0,
   left: 0,
+  right: 0,
+  bottom: 0,
+  margin: 0,
+  maxWidth: 'none',
+  maxHeight: 'none',
   position: 'fixed',
   backgroundColor: 'rgba(0, 0, 0, 0.45)',
   backdropFilter: 'blur(8px)',
   WebkitBackdropFilter: 'blur(8px)',
+  overflow: 'hidden',
+  zIndex: 10500,
+};
+
+const popupCenterStyle: CSSProperties = {
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '16px',
   boxSizing: 'border-box',
-  overflow: 'hidden',
-  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
   position: 'relative',
+  margin: 'auto',
   width: '100%',
   maxWidth: 500,
   maxHeight: 'min(640px, calc(100vh - 40px))',
@@ -96,6 +107,11 @@ export function AddClientPopup({
   const [email, setEmail] = useState('');
   const [caseType, setCaseType] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [contentMounted, setContentMounted] = useState(opened);
+
+  useEffect(() => {
+    if (opened) setContentMounted(true);
+  }, [opened]);
 
   useEffect(() => {
     if (!opened) return;
@@ -160,7 +176,15 @@ export function AddClientPopup({
   };
 
   return (
-    <Popup opened={opened} className="popup-tablet-fullscreen" style={popupStyle} closeByBackdropClick={false}>
+    <Popup
+      opened={opened}
+      className="popup-tablet-fullscreen"
+      style={popupStyle}
+      closeByBackdropClick={false}
+      onPopupClosed={() => setContentMounted(false)}
+    >
+      {contentMounted && (
+      <div style={popupCenterStyle}>
       <div style={contentStyle}>
         <form
           onSubmit={handleSubmit}
@@ -289,6 +313,8 @@ export function AddClientPopup({
           </div>
         </form>
       </div>
+      </div>
+      )}
     </Popup>
   );
 }
