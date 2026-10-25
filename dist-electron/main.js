@@ -1,4 +1,4 @@
-import { ipcMain, app, BrowserWindow } from "electron";
+import { ipcMain, app, BrowserWindow, Menu } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const rgba = (rgb, alpha) => `rgba(${rgb}, ${alpha})`;
@@ -107,12 +107,18 @@ ipcMain.on("window-close", () => win == null ? void 0 : win.close());
 ipcMain.handle("get-platform", () => process.platform);
 function createWindow() {
   const isMac = process.platform === "darwin";
+  Menu.setApplicationMenu(null);
   win = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: 1320,
+    height: 820,
+    minWidth: 1e3,
+    minHeight: 640,
     frame: false,
-    titleBarStyle: isMac ? "hiddenInset" : "default",
-    trafficLightPosition: isMac ? { x: 12, y: 12 } : void 0,
+    autoHideMenuBar: true,
+    titleBarStyle: isMac ? "hidden" : "default",
+    trafficLightPosition: isMac ? { x: 18, y: 18 } : void 0,
+    vibrancy: isMac ? "sidebar" : void 0,
+    visualEffectState: isMac ? "active" : void 0,
     show: false,
     backgroundColor: APP_COLORS.background,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
@@ -120,6 +126,7 @@ function createWindow() {
       preload: path.join(__dirname$1, "preload.mjs")
     }
   });
+  win.setMenu(null);
   win.once("ready-to-show", () => {
     win == null ? void 0 : win.show();
   });

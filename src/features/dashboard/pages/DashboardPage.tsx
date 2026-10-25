@@ -13,7 +13,7 @@ export default function Dashboard() {
     <Page noNavbar noToolbar>
       <div
         style={{
-          padding: '48px 24px 28px',
+          padding: '20px 24px 28px',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',

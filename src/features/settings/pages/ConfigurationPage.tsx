@@ -39,7 +39,7 @@ export default function Configuration() {
   const pageContainerStyle: CSSProperties = {
     maxWidth: 680,
     margin: '0',
-    padding: '48px 20px 48px 20px',
+    padding: '24px 20px 48px 20px',
     boxSizing: 'border-box',
   };
 

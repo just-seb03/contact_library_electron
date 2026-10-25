@@ -242,7 +242,7 @@ export default function Calendar() {
         style={{
           width: '100%',
           minWidth: 0,
-          paddingTop: '48px',
+          paddingTop: '20px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}

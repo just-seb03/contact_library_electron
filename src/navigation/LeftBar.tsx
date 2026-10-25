@@ -1,28 +1,23 @@
 import { useEffect, type CSSProperties } from 'react';
-import {
-  List,
-  ListItem,
-  Icon,
-  Badge,
-  BlockTitle,
-  Link,
-  f7,
-  f7ready,
-} from 'framework7-react';
+import { Icon, f7, f7ready } from 'framework7-react';
 import type { Router as Framework7Router } from 'framework7/types';
 import { useApp } from '../core/context/AppContext';
 import type { AppTab } from '../core/context/types';
 import { navigateToTab, getAppTabForRoute } from './navigation';
 import { TrafficLights } from '../core/windowControls/TrafficLights';
-import {
-  APP_COLORS,
-  SIDEBAR_CONTAINER_STYLE,
-  SIDEBAR_ICON_SELECTED_COLOR,
-  SIDEBAR_ICON_COLOR,
-} from '../core/theme/style';
+import { MACOS_THEME } from '../core/theme/style';
+
+interface NavItemConfig {
+  id: AppTab;
+  title: string;
+  icon: string;
+  iconColor: string;
+  badge?: number | null;
+  badgeColor?: string;
+}
 
 export const LeftBar = () => {
-  const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
+  const { activeTab, setActiveTab, clients, hearings, payments, darkMode } = useApp();
 
   const handleSelect = (tab: AppTab) => {
     setActiveTab(tab);
@@ -61,157 +56,288 @@ export const LeftBar = () => {
     });
   }, [activeTab, setActiveTab]);
 
-  const sidebarContainerStyle: CSSProperties = {
+  const mainNavItems: NavItemConfig[] = [
+    {
+      id: 'inicio',
+      title: 'Inicio',
+      icon: 'house_fill',
+      iconColor: '#007aff',
+    },
+    {
+      id: 'calendar',
+      title: 'Agenda',
+      icon: 'calendar',
+      iconColor: '#ff3b30',
+      badge: hearings.length > 0 ? hearings.length : null,
+      badgeColor: '#007aff',
+    },
+  ];
+
+  const libraryNavItems: NavItemConfig[] = [
+    {
+      id: 'cliente',
+      title: 'Clientes',
+      icon: 'person_2_fill',
+      iconColor: '#5856d6',
+      badge: clients.length > 0 ? clients.length : null,
+      badgeColor: '#8e8e93',
+    },
+    {
+      id: 'pagos',
+      title: 'Pagos',
+      icon: 'creditcard_fill',
+      iconColor: '#34c759',
+      badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
+      badgeColor: '#ff9500',
+    },
+  ];
+
+  const systemNavItems: NavItemConfig[] = [
+    {
+      id: 'config',
+      title: 'Ajustes',
+      icon: 'gear_alt_fill',
+      iconColor: '#8e8e93',
+    },
+  ];
+
+  const containerStyle: CSSProperties = {
     height: '100%',
+    width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    ...SIDEBAR_CONTAINER_STYLE,
+    backgroundColor: darkMode ? MACOS_THEME.sidebarGlassDark : MACOS_THEME.sidebarGlass,
+    backdropFilter: MACOS_THEME.backdropBlur,
+    WebkitBackdropFilter: MACOS_THEME.backdropBlur,
+    color: darkMode ? '#ffffff' : '#1c1c1e',
+    borderRight: darkMode ? MACOS_THEME.hairlineBorderDark : MACOS_THEME.hairlineBorder,
+    userSelect: 'none',
+    boxSizing: 'border-box',
   };
 
-  /** Reemplaza .app-sidebar-header y .app-sidebar-list con el fondo tenue anterior del home */
-  const sidebarElementBg: CSSProperties = {
-    backgroundColor: APP_COLORS.background,
-  };
+  const renderNavGroup = (title: string, items: NavItemConfig[]) => (
+    <div style={{ marginBottom: 16 }}>
+      <div
+        style={{
+          padding: '6px 14px 4px 14px',
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase',
+          color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.55)',
+        }}
+      >
+        {title}
+      </div>
 
-  const iconStyle = (isActive: boolean): CSSProperties => ({
-    color: isActive ? SIDEBAR_ICON_SELECTED_COLOR : SIDEBAR_ICON_COLOR,
-  });
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {items.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => handleSelect(item.id)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                margin: '1px 8px',
+                padding: '7px 10px',
+                borderRadius: 8,
+                border: 'none',
+                outline: 'none',
+                cursor: 'pointer',
+                textAlign: 'left',
+                backgroundColor: isActive
+                  ? darkMode
+                    ? 'rgba(0, 122, 255, 0.26)'
+                    : 'rgba(0, 122, 255, 0.12)'
+                  : 'transparent',
+                color: isActive
+                  ? '#007aff'
+                  : darkMode
+                  ? '#f2f2f7'
+                  : '#1c1c1e',
+                fontWeight: isActive ? 600 : 450,
+                fontSize: 13,
+                transition: 'background-color 0.12s ease, transform 0.08s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = darkMode
+                    ? 'rgba(255, 255, 255, 0.06)'
+                    : 'rgba(0, 0, 0, 0.04)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+                <div
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 6,
+                    backgroundColor: isActive
+                      ? '#007aff'
+                      : darkMode
+                      ? 'rgba(255, 255, 255, 0.08)'
+                      : `${item.iconColor}14`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    transition: 'all 0.12s ease',
+                  }}
+                >
+                  <Icon
+                    f7={item.icon}
+                    size="14px"
+                    style={{
+                      color: isActive ? '#ffffff' : item.iconColor,
+                    }}
+                  />
+                </div>
+                <span
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {item.title}
+                </span>
+              </div>
+
+              {item.badge !== undefined && item.badge !== null && (
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    padding: '2px 7px',
+                    borderRadius: 10,
+                    backgroundColor: isActive
+                      ? '#007aff'
+                      : darkMode
+                      ? 'rgba(255, 255, 255, 0.12)'
+                      : 'rgba(0, 0, 0, 0.06)',
+                    color: isActive ? '#ffffff' : darkMode ? '#e5e5ea' : '#3c3c43',
+                    flexShrink: 0,
+                    marginLeft: 6,
+                  }}
+                >
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   return (
-    <div style={sidebarContainerStyle}>
-      {/* Cabecera estilo macOS con Traffic Lights y controles de ventana */}
+    <nav style={containerStyle} aria-label="Navegación principal">
+      {/* ── Cabecera de la barra lateral (Traffic Lights + Arrastre) ── */}
       <div
-        className="display-flex align-items-center justify-content-space-between padding-horizontal padding-vertical-half"
-        style={{ ...sidebarElementBg, WebkitAppRegion: 'drag' } as CSSProperties}
+        style={{
+          height: 52,
+          minHeight: 52,
+          padding: '0 14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          WebkitAppRegion: 'drag',
+          borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.03)',
+        } as CSSProperties}
       >
         <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
           <TrafficLights />
         </div>
-        <div
-          className="display-flex align-items-center"
-          style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}
-        >
-          <Link
-            iconF7="folder_badge_plus"
-            iconSize="16px"
-            className="text-color-gray margin-right-half"
-            aria-label="Nueva carpeta"
-          />
-          <Link
-            iconF7="sidebar_left"
-            iconSize="16px"
-            className="text-color-gray"
-            aria-label="Alternar barra lateral"
-          />
-        </div>
       </div>
 
-      {/* Primer grupo de accesos directos (Inicio, Agenda) */}
-      <List
-        menuList
-        strongIos={false}
-        outlineIos={false}
-        dividersIos={false}
-        className="no-margin-top no-margin-bottom"
-        style={sidebarElementBg}
+      {/* ── Grupos de navegación estilo Source List ── */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '12px 0',
+        }}
       >
-        <ListItem
-          link="#"
-          title="Inicio"
-          selected={activeTab === 'inicio'}
-          onClick={() => handleSelect('inicio')}
-        >
-          <Icon
-            slot="media"
-            f7="house_fill"
-            style={iconStyle(activeTab === 'inicio')}
-          />
-        </ListItem>
-        <ListItem
-          link="#"
-          title="Agenda"
-          selected={activeTab === 'calendar'}
-          onClick={() => handleSelect('calendar')}
-        >
-          <Icon
-            slot="media"
-            f7="calendar"
-            style={iconStyle(activeTab === 'calendar')}
-          />
-          {hearings.length > 0 && (
-            <Badge slot="after" color="blue">
-              {hearings.length}
-            </Badge>
-          )}
-        </ListItem>
-      </List>
+        {renderNavGroup('Principal', mainNavItems)}
+        {renderNavGroup('Biblioteca', libraryNavItems)}
+        {renderNavGroup('Sistema', systemNavItems)}
+      </div>
 
-      {/* Título de sección Biblioteca */}
-      <BlockTitle className="text-color-gray margin-left-half margin-top-half margin-bottom-half">
-        Biblioteca
-      </BlockTitle>
-
-      {/* Segundo grupo: Clientes, Pagos, Ajustes */}
-      <List
-        menuList
-        strongIos={false}
-        outlineIos={false}
-        dividersIos={false}
-        className="no-margin-top no-margin-bottom"
-        style={sidebarElementBg}
+      {/* ── Pie de la barra lateral (Perfil del Usuario / Estudio Jurídico) ── */}
+      <div
+        style={{
+          padding: '12px 14px',
+          borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.3)',
+        }}
       >
-        <ListItem
-          link="#"
-          title="Clientes"
-          selected={activeTab === 'cliente'}
-          onClick={() => handleSelect('cliente')}
+        <div
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #007aff, #5856d6)',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 12,
+            fontWeight: 700,
+            flexShrink: 0,
+            boxShadow: '0 2px 6px rgba(0, 122, 255, 0.3)',
+          }}
         >
-          <Icon
-            slot="media"
-            f7="person_2_fill"
-            style={iconStyle(activeTab === 'cliente')}
-          />
-          <Badge
-            slot="after"
-            color={activeTab === 'cliente' ? 'blue' : 'gray'}
+          CL
+        </div>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              color: darkMode ? '#ffffff' : '#1c1c1e',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
           >
-            {clients.length}
-          </Badge>
-        </ListItem>
-        <ListItem
-          link="#"
-          title="Pagos"
-          selected={activeTab === 'pagos'}
-          onClick={() => handleSelect('pagos')}
-        >
-          <Icon
-            slot="media"
-            f7="creditcard_fill"
-            style={iconStyle(activeTab === 'pagos')}
-          />
-          {pendingPaymentsCount > 0 && (
-            <Badge
-              slot="after"
-              color="orange"
-            >
-              {pendingPaymentsCount}
-            </Badge>
-          )}
-        </ListItem>
-        <ListItem
-          link="#"
-          title="Ajustes"
-          selected={activeTab === 'config'}
-          onClick={() => handleSelect('config')}
-        >
-          <Icon
-            slot="media"
-            f7="gear_alt_fill"
-            style={iconStyle(activeTab === 'config')}
-          />
-        </ListItem>
-      </List>
-    </div>
+            Estudio Jurídico
+          </div>
+          <div
+            style={{
+              fontSize: 11,
+              color: darkMode ? '#a1a1aa' : '#8e8e93',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: '#34c759',
+                display: 'inline-block',
+              }}
+            />
+            <span>Activo • macOS</span>
+          </div>
+        </div>
+      </div>
+    </nav>
   );
 };
 

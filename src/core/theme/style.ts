@@ -70,8 +70,6 @@ export const APP_COLORS = {
   primaryLight: '#30b0ff',
 } as const;
 
-// Escalas de espaciado, tipografía y sombras
-
 export const APP_SPACING = {
   sectionRadius: 16,
   controlRadius: 8,
@@ -79,10 +77,30 @@ export const APP_SPACING = {
   glassRadius: 14,
   sectionPadding: 24,
   controlHeight: 36,
-  sidebarWidth: 250,
+  sidebarWidth: 240,
+  toolbarHeight: 52,
   pageMaxWidth: 1200,
-  pageTopPadding: 48,
+  pageTopPadding: 24,
   pageBottomPadding: 28,
+} as const;
+
+export const MACOS_THEME = {
+  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  sidebarGlass: 'rgba(246, 246, 248, 0.82)',
+  sidebarGlassDark: 'rgba(28, 28, 30, 0.82)',
+  toolbarGlass: 'rgba(255, 255, 255, 0.82)',
+  toolbarGlassDark: 'rgba(32, 32, 34, 0.82)',
+  backdropBlur: 'blur(30px) saturate(190%)',
+  hairlineBorder: '1px solid rgba(0, 0, 0, 0.08)',
+  hairlineBorderDark: '1px solid rgba(255, 255, 255, 0.08)',
+  trafficLights: {
+    close: '#ff5f56',
+    closeBorder: 'rgba(224, 68, 62, 0.6)',
+    minimize: '#ffbd2e',
+    minimizeBorder: 'rgba(222, 161, 35, 0.6)',
+    maximize: '#27c93f',
+    maximizeBorder: 'rgba(40, 169, 55, 0.6)',
+  },
 } as const;
 
 export const APP_GAP = {
@@ -106,6 +124,8 @@ export const APP_FONT_WEIGHT = {
 export const APP_SHADOWS = {
   section: `0 2px 10px ${rgba(BLACK_RGB, 0.04)}`,
   glass: `0 1px 4px ${rgba(BLACK_RGB, 0.06)}, 0 2px 12px ${rgba(BLACK_RGB, 0.04)}`,
+  macButton: '0 1px 2px rgba(0, 0, 0, 0.06)',
+  macPopover: '0 10px 30px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.2)',
 } as const;
 
 // Estilos base reutilizables

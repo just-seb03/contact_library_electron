@@ -1,5 +1,4 @@
-// electron/main.ts
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { APP_COLORS } from '../src/core/theme/style'
@@ -33,12 +32,20 @@ ipcMain.handle('get-platform', () => process.platform)
 function createWindow() {
   const isMac = process.platform === 'darwin'
 
+  // Deshabilitar completamente el menú nativo (File, Edit, View, Window, Help)
+  Menu.setApplicationMenu(null)
+
   win = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: 1320,
+    height: 820,
+    minWidth: 1000,
+    minHeight: 640,
     frame: false,
-    titleBarStyle: isMac ? 'hiddenInset' : 'default',
-    trafficLightPosition: isMac ? { x: 12, y: 12 } : undefined,
+    autoHideMenuBar: true,
+    titleBarStyle: isMac ? 'hidden' : 'default',
+    trafficLightPosition: isMac ? { x: 18, y: 18 } : undefined,
+    vibrancy: isMac ? 'sidebar' : undefined,
+    visualEffectState: isMac ? 'active' : undefined,
     show: false,
     backgroundColor: APP_COLORS.background,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
@@ -46,6 +53,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   })
+
+  win.setMenu(null)
 
   win.once('ready-to-show', () => {
     win?.show();
