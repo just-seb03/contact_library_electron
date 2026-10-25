@@ -14,7 +14,7 @@ export const IosSwitch: React.FC<IosSwitchProps> = ({
   checked,
   onChange,
   disabled = false,
-  activeColor = '#34C759',
+  activeColor = 'var(--macos-accent-color, #007aff)',
   inactiveColor,
   darkMode = false,
   ariaLabel = 'Interruptor',

@@ -52,22 +52,22 @@ export const APP_COLORS = {
   whiteTextFaint: rgba(WHITE_RGB, 0.6),
 
   // Tints derivados de APP_COLOR_RGB
-  primaryTint: rgba(APP_COLOR_RGB.primary, 0.08),
-  primaryStatusTint: rgba(APP_COLOR_RGB.primary, 0.1),
+  primaryTint: 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.08))',
+  primaryStatusTint: 'var(--macos-accent-tint-status, rgba(0, 122, 255, 0.1))',
   neutralTint: rgba(APP_COLOR_RGB.neutral, 0.1),
   successTint: rgba(APP_COLOR_RGB.success, 0.1),
   warningTint: rgba(APP_COLOR_RGB.warning, 0.1),
 
   // Colores semánticos derivados del RGB base
-  primary: rgbToHex(APP_COLOR_RGB.primary),
+  primary: 'var(--macos-accent-color, #007aff)',
   success: rgbToHex(APP_COLOR_RGB.success),
   warning: rgbToHex(APP_COLOR_RGB.warning),
   danger: rgbToHex(APP_COLOR_RGB.danger),
   neutral: rgbToHex(APP_COLOR_RGB.neutral),
 
   // Variantes del primario
-  primaryStrong: '#0a84ff',
-  primaryLight: '#30b0ff',
+  primaryStrong: 'var(--macos-accent-color, #0a84ff)',
+  primaryLight: 'var(--macos-accent-color, #30b0ff)',
 } as const;
 
 export const APP_SPACING = {

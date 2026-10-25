@@ -49,7 +49,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             width: 48,
             height: 48,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #007aff, #5856d6)',
+            background: 'linear-gradient(135deg, var(--macos-accent-color, #007aff), #5856d6)',
             color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
@@ -57,7 +57,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             fontSize: 18,
             fontWeight: 700,
             flexShrink: 0,
-            boxShadow: '0 4px 12px rgba(0, 122, 255, 0.35)',
+            boxShadow: '0 4px 12px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
             border: darkMode ? '2px solid rgba(255, 255, 255, 0.15)' : '2px solid #ffffff',
           }}
         >
@@ -76,7 +76,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             >
               {name}
             </span>
-            <Icon f7="checkmark_seal_fill" size="14px" style={{ color: '#007aff' }} />
+            <Icon f7="checkmark_seal_fill" size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
           </div>
 
           <div
@@ -139,7 +139,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255, 255, 255, 0.08)' : '#ffffff';
           }}
         >
-          <Icon f7="pencil" size="11px" style={{ color: '#007aff' }} />
+          <Icon f7="pencil" size="11px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
           <span>Editar</span>
         </button>
       )}

@@ -165,7 +165,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   fontSize: 10,
                   fontWeight: 700,
                   color: isToday
-                    ? '#007aff'
+                    ? 'var(--macos-accent-color, #007aff)'
                     : darkMode
                     ? '#8e8e93'
                     : '#8e8e93',
@@ -195,13 +195,13 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                     ? '#e5e5ea'
                     : '#1c1c1e',
                   backgroundColor: isToday
-                    ? '#007aff'
+                    ? 'var(--macos-accent-color, #007aff)'
                     : isSelected
                     ? darkMode
                       ? 'rgba(255, 255, 255, 0.15)'
                       : 'rgba(0, 0, 0, 0.08)'
                     : 'transparent',
-                  boxShadow: isToday ? '0 2px 6px rgba(0, 122, 255, 0.35)' : 'none',
+                  boxShadow: isToday ? '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))' : 'none',
                 }}
               >
                 {dayFormatter.format(day)}

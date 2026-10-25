@@ -5,9 +5,57 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Library</title>
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('contact_library_settings');
+          if (saved) {
+            var parsed = JSON.parse(saved);
+            var map = {
+              blue: '#007aff',
+              purple: '#af52de',
+              pink: '#ff2d55',
+              red: '#ff3b30',
+              orange: '#ff9500',
+              green: '#34c759',
+              graphite: '#8e8e93'
+            };
+            var hex = map[parsed.accentColor] || '#007aff';
+            var clean = hex.replace('#', '');
+            var r = parseInt(clean.substring(0, 2), 16);
+            var g = parseInt(clean.substring(2, 4), 16);
+            var b = parseInt(clean.substring(4, 6), 16);
+            var rgb = r + ', ' + g + ', ' + b;
+            var root = document.documentElement;
+            root.style.setProperty('--macos-accent-color', hex);
+            root.style.setProperty('--macos-accent-color-rgb', rgb);
+            root.style.setProperty('--macos-accent-tint', 'rgba(' + rgb + ', 0.12)');
+            root.style.setProperty('--macos-accent-tint-subtle', 'rgba(' + rgb + ', 0.08)');
+            root.style.setProperty('--macos-accent-tint-status', 'rgba(' + rgb + ', 0.15)');
+            root.style.setProperty('--macos-accent-tint-hover', 'rgba(' + rgb + ', 0.18)');
+            root.style.setProperty('--macos-accent-tint-active', 'rgba(' + rgb + ', 0.26)');
+            root.style.setProperty('--f7-theme-color', hex);
+            root.style.setProperty('--f7-theme-color-rgb', rgb);
+            root.style.setProperty('--f7-theme-color-shade', hex);
+            root.style.setProperty('--f7-toggle-active-color', hex);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <style>
       :root {
         --apple-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --macos-accent-color: #007aff;
+        --macos-accent-color-rgb: 0, 122, 255;
+        --macos-accent-tint: rgba(0, 122, 255, 0.12);
+        --macos-accent-tint-subtle: rgba(0, 122, 255, 0.08);
+        --macos-accent-tint-status: rgba(0, 122, 255, 0.15);
+        --macos-accent-tint-hover: rgba(0, 122, 255, 0.18);
+        --macos-accent-tint-active: rgba(0, 122, 255, 0.26);
+        --f7-theme-color: #007aff;
+        --f7-theme-color-rgb: 0, 122, 255;
+        --f7-theme-color-shade: #007aff;
+        --f7-toggle-active-color: #007aff;
         --macos-canvas-bg: #f5f5f7;
         --macos-card-bg: #ffffff;
         --macos-modal-bg: #ffffff;
@@ -17,6 +65,10 @@
         --macos-card-border: rgba(0, 0, 0, 0.08);
         --f7-page-bg-color: #f5f5f7;
         --f7-card-bg-color: #ffffff;
+      }
+      ::selection {
+        background-color: var(--macos-accent-color, #007aff);
+        color: #ffffff;
       }
       * {
         box-sizing: border-box;

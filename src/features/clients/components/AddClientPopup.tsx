@@ -325,14 +325,14 @@ export function AddClientPopup({
               type="submit"
               fill
               style={{
-                backgroundColor: '#007aff',
+                backgroundColor: 'var(--macos-accent-color, #007aff)',
                 borderRadius: 7,
                 color: '#ffffff',
                 fontSize: 13,
                 fontWeight: 600,
                 padding: '0 18px',
                 height: 34,
-                boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
+                boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
               }}
             >
               <Icon f7={client ? 'checkmark_alt' : 'plus'} size="14px" className="margin-right-half" />

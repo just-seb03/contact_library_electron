@@ -36,7 +36,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
     height: 72,
     borderRadius: 8,
     border: selected
-      ? '2px solid #007aff'
+      ? '2px solid var(--macos-accent-color, #007aff)'
       : darkMode
       ? '1px solid rgba(255, 255, 255, 0.12)'
       : '1px solid rgba(0, 0, 0, 0.12)',
@@ -44,7 +44,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
     display: 'flex',
     overflow: 'hidden',
     boxShadow: selected
-      ? '0 0 0 3px rgba(0, 122, 255, 0.25)'
+      ? '0 0 0 3px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.25))'
       : '0 2px 6px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.15s ease',
   });
@@ -90,7 +90,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                   <span style={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: '#ffbd2e' }} />
                   <span style={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: '#27c93f' }} />
                 </div>
-                <div style={{ width: '80%', height: 4, borderRadius: 2, backgroundColor: '#007aff' }} />
+                <div style={{ width: '80%', height: 4, borderRadius: 2, backgroundColor: 'var(--macos-accent-color, #007aff)' }} />
                 <div style={{ width: '60%', height: 3, borderRadius: 2, backgroundColor: '#c7c7cc' }} />
               </div>
               {/* Mini contenido claro */}
@@ -103,7 +103,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
               style={{
                 fontSize: 12,
                 fontWeight: !darkMode ? 600 : 450,
-                color: !darkMode ? '#007aff' : darkMode ? '#a1a1aa' : '#636366',
+                color: !darkMode ? 'var(--macos-accent-color, #007aff)' : darkMode ? '#a1a1aa' : '#636366',
               }}
             >
               Claro {!darkMode && '✓'}
@@ -135,7 +135,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                   <span style={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: '#ffbd2e' }} />
                   <span style={{ width: 4, height: 4, borderRadius: '50%', backgroundColor: '#27c93f' }} />
                 </div>
-                <div style={{ width: '80%', height: 4, borderRadius: 2, backgroundColor: '#007aff' }} />
+                <div style={{ width: '80%', height: 4, borderRadius: 2, backgroundColor: 'var(--macos-accent-color, #007aff)' }} />
                 <div style={{ width: '60%', height: 3, borderRadius: 2, backgroundColor: '#48484a' }} />
               </div>
               {/* Mini contenido oscuro */}
@@ -148,7 +148,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
               style={{
                 fontSize: 12,
                 fontWeight: darkMode ? 600 : 450,
-                color: darkMode ? '#007aff' : '#636366',
+                color: darkMode ? 'var(--macos-accent-color, #007aff)' : '#636366',
               }}
             >
               Oscuro {darkMode && '✓'}

@@ -18,6 +18,11 @@ import {
   saveRegisteredPayments,
 } from './appStorage';
 import { parseHearing } from './hearingUtils';
+import {
+  DEFAULT_SETTINGS,
+  MAC_ACCENT_COLORS,
+  type AppSettings,
+} from '../../features/settings/data/settingsData';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(loadClients);
@@ -30,6 +35,53 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('contact_library_dark_mode') === 'true';
   });
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    try {
+      const saved = localStorage.getItem('contact_library_settings');
+      if (saved) {
+        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+      }
+    } catch {
+      // fallback
+    }
+    return DEFAULT_SETTINGS;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('contact_library_settings', JSON.stringify(settings));
+    } catch {
+      // fallback
+    }
+    const selected = MAC_ACCENT_COLORS.find((c) => c.id === settings.accentColor) ?? MAC_ACCENT_COLORS[0];
+    const hex = selected.hex;
+    const cleanHex = hex.replace('#', '');
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    const rgb = `${r}, ${g}, ${b}`;
+
+    const root = document.documentElement;
+    root.style.setProperty('--macos-accent-color', hex);
+    root.style.setProperty('--macos-accent-color-rgb', rgb);
+    root.style.setProperty('--macos-accent-tint', `rgba(${rgb}, 0.12)`);
+    root.style.setProperty('--macos-accent-tint-subtle', `rgba(${rgb}, 0.08)`);
+    root.style.setProperty('--macos-accent-tint-status', `rgba(${rgb}, 0.15)`);
+    root.style.setProperty('--macos-accent-tint-hover', `rgba(${rgb}, 0.18)`);
+    root.style.setProperty('--macos-accent-tint-active', `rgba(${rgb}, 0.26)`);
+    root.style.setProperty('--f7-theme-color', hex);
+    root.style.setProperty('--f7-theme-color-rgb', rgb);
+    root.style.setProperty('--f7-theme-color-shade', hex);
+    root.style.setProperty('--f7-toggle-active-color', hex);
+  }, [settings]);
+
+  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const updateSettings = (newSettings: Partial<AppSettings>) => {
+    setSettings((prev) => ({ ...prev, ...newSettings }));
+  };
 
   useEffect(() => {
     try {
@@ -289,6 +341,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     darkMode,
     setDarkMode,
     toggleDarkMode,
+    settings,
+    updateSetting,
+    updateSettings,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

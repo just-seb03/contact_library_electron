@@ -78,6 +78,8 @@ export interface HearingEvent {
   timeStr: string;
 }
 
+import type { AppSettings } from '../../features/settings/data/settingsData';
+
 export type AppTab = 'inicio' | 'calendar' | 'cliente' | 'pagos' | 'config';
 
 export interface AppContextType {
@@ -107,4 +109,8 @@ export interface AppContextType {
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   toggleDarkMode: () => void;
+  settings: AppSettings;
+  updateSetting: <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => void;
+  updateSettings: (newSettings: Partial<AppSettings>) => void;
 }
+

@@ -110,12 +110,12 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
     padding: '0 14px',
     borderRadius: 8,
     border: 'none',
-    backgroundColor: '#007aff',
+    backgroundColor: 'var(--macos-accent-color, #007aff)',
     color: '#ffffff',
     fontSize: 12.5,
     fontWeight: 600,
     cursor: 'pointer',
-    boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
+    boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
     transition: 'all 0.12s ease',
   };
 

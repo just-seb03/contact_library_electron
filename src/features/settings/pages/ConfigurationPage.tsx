@@ -1,4 +1,4 @@
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { SettingsGroup } from '../components/SettingsGroup';
@@ -8,64 +8,20 @@ import { SettingsProfileCard } from '../components/SettingsProfileCard';
 import { SettingsAppearanceSelector } from '../components/SettingsAppearanceSelector';
 import { EditProfileModal, type ProfileFormData } from '../components/EditProfileModal';
 import {
-  DEFAULT_SETTINGS,
   SOFTWARE_INFO,
-  MAC_ACCENT_COLORS,
-  type AppSettings,
   type AppleAccentColor,
 } from '../data/settingsData';
 
 export default function Configuration() {
-  const { darkMode, toggleDarkMode } = useApp();
-
-  const [settings, setSettings] = useState<AppSettings>(() => {
-    try {
-      const saved = localStorage.getItem('contact_library_settings');
-      if (saved) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
-      }
-    } catch {
-      // fallback
-    }
-    return DEFAULT_SETTINGS;
-  });
+  const { darkMode, toggleDarkMode, settings, updateSetting, updateSettings } = useApp();
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
-  // Sincronizar color de acento de macOS
-  useEffect(() => {
-    const selected = MAC_ACCENT_COLORS.find((c) => c.id === settings.accentColor);
-    if (selected) {
-      document.documentElement.style.setProperty('--macos-accent-color', selected.hex);
-    }
-  }, [settings.accentColor]);
-
-  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
-    setSettings((prev) => {
-      const next = { ...prev, [key]: value };
-      try {
-        localStorage.setItem('contact_library_settings', JSON.stringify(next));
-      } catch {
-        // fallback
-      }
-      return next;
-    });
-  };
-
   const handleSaveProfile = (formData: ProfileFormData) => {
-    setSettings((prev) => {
-      const next: AppSettings = {
-        ...prev,
-        lawyerName: formData.name,
-        lawyerFirm: formData.firm,
-        lawyerEmail: formData.email,
-      };
-      try {
-        localStorage.setItem('contact_library_settings', JSON.stringify(next));
-      } catch {
-        // fallback
-      }
-      return next;
+    updateSettings({
+      lawyerName: formData.name,
+      lawyerFirm: formData.firm,
+      lawyerEmail: formData.email,
     });
   };
 

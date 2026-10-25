@@ -60,14 +60,14 @@ export default function Dashboard() {
                   cursor: 'pointer',
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: '#007aff',
+                  color: 'var(--macos-accent-color, #007aff)',
                   boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                   transition: 'background 0.15s, box-shadow 0.15s',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,122,255,0.15)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--macos-accent-tint, rgba(0,122,255,0.15))')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'var(--macos-input-bg, rgba(255, 255, 255, 0.55))')}
               >
-                <Icon f7={icon} size="14px" style={{ color: '#007aff' }} />
+                <Icon f7={icon} size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
                 {label}
               </button>
             ))}
@@ -95,12 +95,12 @@ export default function Dashboard() {
         <Card outline className="no-margin" style={{ ...DASHBOARD_WIDGET_STYLE, width: '100%' }}>
           <CardHeader style={{ padding: '14px 16px 10px 16px' }}>
             <div className="display-flex align-items-center" style={{ gap: '8px', marginLeft: '4px' }}>
-              <Icon f7="calendar_badge_clock" size="18px" style={{ color: '#007aff', flexShrink: 0 }} />
+              <Icon f7="calendar_badge_clock" size="18px" style={{ color: 'var(--macos-accent-color, #007aff)', flexShrink: 0 }} />
               <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--macos-text, #1c1c1e)', marginLeft: '12px' }}>
                 Audiencias de hoy
               </span>
               {todayHearings.length > 0 && (
-                <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px' }}>
+                <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px', backgroundColor: 'var(--macos-accent-color, #007aff)' }}>
                   {todayHearings.length}
                 </Badge>
               )}
@@ -125,7 +125,7 @@ export default function Dashboard() {
                     key={hearing.id}
                     style={{
                       ...DASHBOARD_INNER_SURFACE_STYLE,
-                      backgroundColor: 'rgba(0, 122, 255, 0.055)',
+                      backgroundColor: 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.055))',
                       padding: '12px 14px',
                       display: 'flex',
                       alignItems: 'center',
@@ -152,7 +152,7 @@ export default function Dashboard() {
                       <div
                         style={{
                           ...DASHBOARD_INNER_SURFACE_STYLE,
-                          backgroundColor: 'rgba(0, 122, 255, 0.045)',
+                          backgroundColor: 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.045))',
                           padding: '8px 12px',
                           display: 'flex',
                           alignItems: 'center',
@@ -161,8 +161,8 @@ export default function Dashboard() {
                         }}
                       >
                         <div className="display-flex align-items-center" style={{ gap: '4px' }}>
-                          <Icon f7="clock_fill" size="14px" style={{ color: '#007aff' }} />
-                          <span style={{ fontSize: '13px', color: '#007aff', fontWeight: 600 }}>{hearing.timeStr}</span>
+                          <Icon f7="clock_fill" size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
+                          <span style={{ fontSize: '13px', color: 'var(--macos-accent-color, #007aff)', fontWeight: 600 }}>{hearing.timeStr}</span>
                         </div>
                         <div className="display-flex align-items-center" style={{ gap: '4px' }}>
                           <Icon f7="briefcase_fill" size="14px" className="text-color-gray" />

@@ -397,7 +397,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                           fontSize: 14,
                           fontWeight: 550,
                           color: isSelected
-                            ? '#007aff'
+                            ? 'var(--macos-accent-color, #007aff)'
                             : darkMode
                             ? '#ffffff'
                             : '#1c1c1e',
@@ -431,11 +431,11 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                         padding: '2px 8px',
                         borderRadius: 10,
                         backgroundColor: isSelected
-                          ? 'rgba(0, 122, 255, 0.2)'
+                          ? 'var(--macos-accent-tint-active, rgba(0, 122, 255, 0.2))'
                           : darkMode
                           ? 'rgba(255, 255, 255, 0.08)'
                           : 'rgba(0, 0, 0, 0.05)',
-                        color: isSelected ? '#007aff' : darkMode ? '#c7c7cc' : '#636366',
+                        color: isSelected ? 'var(--macos-accent-color, #007aff)' : darkMode ? '#c7c7cc' : '#636366',
                         flexShrink: 0,
                         marginLeft: 8,
                       }}

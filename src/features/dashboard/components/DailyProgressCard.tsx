@@ -93,13 +93,13 @@ export function DailyProgressCard() {
           }}
         >
           <svg viewBox="0 0 100 100" width="108" height="108" aria-hidden="true">
-            <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(0, 122, 255, 0.12)" strokeWidth="8" />
+            <circle cx="50" cy="50" r="42" fill="none" stroke="var(--macos-accent-tint, rgba(0, 122, 255, 0.12))" strokeWidth="8" />
             <circle
               cx="50"
               cy="50"
               r="42"
               fill="none"
-              stroke="#007aff"
+              stroke="var(--macos-accent-color, #007aff)"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={`${(progress / 100) * circumference} ${circumference}`}
@@ -149,7 +149,7 @@ export function DailyProgressCard() {
                     key={hearing.id}
                     style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--macos-text, #1c1c1e)', fontSize: '13px' }}
                   >
-                    <Icon f7="clock" size="14px" style={{ color: '#007aff', flexShrink: 0 }} />
+                    <Icon f7="clock" size="14px" style={{ color: 'var(--macos-accent-color, #007aff)', flexShrink: 0 }} />
                     <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {formatTime(hearing.timeStr)} · {hearing.clientName}
                     </span>
@@ -169,7 +169,7 @@ export function DailyProgressCard() {
                 {elapsedHearings.length > 0 && <span style={{ color: 'var(--macos-text-secondary, #6e6e73)' }}> según horario</span>}
               </span>
               <span style={{ color: 'var(--macos-text, #1c1c1e)' }}>
-                <Icon f7="circle_fill" size="8px" style={{ color: '#007aff', marginRight: '10px' }} />
+                <Icon f7="circle_fill" size="8px" style={{ color: 'var(--macos-accent-color, #007aff)', marginRight: '10px' }} />
                 {nextHearing
                   ? `${remainingHearings.length} ${remainingHearings.length === 1 ? 'audiencia restante' : 'audiencias restantes'} · ${formatTime(nextHearing.timeStr)}`
                   : 'Sin audiencias restantes'}

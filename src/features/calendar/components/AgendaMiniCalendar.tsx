@@ -229,7 +229,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                   style={{
                     ...dayNumberBaseStyle,
                     backgroundColor: todayMatch
-                      ? '#007aff'
+                      ? 'var(--macos-accent-color, #007aff)'
                       : selectedMatch
                       ? darkMode
                         ? '#ffffff'
@@ -249,7 +249,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                       ? 'rgba(255, 255, 255, 0.25)'
                       : 'rgba(0, 0, 0, 0.25)',
                     fontWeight: todayMatch || selectedMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
-                    boxShadow: todayMatch ? '0 2px 5px rgba(0, 122, 255, 0.4)' : 'none',
+                    boxShadow: todayMatch ? '0 2px 5px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.4))' : 'none',
                   }}
                 >
                   {cell.day}
@@ -262,11 +262,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                     height: 4,
                     borderRadius: '50%',
                     backgroundColor: hasEvents
-                      ? todayMatch
-                        ? '#007aff'
-                        : darkMode
-                        ? '#0a84ff'
-                        : '#007aff'
+                      ? 'var(--macos-accent-color, #007aff)'
                       : 'transparent',
                   }}
                   aria-hidden="true"
