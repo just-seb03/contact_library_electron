@@ -18,29 +18,31 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   };
 
   const headerStyle: CSSProperties = {
-    fontSize: 12,
-    fontWeight: 600,
+    fontSize: 11,
+    fontWeight: 700,
     textTransform: 'uppercase',
-    letterSpacing: '0.04em',
-    color: darkMode ? '#AEAEB2' : '#48484A',
+    letterSpacing: '0.05em',
+    color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.55)',
     marginBottom: 8,
-    paddingLeft: 12,
+    paddingLeft: 14,
     userSelect: 'none',
   };
 
   const cardStyle: CSSProperties = {
-    backgroundColor: darkMode ? '#1C1C1E' : '#FFFFFF',
+    backgroundColor: darkMode ? 'rgba(38, 38, 42, 0.85)' : 'rgba(255, 255, 255, 0.85)',
     borderRadius: 12,
-    border: darkMode ? '1px solid #2C2C2E' : '1px solid #E5E5EA',
+    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.07)',
     overflow: 'hidden',
-    boxShadow: darkMode ? '0 1px 3px rgba(0, 0, 0, 0.3)' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+    boxShadow: darkMode ? '0 2px 8px rgba(0, 0, 0, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.04)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
   };
 
   const footerStyle: CSSProperties = {
-    fontSize: 12,
-    color: '#8E8E93',
+    fontSize: 11.5,
+    color: darkMode ? 'rgba(235, 235, 245, 0.4)' : '#8e8e93',
     marginTop: 6,
-    paddingLeft: 12,
+    paddingLeft: 14,
     lineHeight: 1.4,
   };
 
@@ -52,3 +54,5 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
     </div>
   );
 };
+
+export default SettingsGroup;
