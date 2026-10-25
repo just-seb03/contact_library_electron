@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent, Icon, Button, Badge } from 'framework7-react';
 import type { HearingEvent } from '../../../core/context/types';
-import { GLASS_CARD_STYLE } from '../../../core/theme/style';
+import { DASHBOARD_INNER_SURFACE_STYLE, DASHBOARD_WIDGET_STYLE } from '../styles';
 
 interface UpcomingMeetingCardProps {
   nextMeeting: HearingEvent | null;
@@ -32,7 +32,7 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
       outline
       className="no-margin"
       style={{
-        ...GLASS_CARD_STYLE,
+        ...DASHBOARD_WIDGET_STYLE,
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -52,10 +52,9 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
         {nextMeeting ? (
           <div
             style={{
-              backgroundColor: 'rgba(0, 122, 255, 0.05)',
-              borderRadius: '8px',
+              ...DASHBOARD_INNER_SURFACE_STYLE,
+              backgroundColor: 'rgba(0, 122, 255, 0.055)',
               padding: '12px',
-              border: '1px solid rgba(0, 122, 255, 0.12)',
             }}
           >
             <div

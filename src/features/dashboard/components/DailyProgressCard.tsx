@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card, CardContent, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
-import { GLASS_CARD_STYLE } from '../../../core/theme/style';
+import { DASHBOARD_WIDGET_STYLE } from '../styles';
 
 function getTimeInMinutes(time: string): number | null {
   const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
@@ -59,7 +59,7 @@ export function DailyProgressCard() {
       outline
       className="no-margin"
       style={{
-        ...GLASS_CARD_STYLE,
+        ...DASHBOARD_WIDGET_STYLE,
         minHeight: '170px',
         height: '100%',
       }}

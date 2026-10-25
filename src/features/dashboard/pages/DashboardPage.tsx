@@ -3,7 +3,11 @@ import { useDashboard } from '../hooks/useDashboard';
 import { useHomeData } from '../hooks/useHomeData';
 import { UpcomingMeetingCard } from '../components/UpcomingMeetingCard';
 import { DailyProgressCard } from '../components/DailyProgressCard';
-import { GLASS_CARD_STYLE } from '../../../core/theme/style';
+import {
+  DASHBOARD_INNER_SURFACE_STYLE,
+  DASHBOARD_PAGE_STYLE,
+  DASHBOARD_WIDGET_STYLE,
+} from '../styles';
 
 export default function Dashboard() {
   const { lawyerName, todayLabel, nextMeeting, openClient: openClientHome, showTab } = useHomeData();
@@ -13,11 +17,11 @@ export default function Dashboard() {
     <Page noNavbar noToolbar>
       <div
         style={{
-          padding: '20px 24px 28px',
+          ...DASHBOARD_PAGE_STYLE,
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
-          maxWidth: '1200px',
+          maxWidth: '1280px',
           width: '100%',
           boxSizing: 'border-box',
         }}
@@ -27,11 +31,11 @@ export default function Dashboard() {
           <div>
             <span
               className="text-color-gray text-transform-capitalize"
-              style={{ fontSize: '13px', display: 'block', marginBottom: '4px' }}
+              style={{ fontSize: '12px', display: 'block', marginBottom: '7px', letterSpacing: '0.02em' }}
             >
               {todayLabel}
             </span>
-            <h1 className="no-margin font-weight-bold" style={{ fontSize: '26px', color: '#1c1c1e' }}>
+            <h1 className="no-margin font-weight-bold" style={{ fontSize: '30px', letterSpacing: '-0.03em', color: '#1c1c1e' }}>
               Hola, {lawyerName}
             </h1>
           </div>
@@ -46,10 +50,10 @@ export default function Dashboard() {
                 key={label}
                 onClick={action}
                 style={{
-                  background: 'rgba(0,0,0,0.04)',
-                  border: '1px solid rgba(0,0,0,0.10)',
-                  borderRadius: '10px',
-                  padding: '7px 14px',
+                  background: 'rgba(255,255,255,0.55)',
+                  border: '1px solid rgba(0,0,0,0.08)',
+                  borderRadius: '12px',
+                  padding: '8px 14px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
@@ -57,7 +61,8 @@ export default function Dashboard() {
                   fontSize: '13px',
                   fontWeight: 500,
                   color: '#007aff',
-                  transition: 'background 0.15s',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                  transition: 'background 0.15s, box-shadow 0.15s',
                 }}
                 onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,122,255,0.10)')}
                 onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.04)')}
@@ -87,7 +92,7 @@ export default function Dashboard() {
         </div>
 
         {/* ── FILA INFERIOR: Audiencias de hoy ── */}
-        <Card outline className="no-margin" style={{ ...GLASS_CARD_STYLE, width: '100%' }}>
+        <Card outline className="no-margin" style={{ ...DASHBOARD_WIDGET_STYLE, width: '100%' }}>
           <CardHeader style={{ padding: '14px 16px 10px 16px' }}>
             <div className="display-flex align-items-center" style={{ gap: '8px', marginLeft: '4px' }}>
               <Icon f7="calendar_badge_clock" size="18px" style={{ color: '#007aff', flexShrink: 0 }} />
@@ -119,9 +124,8 @@ export default function Dashboard() {
                   <div
                     key={hearing.id}
                     style={{
-                      backgroundColor: 'rgba(0, 122, 255, 0.05)',
-                      border: '1px solid rgba(0, 122, 255, 0.12)',
-                      borderRadius: '10px',
+                      ...DASHBOARD_INNER_SURFACE_STYLE,
+                      backgroundColor: 'rgba(0, 122, 255, 0.055)',
                       padding: '12px 14px',
                       display: 'flex',
                       alignItems: 'center',
@@ -147,9 +151,8 @@ export default function Dashboard() {
 
                       <div
                         style={{
-                          backgroundColor: 'rgba(0, 122, 255, 0.05)',
-                          border: '1px solid rgba(0, 122, 255, 0.12)',
-                          borderRadius: '8px',
+                          ...DASHBOARD_INNER_SURFACE_STYLE,
+                          backgroundColor: 'rgba(0, 122, 255, 0.045)',
                           padding: '8px 12px',
                           display: 'flex',
                           alignItems: 'center',
