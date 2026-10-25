@@ -20,34 +20,44 @@ interface CreateEventPopupProps {
 
 const popupStyle: CSSProperties = {
   width: '100%',
-  height: 'calc(100% - 32px)',
+  height: '100%',
+  top: 0,
+  left: 0,
+  position: 'fixed',
+  backgroundColor: 'rgba(0, 0, 0, 0.45)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '16px',
+  boxSizing: 'border-box',
   overflow: 'hidden',
-  backgroundColor: 'transparent',
+  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
-  position: 'absolute',
-  top: 16,
-  bottom: 16,
-  left: '50%',
-  transform: 'translateX(-50%)',
-  width: 'min(560px, calc(100vw - 32px))',
+  position: 'relative',
+  width: '100%',
+  maxWidth: 540,
+  maxHeight: 'min(640px, calc(100vh - 40px))',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  borderRadius: 16,
+  borderRadius: 14,
   backgroundColor: APP_COLORS.white,
-  boxShadow: '0 12px 40px rgba(0,0,0,0.24)',
+  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08)',
   boxSizing: 'border-box',
 };
 
 const formStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  flex: 1,
   height: '100%',
+  maxHeight: 'min(640px, calc(100vh - 40px))',
   minHeight: 0,
   boxSizing: 'border-box',
+  overflow: 'hidden',
 };
 
 const headerStyle: CSSProperties = {
@@ -119,9 +129,12 @@ const actionsStyle: CSSProperties = {
   alignItems: 'center',
   gap: 10,
   flexShrink: 0,
-  padding: '12px 24px 20px',
-  borderTop: '1px solid rgba(0,0,0,0.08)',
+  padding: '14px 24px',
+  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
   backgroundColor: APP_COLORS.white,
+  position: 'sticky',
+  bottom: 0,
+  zIndex: 10,
 };
 
 interface TimePickerFieldProps {
@@ -389,6 +402,7 @@ export function CreateEventPopup({
   return (
     <Popup
       opened={opened}
+      className="popup-tablet-fullscreen"
       style={popupStyle}
       closeByBackdropClick={false}
       closeOnEscape={false}
@@ -566,8 +580,36 @@ export function CreateEventPopup({
           </div>
 
           <div style={actionsStyle}>
-            <Button type="button" onClick={requestClose}>Cancelar</Button>
-            <Button type="submit" fill round style={{ backgroundColor: APP_COLORS.black }}>
+            <Button
+              type="button"
+              onClick={requestClose}
+              style={{
+                borderRadius: 7,
+                border: '1px solid #d1d1d6',
+                color: '#1c1c1e',
+                fontSize: 13,
+                fontWeight: 500,
+                padding: '0 16px',
+                height: 34,
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              fill
+              style={{
+                backgroundColor: '#007aff',
+                borderRadius: 7,
+                color: '#ffffff',
+                fontSize: 13,
+                fontWeight: 600,
+                padding: '0 18px',
+                height: 34,
+                boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
+              }}
+            >
+              <Icon f7="checkmark" size="14px" style={{ marginRight: 6 }} />
               {editingEvent ? 'Guardar cambios' : 'Guardar evento'}
             </Button>
           </div>

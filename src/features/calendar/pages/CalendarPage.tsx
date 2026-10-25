@@ -254,6 +254,7 @@ export default function Calendar() {
             monthShort={monthShort}
             fullDateLabel={isWeekView ? weekDateLabel : fullDateLabel}
             isWeekView={isWeekView}
+            onToday={() => handleSelectDate(new Date())}
             onPreviousDay={() => handleSelectDate(new Date(
               currentYear,
               currentMonthIndex,
@@ -300,6 +301,7 @@ export default function Calendar() {
                     todayHearings={todayHearings}
                     calendarEvents={selectedDayEvents}
                     onSelectEvent={setSelectedEvent}
+                    selectedDate={selectedDate}
                   />
                 </CardContent>
               )}

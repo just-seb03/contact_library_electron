@@ -1,89 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { FC, CSSProperties } from 'react';
-import { Button, Icon } from 'framework7-react';
-import { APP_COLORS } from '../../../core/theme/style';
+import { Icon } from 'framework7-react';
+import { useApp } from '../../../core/context/AppContext';
 
-const WEEKDAYS = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do'];
-
-const containerStyle: CSSProperties = {
-  padding: '16px 12px',
-};
-
-const navRowStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  marginBottom: 12,
-};
-
-const monthTitleStyle: CSSProperties = {
-  fontSize: 15,
-  fontWeight: 700,
-  color: APP_COLORS.black,
-};
-
-const weekdayRowStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
-  gap: 0,
-  marginBottom: 4,
-};
-
-const weekdayLabelStyle: CSSProperties = {
-  fontSize: 11,
-  fontWeight: 600,
-  color: APP_COLORS.neutral,
-  textAlign: 'center',
-  padding: '4px 0',
-};
-
-const daysGridStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(7, 1fr)',
-  gap: 0,
-};
-
-const dayCellStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: 36,
-  width: '100%',
-  padding: 0,
-  border: 0,
-  background: 'transparent',
-  cursor: 'pointer',
-};
-
-const dayContentStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: 1,
-};
-
-const dayNumberBaseStyle: CSSProperties = {
-  width: 28,
-  height: 28,
-  borderRadius: '50%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: 12,
-  fontWeight: 500,
-  transition: 'background-color 0.15s, color 0.15s',
-};
-
-const eventIndicatorStyle: CSSProperties = {
-  width: 14,
-  height: 2,
-  borderRadius: 1,
-  backgroundColor: '#8ecbff',
-};
-
-const navButtonStyle: CSSProperties = {
-  ['--f7-button-padding-horizontal' as string]: '6px',
-};
+const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 interface AgendaMiniCalendarProps {
   selectedDate: Date;
@@ -108,6 +28,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   eventDates,
   onSelectDate,
 }) => {
+  const { darkMode } = useApp();
   const today = new Date();
   const [viewYear, setViewYear] = useState(selectedDate.getFullYear());
   const [viewMonth, setViewMonth] = useState(selectedDate.getMonth());
@@ -124,8 +45,8 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
 
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const mondayOffset = getMondayOffset(viewYear, viewMonth);
-
   const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+
   const cells = useMemo(() => {
     const result: { day: number; isCurrentMonth: boolean }[] = [];
     for (let i = mondayOffset - 1; i >= 0; i--) {
@@ -167,26 +88,112 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
     viewMonth === today.getMonth() &&
     viewYear === today.getFullYear();
 
+  const containerStyle: CSSProperties = {
+    padding: '16px 14px',
+    userSelect: 'none',
+  };
+
+  const navRowStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  };
+
+  const monthTitleStyle: CSSProperties = {
+    fontSize: 14,
+    fontWeight: 650,
+    color: darkMode ? '#ffffff' : '#1c1c1e',
+    letterSpacing: '-0.01em',
+  };
+
+  const navButtonStyle: CSSProperties = {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    border: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)',
+    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.9)',
+    color: darkMode ? '#ffffff' : '#1c1c1e',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    transition: 'background-color 0.12s ease',
+  };
+
+  const weekdayRowStyle: CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, 1fr)',
+    gap: 0,
+    marginBottom: 4,
+  };
+
+  const weekdayLabelStyle: CSSProperties = {
+    fontSize: 10.5,
+    fontWeight: 600,
+    color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.55)',
+    textAlign: 'center',
+    padding: '4px 0',
+  };
+
+  const daysGridStyle: CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, 1fr)',
+    gap: '2px 0',
+  };
+
+  const dayCellStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 34,
+    width: '100%',
+    padding: 0,
+    border: 0,
+    background: 'transparent',
+    cursor: 'pointer',
+    outline: 'none',
+  };
+
+  const dayNumberBaseStyle: CSSProperties = {
+    width: 24,
+    height: 24,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 12,
+    fontWeight: 500,
+    transition: 'all 0.12s ease',
+  };
+
   return (
     <div style={containerStyle}>
+      {/* ── Navegación de Mes/Año ── */}
       <div style={navRowStyle}>
-        <Button small round style={navButtonStyle} onClick={goPrev}>
-          <Icon f7="chevron_left" size="14px" />
-        </Button>
         <span style={monthTitleStyle}>
           {monthNames[viewMonth]} {viewYear}
         </span>
-        <Button small round style={navButtonStyle} onClick={goNext}>
-          <Icon f7="chevron_right" size="14px" />
-        </Button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <button type="button" style={navButtonStyle} onClick={goPrev} aria-label="Mes anterior">
+            <Icon f7="chevron_left" size="11px" />
+          </button>
+          <button type="button" style={navButtonStyle} onClick={goNext} aria-label="Mes siguiente">
+            <Icon f7="chevron_right" size="11px" />
+          </button>
+        </div>
       </div>
 
+      {/* ── Fila de días de la semana (L M M J V S D) ── */}
       <div style={weekdayRowStyle}>
-        {WEEKDAYS.map((wd) => (
-          <div key={wd} style={weekdayLabelStyle}>{wd}</div>
+        {WEEKDAYS.map((wd, i) => (
+          <div key={`weekday-${i}`} style={weekdayLabelStyle}>
+            {wd}
+          </div>
         ))}
       </div>
 
+      {/* ── Grilla de días del mes con puntos de eventos Apple ── */}
       <div style={daysGridStyle}>
         {cells.map((cell, idx) => {
           const todayMatch = isToday(cell.day, cell.isCurrentMonth);
@@ -197,6 +204,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
           );
           const selectedMatch = cellDate.toDateString() === selectedDate.toDateString();
           const hasEvents = eventDates.has(toDateKey(cellDate));
+
           return (
             <button
               key={idx}
@@ -216,23 +224,53 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                 }
               }}
             >
-              <div style={dayContentStyle}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                 <div
                   style={{
                     ...dayNumberBaseStyle,
-                    backgroundColor: selectedMatch ? APP_COLORS.black : 'transparent',
-                    color: selectedMatch
-                      ? APP_COLORS.white
+                    backgroundColor: todayMatch
+                      ? '#007aff'
+                      : selectedMatch
+                      ? darkMode
+                        ? '#ffffff'
+                        : '#1c1c1e'
+                      : 'transparent',
+                    color: todayMatch
+                      ? '#ffffff'
+                      : selectedMatch
+                      ? darkMode
+                        ? '#1c1c1e'
+                        : '#ffffff'
                       : cell.isCurrentMonth
-                        ? APP_COLORS.black
-                        : 'rgba(0,0,0,0.25)',
-                    fontWeight: selectedMatch || todayMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
-                    boxShadow: todayMatch && !selectedMatch ? `inset 0 0 0 1px ${APP_COLORS.primary}` : 'none',
+                      ? darkMode
+                        ? '#f2f2f7'
+                        : '#1c1c1e'
+                      : darkMode
+                      ? 'rgba(255, 255, 255, 0.25)'
+                      : 'rgba(0, 0, 0, 0.25)',
+                    fontWeight: todayMatch || selectedMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
+                    boxShadow: todayMatch ? '0 2px 5px rgba(0, 122, 255, 0.4)' : 'none',
                   }}
                 >
                   {cell.day}
                 </div>
-                {hasEvents && <div style={eventIndicatorStyle} aria-hidden="true" />}
+
+                {/* Punto indicador de eventos estilo iOS / macOS Calendar */}
+                <div
+                  style={{
+                    width: 4,
+                    height: 4,
+                    borderRadius: '50%',
+                    backgroundColor: hasEvents
+                      ? todayMatch
+                        ? '#007aff'
+                        : darkMode
+                        ? '#0a84ff'
+                        : '#007aff'
+                      : 'transparent',
+                  }}
+                  aria-hidden="true"
+                />
               </div>
             </button>
           );
@@ -241,3 +279,5 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
     </div>
   );
 };
+
+export default AgendaMiniCalendar;

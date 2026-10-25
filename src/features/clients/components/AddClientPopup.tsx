@@ -14,24 +14,33 @@ interface AddClientPopupProps {
 
 const popupStyle: CSSProperties = {
   width: '100%',
-  height: 'calc(100% - 32px)',
+  height: '100%',
+  top: 0,
+  left: 0,
+  position: 'fixed',
+  backgroundColor: 'rgba(0, 0, 0, 0.45)',
+  backdropFilter: 'blur(8px)',
+  WebkitBackdropFilter: 'blur(8px)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '16px',
+  boxSizing: 'border-box',
   overflow: 'hidden',
-  backgroundColor: 'transparent',
+  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
-  position: 'absolute',
-  top: 16,
-  bottom: 16,
-  left: '50%',
-  transform: 'translateX(-50%)',
-  width: 'min(500px, calc(100vw - 32px))',
+  position: 'relative',
+  width: '100%',
+  maxWidth: 500,
+  maxHeight: 'min(640px, calc(100vh - 40px))',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  borderRadius: 16,
+  borderRadius: 14,
   backgroundColor: APP_COLORS.white,
-  boxShadow: '0 12px 40px rgba(0,0,0,0.24)',
+  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08)',
   boxSizing: 'border-box',
 };
 
@@ -151,13 +160,13 @@ export function AddClientPopup({
   };
 
   return (
-    <Popup opened={opened} style={popupStyle} closeByBackdropClick={false}>
+    <Popup opened={opened} className="popup-tablet-fullscreen" style={popupStyle} closeByBackdropClick={false}>
       <div style={contentStyle}>
         <form
           onSubmit={handleSubmit}
-          style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}
+          style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'min(640px, calc(100vh - 40px))', minHeight: 0, overflow: 'hidden' }}
         >
-          <div style={{ padding: '20px 24px 12px' }}>
+          <div style={{ padding: '20px 24px 12px', flexShrink: 0 }}>
             <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
               {client ? 'Editar cliente' : 'Añadir cliente'}
             </h2>
@@ -234,16 +243,45 @@ export function AddClientPopup({
             style={{
               display: 'flex',
               justifyContent: 'flex-end',
+              alignItems: 'center',
               gap: 10,
-              padding: '12px 24px 20px',
+              padding: '14px 24px',
               borderTop: `1px solid ${APP_COLORS.borderSubtle}`,
+              backgroundColor: APP_COLORS.white,
+              position: 'sticky',
+              bottom: 0,
+              zIndex: 10,
+              flexShrink: 0,
             }}
           >
-            <Button type="button" onClick={onClose}>Cancelar</Button>
+            <Button
+              type="button"
+              onClick={onClose}
+              style={{
+                borderRadius: 7,
+                border: '1px solid #d1d1d6',
+                color: '#1c1c1e',
+                fontSize: 13,
+                fontWeight: 500,
+                padding: '0 16px',
+                height: 34,
+              }}
+            >
+              Cancelar
+            </Button>
             <Button
               type="submit"
               fill
-              style={{ backgroundColor: APP_COLORS.primary, borderRadius: 7 }}
+              style={{
+                backgroundColor: '#007aff',
+                borderRadius: 7,
+                color: '#ffffff',
+                fontSize: 13,
+                fontWeight: 600,
+                padding: '0 18px',
+                height: 34,
+                boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
+              }}
             >
               <Icon f7={client ? 'checkmark_alt' : 'plus'} size="14px" className="margin-right-half" />
               {client ? 'Guardar cambios' : 'Guardar cliente'}
