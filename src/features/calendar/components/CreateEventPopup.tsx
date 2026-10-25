@@ -27,13 +27,18 @@ const popupStyle: CSSProperties = {
   backgroundColor: 'rgba(0, 0, 0, 0.45)',
   backdropFilter: 'blur(8px)',
   WebkitBackdropFilter: 'blur(8px)',
+  overflow: 'hidden',
+  zIndex: 10500,
+};
+
+const popupCenterStyle: CSSProperties = {
+  width: '100%',
+  height: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '16px',
   boxSizing: 'border-box',
-  overflow: 'hidden',
-  zIndex: 10500,
 };
 
 const contentStyle: CSSProperties = {
@@ -285,6 +290,12 @@ export function CreateEventPopup({
   const [details, setDetails] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const initialValues = useRef('');
+  const [contentMounted, setContentMounted] = useState(opened);
+  const selectedTime = selectedDate.getTime();
+
+  useEffect(() => {
+    if (opened) setContentMounted(true);
+  }, [opened]);
 
   const getFormValues = () => ({
     title,
@@ -330,7 +341,7 @@ export function CreateEventPopup({
     setDetails(values.details);
     setErrorMessage('');
     initialValues.current = JSON.stringify(values);
-  }, [opened, selectedDate, editingEvent]);
+  }, [opened, selectedTime, editingEvent]);
 
   const requestClose = () => {
     if (JSON.stringify(getFormValues()) === initialValues.current) {
@@ -406,7 +417,10 @@ export function CreateEventPopup({
       style={popupStyle}
       closeByBackdropClick={false}
       closeOnEscape={false}
+      onPopupClosed={() => setContentMounted(false)}
     >
+      {contentMounted && (
+      <div style={popupCenterStyle}>
       <div style={contentStyle}>
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={headerStyle}>
@@ -615,6 +629,8 @@ export function CreateEventPopup({
           </div>
         </form>
       </div>
+      </div>
+      )}
     </Popup>
   );
 }
