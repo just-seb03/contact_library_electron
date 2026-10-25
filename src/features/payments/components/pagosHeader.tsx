@@ -14,14 +14,14 @@ export const PaymentsHeader = ({ onRegisterPayment }: PaymentsHeaderProps) => (
       justifyContent: 'space-between',
       gap: '16px',
       padding: '4px 0 18px',
-      borderBottom: `1px solid ${APP_COLORS.borderSubtle}`,
+      borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
     }}
   >
     <div>
-      <h1 className="no-margin font-weight-bold" style={{ fontSize: '28px', letterSpacing: '-0.02em', color: APP_COLORS.sidebarText }}>
+      <h1 className="no-margin font-weight-bold" style={{ fontSize: '28px', letterSpacing: '-0.02em', color: 'var(--macos-text, #1c1c1e)' }}>
       Pagos
       </h1>
-      <p style={{ margin: '5px 0 0', color: APP_COLORS.secondaryText, fontSize: 13 }}>
+      <p style={{ margin: '5px 0 0', color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 13 }}>
         Control y seguimiento de tus transacciones
       </p>
     </div>

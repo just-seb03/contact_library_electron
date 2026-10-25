@@ -115,11 +115,11 @@ export function DailyProgressCard() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#1c1c1e',
+              color: 'var(--macos-text, #1c1c1e)',
             }}
           >
             <strong style={{ fontSize: '23px', lineHeight: 1 }}>{progress}%</strong>
-            <span style={{ marginTop: '4px', fontSize: '10px', color: '#6e6e73' }}>del día</span>
+            <span style={{ marginTop: '4px', fontSize: '10px', color: 'var(--macos-text-secondary, #6e6e73)' }}>del día</span>
           </span>
         </button>
 
@@ -133,10 +133,10 @@ export function DailyProgressCard() {
               marginBottom: '14px',
             }}
           >
-            <h2 className="no-margin" style={{ color: '#1c1c1e', fontSize: '15px', fontWeight: 700 }}>
+            <h2 className="no-margin" style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: '15px', fontWeight: 700 }}>
               JORNADA DE HOY
             </h2>
-            <span style={{ color: '#6e6e73', fontSize: '12px' }}>
+            <span style={{ color: 'var(--macos-text-secondary, #6e6e73)', fontSize: '12px' }}>
               {elapsedHearings.length} de {todayHearings.length}
             </span>
           </div>
@@ -147,7 +147,7 @@ export function DailyProgressCard() {
                 {remainingHearings.map((hearing) => (
                   <div
                     key={hearing.id}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#1c1c1e', fontSize: '13px' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--macos-text, #1c1c1e)', fontSize: '13px' }}
                   >
                     <Icon f7="clock" size="14px" style={{ color: '#007aff', flexShrink: 0 }} />
                     <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -157,18 +157,18 @@ export function DailyProgressCard() {
                 ))}
               </div>
             ) : (
-              <p className="no-margin" style={{ color: '#6e6e73', fontSize: '13px' }}>
+              <p className="no-margin" style={{ color: 'var(--macos-text-secondary, #6e6e73)', fontSize: '13px' }}>
                 No quedan reuniones en la agenda de hoy.
               </p>
             )
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '13px' }}>
-              <span style={{ color: '#1c1c1e' }}>
+              <span style={{ color: 'var(--macos-text, #1c1c1e)' }}>
                 <Icon f7="checkmark_circle_fill" size="14px" style={{ color: '#34c759', marginRight: '7px' }} />
                 {elapsedHearings.length} {elapsedHearings.length === 1 ? 'reunión transcurrida' : 'reuniones transcurridas'}
-                {elapsedHearings.length > 0 && <span style={{ color: '#6e6e73' }}> según horario</span>}
+                {elapsedHearings.length > 0 && <span style={{ color: 'var(--macos-text-secondary, #6e6e73)' }}> según horario</span>}
               </span>
-              <span style={{ color: '#1c1c1e' }}>
+              <span style={{ color: 'var(--macos-text, #1c1c1e)' }}>
                 <Icon f7="circle_fill" size="8px" style={{ color: '#007aff', marginRight: '10px' }} />
                 {nextHearing
                   ? `${remainingHearings.length} ${remainingHearings.length === 1 ? 'audiencia restante' : 'audiencias restantes'} · ${formatTime(nextHearing.timeStr)}`

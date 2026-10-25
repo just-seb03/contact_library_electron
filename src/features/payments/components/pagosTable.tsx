@@ -20,20 +20,20 @@ function formatPaymentDate(value: string): string {
 export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) => {
   const headerCellStyle = {
     padding: '12px 14px',
-    color: '#6e6e73',
+    color: 'var(--macos-text-secondary, #6e6e73)',
     fontSize: '11px',
     fontWeight: 700,
     textAlign: 'left' as const,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.04em',
     whiteSpace: 'nowrap' as const,
-    borderBottom: '1px solid rgba(0, 0, 0, 0.08)',
+    borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   };
   const cellStyle = {
     padding: '14px',
-    color: '#1c1c1e',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: '14px',
-    borderTop: '1px solid rgba(60, 60, 67, 0.12)',
+    borderTop: '1px solid var(--macos-card-border, rgba(60, 60, 67, 0.12))',
     textAlign: 'left' as const,
   };
 

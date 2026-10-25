@@ -16,10 +16,10 @@ export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDele
     zIndex: 2,
     minWidth: 120,
     padding: 4,
-    border: '1px solid #e5e5ea',
+    border: '1px solid var(--macos-card-border, #e5e5ea)',
     borderRadius: 10,
-    backgroundColor: '#ffffff',
-    boxShadow: '0 5px 18px rgba(0,0,0,0.14)',
+    backgroundColor: 'var(--macos-modal-bg, #ffffff)',
+    boxShadow: '0 5px 18px rgba(0,0,0,0.22)',
   };
 
   const actionStyle: CSSProperties = {
@@ -31,7 +31,7 @@ export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDele
     border: 'none',
     borderRadius: 7,
     backgroundColor: 'transparent',
-    color: '#1c1c1e',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: 13,
     textAlign: 'left',
     cursor: 'pointer',
@@ -52,8 +52,8 @@ export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDele
           height: 30,
           border: 'none',
           borderRadius: 8,
-          backgroundColor: open ? '#e5e5ea' : 'transparent',
-          color: '#6e6e73',
+          backgroundColor: open ? 'var(--macos-input-bg, #e5e5ea)' : 'transparent',
+          color: 'var(--macos-text-secondary, #6e6e73)',
           cursor: 'pointer',
         }}
       >

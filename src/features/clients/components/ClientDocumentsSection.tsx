@@ -88,7 +88,7 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
                   <a
                     href={document.dataUrl}
                     download={document.name}
-                    style={{ color: APP_COLORS.sidebarText, fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                    style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
                     title={`Descargar ${document.name}`}
                   >
                     {document.name}

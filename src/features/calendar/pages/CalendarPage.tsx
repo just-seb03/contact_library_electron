@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Button, f7, Page, Block, Card, CardContent } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
-import { APP_COLORS } from '../../../core/theme/style';
 import type { HearingEvent } from '../../../core/context/types';
 
 import { AgendaHeader } from '../components/AgendaHeader';
@@ -40,18 +39,18 @@ const sectionTitleStyle: CSSProperties = {
   fontSize: 22,
   fontWeight: 700,
   lineHeight: 1.2,
-  color: APP_COLORS.black,
+  color: 'var(--macos-text, #1c1c1e)',
 };
 
 const calendarCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: APP_COLORS.white,
+  ['--f7-card-bg-color' as string]: 'var(--macos-card-bg, #ffffff)',
   ['--f7-card-border-radius' as string]: '16px',
   display: 'flex',
   flexDirection: 'column',
   height: 'calc(100vh - 150px)',
   minHeight: 320,
   margin: 0,
-  border: '1px solid rgba(0,0,0,0.08)',
+  border: '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
   boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
   overflow: 'hidden',
 };
@@ -84,8 +83,9 @@ const undoBannerStyle: CSSProperties = {
   alignItems: 'center',
   gap: 12,
   padding: '10px 16px',
-  borderTop: '1px solid rgba(0,0,0,0.08)',
-  backgroundColor: '#f5f5f7',
+  borderTop: '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
+  backgroundColor: 'var(--macos-input-bg, #f5f5f7)',
+  color: 'var(--macos-text, #1c1c1e)',
   fontSize: 13,
 };
 
@@ -311,8 +311,8 @@ export default function Calendar() {
               ...sidebarPanelStyle,
               width: compactLayout ? '100%' : 300,
               minWidth: compactLayout ? 0 : 300,
-              borderLeft: compactLayout ? 'none' : '1px solid rgba(0,0,0,0.08)',
-              borderTop: compactLayout ? '1px solid rgba(0,0,0,0.08)' : 'none',
+              borderLeft: compactLayout ? 'none' : '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
+              borderTop: compactLayout ? '1px solid var(--macos-card-border, rgba(0,0,0,0.08))' : 'none',
             }}>
               <AgendaMiniCalendar
                 selectedDate={selectedDate}

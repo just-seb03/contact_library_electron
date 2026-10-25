@@ -8,6 +8,15 @@
     <style>
       :root {
         --apple-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --macos-canvas-bg: #f5f5f7;
+        --macos-card-bg: #ffffff;
+        --macos-modal-bg: #ffffff;
+        --macos-input-bg: #ffffff;
+        --macos-text: #1c1c1e;
+        --macos-text-secondary: #8e8e93;
+        --macos-card-border: rgba(0, 0, 0, 0.08);
+        --f7-page-bg-color: #f5f5f7;
+        --f7-card-bg-color: #ffffff;
       }
       * {
         box-sizing: border-box;
@@ -44,6 +53,65 @@
       }
       .dark ::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.32);
+      }
+
+      /* Soporte global de Modo Oscuro nativo de macOS */
+      html.dark,
+      body.dark {
+        --macos-canvas-bg: #1e1e20;
+        --macos-card-bg: rgba(38, 38, 42, 0.85);
+        --macos-modal-bg: #242426;
+        --macos-input-bg: rgba(255, 255, 255, 0.08);
+        --macos-text: #ffffff;
+        --macos-text-secondary: #8e8e93;
+        --macos-card-border: rgba(255, 255, 255, 0.08);
+        --f7-page-bg-color: #1e1e20;
+        --f7-card-bg-color: rgba(38, 38, 42, 0.85);
+        background-color: #1e1e20;
+        color: #ffffff;
+        color-scheme: dark;
+      }
+      .dark #root,
+      .dark #app,
+      .dark .view-main,
+      .dark #content-view,
+      .dark .page,
+      .dark .page-content {
+        background-color: #1e1e20 !important;
+        color: #ffffff;
+      }
+      .dark .card {
+        background-color: rgba(38, 38, 42, 0.85) !important;
+        color: #ffffff !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+      }
+      .dark input,
+      .dark select,
+      .dark textarea {
+        color-scheme: dark;
+      }
+      .dark select option {
+        background-color: #242426;
+        color: #ffffff;
+      }
+      .dark .popover,
+      .dark .popover-inner,
+      .dark .calendar,
+      .dark .calendar-modal {
+        background-color: #242426 !important;
+        color: #ffffff !important;
+      }
+      .dark .calendar-month-selector,
+      .dark .calendar-year-selector,
+      .dark .calendar-day {
+        color: #ffffff !important;
+      }
+      .dark .calendar-day.calendar-day-next,
+      .dark .calendar-day.calendar-day-prev {
+        color: rgba(255, 255, 255, 0.3) !important;
+      }
+      .dark .calendar-week-header {
+        color: #8e8e93 !important;
       }
     </style>
   </head>

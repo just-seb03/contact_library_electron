@@ -63,14 +63,14 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const titleStyle: CSSProperties = {
     fontSize: 22,
     fontWeight: 700,
-    color: APP_COLORS.sidebarText,
+    color: 'var(--macos-text, #1c1c1e)',
     lineHeight: 1.2,
   };
 
   const counterStyle: CSSProperties = {
     fontSize: 15,
     fontWeight: 500,
-    color: APP_COLORS.secondaryText,
+    color: 'var(--macos-text-secondary, #8e8e93)',
   };
 
   const addClientButtonStyle: CSSProperties = {
@@ -100,7 +100,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const searchIconStyle: CSSProperties = {
     position: 'absolute',
     left: 12,
-    color: APP_COLORS.secondaryText,
+    color: 'var(--macos-text-secondary, #8e8e93)',
     pointerEvents: 'none',
     zIndex: 1,
   };
@@ -111,9 +111,9 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     paddingLeft: 38,
     paddingRight: filterText.length > 0 ? 36 : 14,
     fontSize: 14,
-    color: APP_COLORS.sidebarText,
-    backgroundColor: APP_COLORS.white,
-    border: `1px solid ${APP_COLORS.borderSubtle}`,
+    color: 'var(--macos-text, #1c1c1e)',
+    backgroundColor: 'var(--macos-input-bg, #ffffff)',
+    border: '1px solid var(--macos-card-border, #e5e5ea)',
     borderRadius: 10,
     outline: 'none',
     boxSizing: 'border-box',

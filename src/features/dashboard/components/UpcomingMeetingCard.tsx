@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardContent, Icon, Button, Badge } from 'framework7-react';
 import type { HearingEvent } from '../../../core/context/types';
-import { DASHBOARD_INNER_SURFACE_STYLE, DASHBOARD_WIDGET_STYLE } from '../styles';
+import { DASHBOARD_WIDGET_STYLE } from '../styles';
 
 interface UpcomingMeetingCardProps {
   nextMeeting: HearingEvent | null;
@@ -41,7 +41,7 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
     >
       <CardHeader style={{ padding: '14px 16px' }}>
         <div className="display-flex align-items-center justify-content-space-between" style={{ width: '100%' }}>
-          <h3 className="no-margin" style={{ fontSize: '15px', fontWeight: 600, color: '#1c1c1e' }}>
+          <h3 className="no-margin" style={{ fontSize: '15px', fontWeight: 600, color: 'var(--macos-text, #1c1c1e)' }}>
             Próxima reunión
           </h3>
         </div>
@@ -52,9 +52,10 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
         {nextMeeting ? (
           <div
             style={{
-              ...DASHBOARD_INNER_SURFACE_STYLE,
-              backgroundColor: 'rgba(0, 122, 255, 0.055)',
+              backgroundColor: 'rgba(0, 122, 255, 0.08)',
+              borderRadius: '8px',
               padding: '12px',
+              border: '1px solid rgba(0, 122, 255, 0.20)',
             }}
           >
             <div
@@ -62,7 +63,7 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
               style={{ flexWrap: 'wrap', gap: '8px' }}
             >
               <Icon f7="calendar" size="18px" className="text-color-blue margin-right-half" />
-              <span style={{ fontSize: '15px' }}>
+              <span style={{ fontSize: '15px', color: 'var(--macos-text, #1c1c1e)' }}>
                 {nextMeetingDate}
               </span>
               <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px' }}>
@@ -72,14 +73,14 @@ export const UpcomingMeetingCard: React.FC<UpcomingMeetingCardProps> = ({
 
             <div className="display-flex align-items-center margin-bottom-half">
               <Icon f7="person_fill" size="18px" className="text-color-blue margin-right-half" />
-              <span style={{ fontSize: '15px' }}>
+              <span style={{ fontSize: '15px', color: 'var(--macos-text, #1c1c1e)' }}>
                 {nextMeeting.clientName}
               </span>
             </div>
 
             <div className="display-flex align-items-center">
               <Icon f7="briefcase_fill" size="18px" className="text-color-gray margin-right-half" />
-              <span style={{ fontSize: '15px' }}>
+              <span style={{ fontSize: '15px', color: 'var(--macos-text-secondary, #8e8e93)' }}>
                 {nextMeeting.materia}
               </span>
             </div>

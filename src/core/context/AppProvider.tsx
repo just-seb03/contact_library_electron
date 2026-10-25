@@ -37,12 +37,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {
       // fallback
     }
+    const root = document.documentElement;
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
       document.body.classList.add('dark');
+      root.style.setProperty('--f7-page-bg-color', '#1e1e20');
+      root.style.setProperty('--f7-card-bg-color', 'rgba(38, 38, 42, 0.85)');
+      root.style.setProperty('--macos-canvas-bg', '#1e1e20');
+      root.style.setProperty('--macos-card-bg', 'rgba(38, 38, 42, 0.85)');
+      root.style.setProperty('--macos-modal-bg', '#242426');
+      root.style.setProperty('--macos-input-bg', 'rgba(255, 255, 255, 0.08)');
+      root.style.setProperty('--macos-text', '#ffffff');
+      root.style.setProperty('--macos-text-secondary', '#8e8e93');
+      root.style.setProperty('--macos-card-border', 'rgba(255, 255, 255, 0.08)');
+      root.style.colorScheme = 'dark';
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       document.body.classList.remove('dark');
+      root.style.setProperty('--f7-page-bg-color', '#f5f5f7');
+      root.style.setProperty('--f7-card-bg-color', '#ffffff');
+      root.style.setProperty('--macos-canvas-bg', '#f5f5f7');
+      root.style.setProperty('--macos-card-bg', '#ffffff');
+      root.style.setProperty('--macos-modal-bg', '#ffffff');
+      root.style.setProperty('--macos-input-bg', '#ffffff');
+      root.style.setProperty('--macos-text', '#1c1c1e');
+      root.style.setProperty('--macos-text-secondary', '#8e8e93');
+      root.style.setProperty('--macos-card-border', 'rgba(0, 0, 0, 0.08)');
+      root.style.colorScheme = 'light';
     }
   }, [darkMode]);
 

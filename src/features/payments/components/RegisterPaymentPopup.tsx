@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Popup } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import type { Payment } from '../types';
-import { APP_COLORS } from '../../../core/theme/style';
 import { PaymentForm } from './PaymentForm';
 
 interface RegisterPaymentPopupProps {
@@ -52,8 +51,9 @@ const contentStyle: CSSProperties = {
   flexDirection: 'column',
   overflow: 'hidden',
   borderRadius: 16,
-  backgroundColor: APP_COLORS.white,
-  boxShadow: '0 24px 60px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
+  color: 'var(--macos-text, #1c1c1e)',
+  boxShadow: '0 24px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   boxSizing: 'border-box',
 };
 

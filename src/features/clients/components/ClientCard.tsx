@@ -32,7 +32,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
   const status = client.status ? STATUS_CONFIG[client.status] : null;
 
   const cardStyle: CSSProperties = {
-    backgroundColor: APP_COLORS.white,
+    backgroundColor: 'var(--macos-card-bg, #ffffff)',
     borderRadius: 14,
     padding: '20px 20px 16px 20px',
     boxShadow: '0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04)',
@@ -42,7 +42,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
     flexDirection: 'column',
     gap: 12,
     boxSizing: 'border-box',
-    border: `1px solid ${APP_COLORS.cardBorder}`,
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   };
 
   const headerStyle: CSSProperties = {
@@ -63,7 +63,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
   const nameStyle: CSSProperties = {
     fontSize: 16,
     fontWeight: 700,
-    color: APP_COLORS.sidebarText,
+    color: 'var(--macos-text, #1c1c1e)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -89,7 +89,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
 
   const dividerStyle: CSSProperties = {
     height: 1,
-    backgroundColor: APP_COLORS.controlBackground,
+    backgroundColor: 'var(--macos-card-border, rgba(0, 0, 0, 0.08))',
     margin: '0 -20px',
   };
 
@@ -112,7 +112,7 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
 
   const infoTextStyle: CSSProperties = {
     fontSize: 13,
-    color: APP_COLORS.bodyText,
+    color: 'var(--macos-text, #3c3c43)',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
@@ -122,8 +122,8 @@ export const ClientCard: FC<ClientCardProps> = ({ client, onSelect, payment, eve
 
   const casoStyle: CSSProperties = {
     fontSize: 12,
-    color: APP_COLORS.secondaryText,
-    backgroundColor: APP_COLORS.controlBackground,
+    color: 'var(--macos-text-secondary, #8e8e93)',
+    backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
     borderRadius: 6,
     padding: '5px 10px',
     overflow: 'hidden',

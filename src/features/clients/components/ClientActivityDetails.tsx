@@ -5,12 +5,10 @@ import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
 import type { HearingEvent } from '../../../core/context/types';
 import { formatCLP } from '../../../core/utils/format';
-import { navigateToTab } from '../../../navigation/navigation';
 import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
 import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
 import { ClientDocumentsSection } from './ClientDocumentsSection';
 import {
-  ACTION_BUTTON_STYLE,
   APP_COLORS,
   EMPTY_TEXT_STYLE,
   MUTED_ITEM_STYLE,
@@ -77,25 +75,16 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
   return (
     <>
       <section style={SECTION_STYLE} aria-labelledby="client-payments-heading">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <h2 id="client-payments-heading" style={SECTION_HEADING_STYLE}>Gestión de pagos</h2>
-          <button
-            type="button"
-            onClick={() => navigateToTab('pagos')}
-            style={ACTION_BUTTON_STYLE}
-          >
-            Gestionar pagos
-          </button>
-        </div>
+        <h2 id="client-payments-heading" style={SECTION_HEADING_STYLE}>Gestión de pagos</h2>
         {payments.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {payments.map((payment) => (
               <div key={payment.id} style={MUTED_ITEM_STYLE}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                  <span style={{ color: APP_COLORS.sidebarText, fontSize: 14, fontWeight: 600 }}>
+                  <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
                     {payment.concept} · {formatCLP(payment.amount)}
                   </span>
-                  <span style={{ color: APP_COLORS.secondaryText, fontSize: 12 }}>Fecha: {payment.date}</span>
+                  <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>Fecha: {payment.date}</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   <PaymentStatusIndicator status={payment.status} />
@@ -123,10 +112,10 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
           <div style={{ ...MUTED_ITEM_STYLE, justifyContent: 'flex-start', marginBottom: 8 }}>
             <Icon f7="calendar" size="18px" style={{ color: APP_COLORS.primary, flexShrink: 0 }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-              <span style={{ color: APP_COLORS.sidebarText, fontSize: 14, fontWeight: 600 }}>
+              <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
                 Próxima audiencia
               </span>
-              <span style={{ color: APP_COLORS.secondaryText, fontSize: 12 }}>
+              <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
                 {new Intl.DateTimeFormat('es-CL', {
                   day: 'numeric',
                   month: 'long',
@@ -144,14 +133,14 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
                   <Icon f7="calendar" size="18px" style={{ color: APP_COLORS.primary, flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                    <span style={{ color: APP_COLORS.sidebarText, fontSize: 14, fontWeight: 600 }}>
+                    <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
                       {event.title}
                     </span>
-                    <span style={{ color: APP_COLORS.secondaryText, fontSize: 12 }}>
+                    <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
                       {formatEventDate(event.date)} · {event.startTime}–{event.endTime}
                     </span>
                     {event.details && (
-                      <span style={{ color: APP_COLORS.bodyText, fontSize: 12 }}>{event.details}</span>
+                      <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>{event.details}</span>
                     )}
                   </div>
                 </div>

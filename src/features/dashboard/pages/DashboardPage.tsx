@@ -35,7 +35,7 @@ export default function Dashboard() {
             >
               {todayLabel}
             </span>
-            <h1 className="no-margin font-weight-bold" style={{ fontSize: '30px', letterSpacing: '-0.03em', color: '#1c1c1e' }}>
+            <h1 className="no-margin font-weight-bold" style={{ fontSize: '30px', letterSpacing: '-0.03em', color: 'var(--macos-text, #1c1c1e)' }}>
               Hola, {lawyerName}
             </h1>
           </div>
@@ -50,8 +50,8 @@ export default function Dashboard() {
                 key={label}
                 onClick={action}
                 style={{
-                  background: 'rgba(255,255,255,0.55)',
-                  border: '1px solid rgba(0,0,0,0.08)',
+                  background: 'var(--macos-input-bg, rgba(255, 255, 255, 0.55))',
+                  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
                   borderRadius: '12px',
                   padding: '8px 14px',
                   display: 'flex',
@@ -64,8 +64,8 @@ export default function Dashboard() {
                   boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
                   transition: 'background 0.15s, box-shadow 0.15s',
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,122,255,0.10)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,0,0,0.04)')}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,122,255,0.15)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--macos-input-bg, rgba(255, 255, 255, 0.55))')}
               >
                 <Icon f7={icon} size="14px" style={{ color: '#007aff' }} />
                 {label}
@@ -96,7 +96,7 @@ export default function Dashboard() {
           <CardHeader style={{ padding: '14px 16px 10px 16px' }}>
             <div className="display-flex align-items-center" style={{ gap: '8px', marginLeft: '4px' }}>
               <Icon f7="calendar_badge_clock" size="18px" style={{ color: '#007aff', flexShrink: 0 }} />
-              <span style={{ fontSize: '15px', fontWeight: 600, color: '#1c1c1e', marginLeft: '12px' }}>
+              <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--macos-text, #1c1c1e)', marginLeft: '12px' }}>
                 Audiencias de hoy
               </span>
               {todayHearings.length > 0 && (

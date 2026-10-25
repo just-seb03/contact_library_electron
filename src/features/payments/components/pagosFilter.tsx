@@ -40,7 +40,7 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
         padding: 16,
       }}
     >
-      <h2 style={{ color: '#1c1c1e', fontSize: '16px', fontWeight: 650, margin: '0 0 12px' }}>
+      <h2 style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: '16px', fontWeight: 650, margin: '0 0 12px' }}>
         Filtrar pagos
       </h2>
       <form
@@ -84,9 +84,10 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
                 border: 0,
                 outline: 'none',
                 fontSize: '13px',
+                color: 'var(--macos-text, #1c1c1e)',
               }}
             />
-            <Icon f7="calendar" size="16px" style={{ color: '#8e8e93', flexShrink: 0 }} />
+            <Icon f7="calendar" size="16px" style={{ color: 'var(--macos-text-secondary, #8e8e93)', flexShrink: 0 }} />
             <Button
               type="button"
               small
@@ -100,6 +101,8 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
                 height: '24px',
                 padding: 0,
                 borderRadius: '20%',
+                borderColor: 'var(--macos-card-border, #d1d1d6)',
+                color: 'var(--macos-text-secondary, #8e8e93)',
               }}
             >
               <Icon f7="arrow_counterclockwise" size="11px" />
@@ -136,7 +139,7 @@ function toDateInputValue(date: Date): string {
 const fieldLabelStyle = {
   display: 'block',
   marginBottom: '5px',
-  color: '#6e6e73',
+  color: 'var(--macos-text-secondary, #6e6e73)',
   fontSize: '12px',
   fontWeight: 500,
 };
@@ -146,9 +149,9 @@ const fieldStyle = {
   height: '38px',
   boxSizing: 'border-box' as const,
   padding: '0 10px',
-  color: '#1c1c1e',
-  backgroundColor: '#f2f2f7',
-  border: '1px solid #e5e5ea',
+  color: 'var(--macos-text, #1c1c1e)',
+  backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
+  border: '1px solid var(--macos-card-border, #e5e5ea)',
   borderRadius: '8px',
   outline: 'none',
   fontSize: '13px',

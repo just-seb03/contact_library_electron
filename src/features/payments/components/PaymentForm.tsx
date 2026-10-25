@@ -95,16 +95,16 @@ export function PaymentForm({
         overflow: 'hidden',
       }}
     >
-      <div style={{ padding: '22px 24px 14px', flexShrink: 0, borderBottom: `1px solid ${APP_COLORS.controlBackground}` }}>
-        <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
+      <div style={{ padding: '22px 24px 14px', flexShrink: 0, borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))' }}>
+        <h2 style={{ margin: 0, color: 'var(--macos-text, #1c1c1e)', fontSize: 21, fontWeight: 700 }}>
           {payment ? 'Editar pago' : 'Registrar pago'}
         </h2>
-        <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
+        <p style={{ margin: '6px 0 0', color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 13 }}>
           {payment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
         </p>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 24px 20px', backgroundColor: '#f5f5f7' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 24px 20px', backgroundColor: 'var(--macos-modal-bg, #ffffff)' }}>
         {!payment && (
           <div style={PAYMENT_FIELD_STYLE}>
             <label htmlFor="payment-client" style={PAYMENT_LABEL_STYLE}>Cliente</label>
@@ -190,8 +190,9 @@ export function PaymentForm({
           onClick={onClose}
           style={{
             ...PAYMENT_ACTION_BUTTON_STYLE,
-            border: `1px solid ${APP_COLORS.border}`,
-            color: APP_COLORS.sidebarText,
+            border: '1px solid var(--macos-card-border, #d1d1d6)',
+            backgroundColor: 'var(--macos-input-bg, #ffffff)',
+            color: 'var(--macos-text, #1c1c1e)',
           }}
         >
           Cancelar

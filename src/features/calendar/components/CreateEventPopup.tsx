@@ -50,8 +50,9 @@ const contentStyle: CSSProperties = {
   flexDirection: 'column',
   overflow: 'hidden',
   borderRadius: 14,
-  backgroundColor: APP_COLORS.white,
-  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
+  color: 'var(--macos-text, #1c1c1e)',
+  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   boxSizing: 'border-box',
 };
 
@@ -78,7 +79,7 @@ const titleStyle: CSSProperties = {
   margin: 0,
   fontSize: 21,
   fontWeight: 700,
-  color: APP_COLORS.black,
+  color: 'var(--macos-text, #1c1c1e)',
   flexShrink: 0,
   whiteSpace: 'nowrap',
 };
@@ -100,7 +101,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
-  color: APP_COLORS.black,
+  color: 'var(--macos-text, #1c1c1e)',
 };
 
 const controlStyle: CSSProperties = {
@@ -108,10 +109,10 @@ const controlStyle: CSSProperties = {
   boxSizing: 'border-box',
   minHeight: 40,
   padding: '9px 11px',
-  border: '1px solid #d1d1d6',
+  border: '1px solid var(--macos-card-border, #d1d1d6)',
   borderRadius: 8,
-  backgroundColor: APP_COLORS.white,
-  color: APP_COLORS.black,
+  backgroundColor: 'var(--macos-input-bg, #ffffff)',
+  color: 'var(--macos-text, #1c1c1e)',
   fontSize: 14,
   fontFamily: 'inherit',
 };
@@ -135,8 +136,8 @@ const actionsStyle: CSSProperties = {
   gap: 10,
   flexShrink: 0,
   padding: '14px 24px',
-  borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-  backgroundColor: APP_COLORS.white,
+  borderTop: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
+  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
   position: 'sticky',
   bottom: 0,
   zIndex: 10,
@@ -482,7 +483,7 @@ export function CreateEventPopup({
                     padding: 5,
                     borderRadius: 9,
                     backgroundColor: color.background,
-                    border: colorId === color.id ? `2px solid ${color.border}` : '1px solid rgba(0,0,0,0.1)',
+                    border: colorId === color.id ? `2px solid ${color.border}` : '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
                     cursor: 'pointer',
                     boxSizing: 'border-box',
                   }}
@@ -496,7 +497,7 @@ export function CreateEventPopup({
                       backgroundColor: color.border,
                     }}
                   />
-                  <span style={{ fontSize: 11, color: APP_COLORS.black }}>{color.label}</span>
+                  <span style={{ fontSize: 11, color: 'var(--macos-text, #1c1c1e)' }}>{color.label}</span>
                 </button>
               ))}
             </div>
@@ -599,8 +600,9 @@ export function CreateEventPopup({
               onClick={requestClose}
               style={{
                 borderRadius: 7,
-                border: '1px solid #d1d1d6',
-                color: '#1c1c1e',
+                border: '1px solid var(--macos-card-border, #d1d1d6)',
+                backgroundColor: 'var(--macos-input-bg, #ffffff)',
+                color: 'var(--macos-text, #1c1c1e)',
                 fontSize: 13,
                 fontWeight: 500,
                 padding: '0 16px',

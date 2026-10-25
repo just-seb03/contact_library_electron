@@ -50,8 +50,9 @@ const contentStyle: CSSProperties = {
   flexDirection: 'column',
   overflow: 'hidden',
   borderRadius: 14,
-  backgroundColor: APP_COLORS.white,
-  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08)',
+  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
+  color: 'var(--macos-text, #1c1c1e)',
+  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   boxSizing: 'border-box',
 };
 
@@ -84,10 +85,10 @@ const controlStyle: CSSProperties = {
   boxSizing: 'border-box',
   minHeight: 40,
   padding: '9px 11px',
-  border: `1px solid ${APP_COLORS.border}`,
+  border: '1px solid var(--macos-card-border, #d1d1d6)',
   borderRadius: 8,
-  backgroundColor: APP_COLORS.white,
-  color: APP_COLORS.black,
+  backgroundColor: 'var(--macos-input-bg, #ffffff)',
+  color: 'var(--macos-text, #1c1c1e)',
   fontSize: 14,
   fontFamily: 'inherit',
 };
@@ -102,7 +103,7 @@ const fieldStyle: CSSProperties = {
 const labelStyle: CSSProperties = {
   fontSize: 13,
   fontWeight: 600,
-  color: APP_COLORS.sidebarText,
+  color: 'var(--macos-text, #1c1c1e)',
 };
 
 function generateExpediente(clients: Client[]): string {
@@ -217,10 +218,10 @@ export function AddClientPopup({
           style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'min(640px, calc(100vh - 40px))', minHeight: 0, overflow: 'hidden' }}
         >
           <div style={{ padding: '20px 24px 12px', flexShrink: 0 }}>
-            <h2 style={{ margin: 0, color: APP_COLORS.sidebarText, fontSize: 21, fontWeight: 700 }}>
+            <h2 style={{ margin: 0, color: 'var(--macos-text, #1c1c1e)', fontSize: 21, fontWeight: 700 }}>
               {client ? 'Editar cliente' : 'Añadir cliente'}
             </h2>
-            <p style={{ margin: '6px 0 0', color: APP_COLORS.neutral, fontSize: 13 }}>
+            <p style={{ margin: '6px 0 0', color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 13 }}>
               {client
                 ? 'Actualiza los datos que quieras cambiar.'
                 : 'Completa todos los datos para agregarlo a la lista.'}
@@ -296,8 +297,8 @@ export function AddClientPopup({
               alignItems: 'center',
               gap: 10,
               padding: '14px 24px',
-              borderTop: `1px solid ${APP_COLORS.borderSubtle}`,
-              backgroundColor: APP_COLORS.white,
+              borderTop: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
+              backgroundColor: 'var(--macos-modal-bg, #ffffff)',
               position: 'sticky',
               bottom: 0,
               zIndex: 10,
@@ -309,8 +310,9 @@ export function AddClientPopup({
               onClick={onClose}
               style={{
                 borderRadius: 7,
-                border: '1px solid #d1d1d6',
-                color: '#1c1c1e',
+                border: '1px solid var(--macos-card-border, #d1d1d6)',
+                backgroundColor: 'var(--macos-input-bg, #ffffff)',
+                color: 'var(--macos-text, #1c1c1e)',
                 fontSize: 13,
                 fontWeight: 500,
                 padding: '0 16px',

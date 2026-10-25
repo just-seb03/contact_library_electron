@@ -1,6 +1,5 @@
 import { Icon } from 'framework7-react';
 import { formatCLP } from '../../../core/utils/format';
-import { APP_COLORS } from '../../../core/theme/style';
 import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface StatsProps {
@@ -52,9 +51,9 @@ export const PaymentsStats = ({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 9, color }}>
           <Icon f7={icon} size="17px" />
-          <span style={{ color: APP_COLORS.secondaryText, fontSize: 12, fontWeight: 600 }}>{label}</span>
+          <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12, fontWeight: 600 }}>{label}</span>
         </div>
-        <div style={{ marginTop: 9, color: APP_COLORS.sidebarText, fontSize: 'clamp(18px, 2.2vw, 25px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ marginTop: 9, color: 'var(--macos-text, #1c1c1e)', fontSize: 'clamp(18px, 2.2vw, 25px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
           {value}
         </div>
       </article>

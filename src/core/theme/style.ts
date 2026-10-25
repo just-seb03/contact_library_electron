@@ -131,7 +131,8 @@ export const APP_SHADOWS = {
 // Estilos base reutilizables
 
 const SURFACE_STYLE = {
-  backgroundColor: APP_COLORS.white,
+  backgroundColor: 'var(--macos-canvas-bg, #f5f5f7)',
+  color: 'var(--macos-text, #1c1c1e)',
 } as const satisfies CSSProperties;
 
 const SIDEBAR_DIMENSIONS = {
@@ -143,6 +144,8 @@ const SIDEBAR_DIMENSIONS = {
 
 export const SECTION_STYLE = {
   ...SURFACE_STYLE,
+  backgroundColor: 'var(--macos-card-bg, #ffffff)',
+  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   borderRadius: APP_SPACING.sectionRadius,
   padding: APP_SPACING.sectionPadding,
   boxShadow: APP_SHADOWS.section,
@@ -150,7 +153,7 @@ export const SECTION_STYLE = {
 
 export const SECTION_HEADING_STYLE = {
   margin: `0 0 ${APP_GAP.md}px`,
-  color: APP_COLORS.sidebarText,
+  color: 'var(--macos-text, #1c1c1e)',
   fontSize: APP_FONT_SIZE.lg,
   fontWeight: APP_FONT_WEIGHT.semibold,
 } as const satisfies CSSProperties;
@@ -162,12 +165,12 @@ export const MUTED_ITEM_STYLE = {
   gap: APP_GAP.sm,
   padding: `${APP_GAP.sm}px ${APP_GAP.md}px`,
   borderRadius: APP_SPACING.itemRadius,
-  backgroundColor: APP_COLORS.surfaceMuted,
+  backgroundColor: 'var(--macos-input-bg, #f9f9fb)',
 } as const satisfies CSSProperties;
 
 export const EMPTY_TEXT_STYLE = {
   margin: 0,
-  color: APP_COLORS.secondaryText,
+  color: 'var(--macos-text-secondary, #8e8e93)',
   fontSize: APP_FONT_SIZE.xs,
 } as const satisfies CSSProperties;
 
@@ -180,9 +183,9 @@ export const ACTION_BUTTON_STYLE = {
   width: 130,
   height: APP_SPACING.controlHeight,
   padding: APP_GAP.xs,
-  border: `1px solid ${APP_COLORS.border}`,
+  border: '1px solid var(--macos-card-border, #d1d1d6)',
   borderRadius: APP_SPACING.controlRadius,
-  backgroundColor: APP_COLORS.controlBackground,
+  backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
   color: APP_COLORS.primary,
   fontSize: APP_FONT_SIZE.xs,
   fontWeight: APP_FONT_WEIGHT.medium,
@@ -226,10 +229,10 @@ export const PAGE_SCROLL_CONTENT_STYLE = {
 } as const satisfies CSSProperties;
 
 export const GLASS_CARD_STYLE = {
-  backgroundColor: APP_COLORS.glassSurface,
+  backgroundColor: 'var(--macos-card-bg, rgba(255, 255, 255, 0.85))',
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
-  border: `1px solid ${APP_COLORS.glassBorder}`,
+  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
   boxShadow: APP_SHADOWS.glass,
   borderRadius: APP_SPACING.glassRadius,
 } as const satisfies CSSProperties;
@@ -237,13 +240,13 @@ export const GLASS_CARD_STYLE = {
 // Variables CSS de Framework7
 
 const FRAMEWORK_PAGE_VARIABLES = {
-  '--f7-page-bg-color': APP_COLORS.white,
-  '--f7-bars-bg-color': APP_COLORS.white,
-  '--f7-navbar-bg-color': APP_COLORS.white,
-  '--f7-toolbar-bg-color': APP_COLORS.white,
+  '--f7-page-bg-color': 'var(--macos-canvas-bg, #f5f5f7)',
+  '--f7-bars-bg-color': 'var(--macos-card-bg, #ffffff)',
+  '--f7-navbar-bg-color': 'var(--macos-card-bg, #ffffff)',
+  '--f7-toolbar-bg-color': 'var(--macos-card-bg, #ffffff)',
   '--f7-card-bg-color': 'transparent',
-  '--f7-list-strong-bg-color': APP_COLORS.white,
-  '--f7-list-bg-color': APP_COLORS.white,
+  '--f7-list-strong-bg-color': 'var(--macos-card-bg, #ffffff)',
+  '--f7-list-bg-color': 'var(--macos-card-bg, #ffffff)',
 } as const satisfies ThemeStyle;
 
 const SIDEBAR_VARIABLES = {
