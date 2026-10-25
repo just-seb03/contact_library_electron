@@ -1,6 +1,68 @@
-import type { Client, ClientDocument, ClientPaymentInfo } from '../../features/clients/types';
-import type { Payment } from '../../features/payments/types';
-import type { CalendarEvent } from '../../features/calendar/types';
+export type ClientStatus = 'activo' | 'en_proceso' | 'completado';
+
+export interface ClientCase {
+  expediente: string;
+  juzgado: string;
+  materia: string;
+  estado: string;
+  proximaAudiencia?: string;
+}
+
+export interface ClientPaymentInfo {
+  monto: number;
+  concepto: string;
+  fecha: string;
+  estado: 'completed' | 'pending' | 'overdue';
+}
+
+export interface ClientDocument {
+  id: string;
+  name: string;
+  dataUrl: string;
+  size: number;
+  uploadedAt: string;
+}
+
+export interface Client {
+  id: number;
+  name: string;
+  phone: string;
+  email?: string;
+  rut?: string;
+  status?: ClientStatus;
+  caso?: ClientCase;
+  pago?: ClientPaymentInfo;
+  documentos?: ClientDocument[];
+}
+
+export interface Payment {
+  id: string;
+  client: string;
+  clientId?: number;
+  concept: string;
+  amount: number;
+  date: string;
+  status: 'completed' | 'pending' | 'overdue';
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  colorId: CalendarEventColorId;
+  alarmMinutes: number;
+  clientId: number | null;
+  details: string;
+}
+
+export type CalendarEventColorId =
+  | 'lavender'
+  | 'blue'
+  | 'mint'
+  | 'peach'
+  | 'rose';
 
 export interface HearingEvent {
   id: string;
