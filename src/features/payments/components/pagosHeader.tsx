@@ -13,13 +13,18 @@ export const PaymentsHeader = ({ onRegisterPayment }: PaymentsHeaderProps) => (
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: '16px',
-      paddingBottom: '16px',
-      borderBottom: '1px solid rgba(60, 60, 67, 0.16)',
+      padding: '4px 0 18px',
+      borderBottom: `1px solid ${APP_COLORS.borderSubtle}`,
     }}
   >
-    <h1 className="no-margin font-weight-bold" style={{ fontSize: '26px', color: '#1c1c1e' }}>
+    <div>
+      <h1 className="no-margin font-weight-bold" style={{ fontSize: '28px', letterSpacing: '-0.02em', color: APP_COLORS.sidebarText }}>
       Pagos
-    </h1>
+      </h1>
+      <p style={{ margin: '5px 0 0', color: APP_COLORS.secondaryText, fontSize: 13 }}>
+        Control y seguimiento de tus transacciones
+      </p>
+    </div>
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px' }}>
       <Button
         fill
@@ -28,10 +33,10 @@ export const PaymentsHeader = ({ onRegisterPayment }: PaymentsHeaderProps) => (
           display: 'inline-flex',
           alignItems: 'center',
           gap: '7px',
-          borderRadius: '7px',
+          borderRadius: '9px',
           padding: '0 14px',
           backgroundColor: APP_COLORS.primary,
-          boxShadow: '0 1px 3px rgba(35, 83, 137, 0.18)',
+          boxShadow: '0 1px 3px rgba(0, 122, 255, 0.22)',
         }}
       >
         <Icon f7="plus" size="15px" />

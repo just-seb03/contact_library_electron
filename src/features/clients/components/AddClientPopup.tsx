@@ -55,6 +55,30 @@ const contentStyle: CSSProperties = {
   boxSizing: 'border-box',
 };
 
+const FADE_CSS = `
+  .popup.popup-tablet-fullscreen.f7-fade {
+    transform: none !important;
+    opacity: 0;
+    transition-property: opacity;
+    transition-duration: 220ms;
+    transition-timing-function: ease;
+  }
+
+  .popup.popup-tablet-fullscreen.f7-fade.modal-in {
+    opacity: 1;
+  }
+
+  .popup.popup-tablet-fullscreen.f7-fade.modal-out {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .popup.popup-tablet-fullscreen.f7-fade {
+      transition-duration: 1ms;
+    }
+  }
+`;
+
 const controlStyle: CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
@@ -178,11 +202,13 @@ export function AddClientPopup({
   return (
     <Popup
       opened={opened}
-      className="popup-tablet-fullscreen"
+      className="popup-tablet-fullscreen f7-fade"
       style={popupStyle}
+      backdrop={false}
       closeByBackdropClick={false}
       onPopupClosed={() => setContentMounted(false)}
     >
+      <style>{FADE_CSS}</style>
       {contentMounted && (
       <div style={popupCenterStyle}>
       <div style={contentStyle}>

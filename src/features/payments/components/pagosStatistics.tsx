@@ -1,6 +1,7 @@
-import { Card, CardContent, Icon } from 'framework7-react';
+import { Icon } from 'framework7-react';
 import { formatCLP } from '../../../core/utils/format';
-import { GLASS_CARD_STYLE } from '../../../core/theme/style';
+import { APP_COLORS } from '../../../core/theme/style';
+import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface StatsProps {
   totalIngresos: number;
@@ -18,7 +19,7 @@ export const PaymentsStats = ({
     style={{
       display: 'grid',
       gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-      gap: '16px',
+      gap: '12px',
     }}
   >
     {[
@@ -41,52 +42,22 @@ export const PaymentsStats = ({
         color: '#ff3b30',
       },
     ].map(({ label, value, icon, color }) => (
-      <Card
+      <article
         key={label}
-        outline
-        className="no-margin"
         style={{
-          ...GLASS_CARD_STYLE,
-          aspectRatio: '2 / 1',
+          ...PAYMENT_SURFACE_STYLE,
           minWidth: 0,
+          padding: '15px 16px',
         }}
       >
-        <CardContent
-          style={{
-            height: '100%',
-            padding: 'clamp(16px, 3vw, 28px)',
-            boxSizing: 'border-box',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Icon f7={icon} size="24px" style={{ color }} />
-          <div>
-            <div
-              style={{
-                color: '#8e8e93',
-                fontSize: 'clamp(12px, 1.4vw, 15px)',
-                fontWeight: 600,
-                marginBottom: '8px',
-              }}
-            >
-              {label}
-            </div>
-            <div
-              style={{
-                color: '#1c1c1e',
-                fontSize: 'clamp(20px, 2.5vw, 32px)',
-                fontWeight: 700,
-                lineHeight: 1.15,
-                overflowWrap: 'anywhere',
-              }}
-            >
-              {value}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 9, color }}>
+          <Icon f7={icon} size="17px" />
+          <span style={{ color: APP_COLORS.secondaryText, fontSize: 12, fontWeight: 600 }}>{label}</span>
+        </div>
+        <div style={{ marginTop: 9, color: APP_COLORS.sidebarText, fontSize: 'clamp(18px, 2.2vw, 25px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
+          {value}
+        </div>
+      </article>
     ))}
   </section>
 );
