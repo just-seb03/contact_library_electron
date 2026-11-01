@@ -23,6 +23,7 @@ import {
   MAC_ACCENT_COLORS,
   type AppSettings,
 } from '../../features/settings/data/settingsData';
+import { databaseService } from '../database/databaseService';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(loadClients);
@@ -119,17 +120,65 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [darkMode]);
 
+  // Carga inicial sincronizada desde SQLite al iniciar en Electron
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadFromSqlite() {
+      if (!databaseService.isElectronDbAvailable()) return;
+
+      try {
+        const [dbClients, dbPayments, dbCalendar, dbSettings] = await Promise.all([
+          databaseService.getClients(),
+          databaseService.getPayments(),
+          databaseService.getCalendarEvents(),
+          databaseService.getSettings(),
+        ]);
+
+        if (!isMounted) return;
+
+        if (dbClients && dbClients.length > 0) {
+          setClients(dbClients);
+        }
+        if (dbPayments && dbPayments.length > 0) {
+          setRegisteredPayments(dbPayments);
+        }
+        if (dbCalendar && dbCalendar.length > 0) {
+          setCalendarEvents(dbCalendar);
+        }
+        if (dbSettings && Object.keys(dbSettings).length > 0) {
+          setSettings((prev) => ({ ...prev, ...(dbSettings as unknown as Partial<AppSettings>) }));
+        }
+      } catch (err) {
+        console.error('Error al sincronizar datos iniciales desde SQLite:', err);
+      }
+    }
+
+    loadFromSqlite();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   useEffect(() => {
     saveCalendarEvents(calendarEvents);
+    databaseService.saveCalendarEvents(calendarEvents);
   }, [calendarEvents]);
 
   useEffect(() => {
     saveClients(clients);
+    databaseService.saveAllClients(clients);
   }, [clients]);
 
   useEffect(() => {
     saveRegisteredPayments(registeredPayments);
+    databaseService.savePayments(registeredPayments);
   }, [registeredPayments]);
+
+  useEffect(() => {
+    databaseService.saveSettings(settings as unknown as Record<string, unknown>);
+  }, [settings]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 

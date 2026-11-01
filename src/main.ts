@@ -1,7 +1,12 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { APP_COLORS } from '../src/core/theme/style'
+import { APP_COLORS } from './core/theme/style'
+import { initDatabase, closeDatabase } from './core/database/connection'
+import { registerCalendarController } from './features/calendar/controllers/calendarController'
+import { registerClientController } from './features/clients/controllers/clientController'
+import { registerPaymentController } from './features/payments/controllers/paymentController'
+import { registerSettingsController } from './features/settings/controllers/settingsController'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -72,10 +77,15 @@ function createWindow() {
 }
 
 app.on('window-all-closed', () => {
+  closeDatabase()
   if (process.platform !== 'darwin') {
     app.quit()
     win = null
   }
+})
+
+app.on('before-quit', () => {
+  closeDatabase()
 })
 
 app.on('activate', () => {
@@ -84,4 +94,11 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(async () => {
+  await initDatabase()
+  registerClientController()
+  registerPaymentController()
+  registerCalendarController()
+  registerSettingsController()
+  createWindow()
+})

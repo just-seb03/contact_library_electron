@@ -13,6 +13,9 @@ dist-electron
 dist-ssr
 release
 *.local
+*.db
+*.sqlite
+*.sqlite3
 
 # Editor directories and files
 .vscode/*
