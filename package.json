@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "better-sqlite3": "^13.0.3",
     "framework7": "^9.2.0",
     "framework7-icons": "^5.0.5",
     "framework7-react": "^9.2.0",
