@@ -1,32 +1,48 @@
 import { ipcMain } from 'electron'
-import { getDatabase } from '../../../core/database/connection'
+import { paymentRepository } from '../repositories/PaymentRepository'
+import type { Payment } from '../../../core/context/types'
 
 export function registerPaymentController(): void {
-  ipcMain.handle('db:payments:getAll', async () => {
-    const db = getDatabase()
-    return db.prepare('SELECT * FROM payments ORDER BY date DESC').all()
+  // 1. Obtener todos los pagos (con soporte de filtros opcionales)
+  ipcMain.handle('db:payments:getAll', async (_event, filters) => {
+    return paymentRepository.getAll(filters)
   })
 
-  ipcMain.handle('db:payments:saveAll', async (_event, payments: any[]) => {
-    const db = getDatabase()
-    await db.transaction(async () => {
-      await db.prepare('DELETE FROM payments').run()
-      const statement = db.prepare(`
-        INSERT INTO payments (id, client, clientId, concept, amount, date, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-      for (const payment of payments) {
-        await statement.run(
-          payment.id,
-          payment.client,
-          payment.clientId || null,
-          payment.concept,
-          payment.amount,
-          payment.date,
-          payment.status
-        )
+  // 2. Obtener pago por ID
+  ipcMain.handle('db:payments:getById', async (_event, id: string) => {
+    return paymentRepository.getById(id)
+  })
+
+  // 3. Crear pago atómicamente
+  ipcMain.handle('db:payments:create', async (_event, paymentData: any) => {
+    return paymentRepository.create(paymentData)
+  })
+
+  // 4. Actualizar pago atómicamente
+  ipcMain.handle('db:payments:update', async (_event, id: string, paymentData: any) => {
+    return paymentRepository.update(id, paymentData)
+  })
+
+  // 5. Eliminar pago
+  ipcMain.handle('db:payments:delete', async (_event, id: string) => {
+    return paymentRepository.delete(id)
+  })
+
+  // 6. Obtener balance/resumen financiero
+  ipcMain.handle('db:payments:getSummary', async (_event, clientId?: number) => {
+    return paymentRepository.getSummary(clientId)
+  })
+
+  // 7. Compatibilidad temporal con saveAll (ahora de forma no destructiva / upsert)
+  ipcMain.handle('db:payments:saveAll', async (_event, payments: Payment[]) => {
+    for (const p of payments) {
+      const existing = await paymentRepository.getById(p.id)
+      if (existing) {
+        await paymentRepository.update(p.id, p)
+      } else {
+        await paymentRepository.create(p)
       }
-    })
+    }
     return true
   })
 }

@@ -1,117 +1,90 @@
 import { ipcMain } from 'electron'
-import { getDatabase } from '../../../core/database/connection'
-
-interface ClientRow {
-  id: number
-  name: string
-  phone: string
-  email: string | null
-  rut: string | null
-  status: string
-  caso: string | null
-  pago: string | null
-  documentos: string | null
-}
-
-function parseClient(row: ClientRow) {
-  return {
-    id: row.id,
-    name: row.name,
-    phone: row.phone,
-    email: row.email ?? undefined,
-    rut: row.rut ?? undefined,
-    status: row.status as 'activo' | 'en_proceso' | 'completado',
-    caso: row.caso ? JSON.parse(row.caso) : undefined,
-    pago: row.pago ? JSON.parse(row.pago) : undefined,
-    documentos: row.documentos ? JSON.parse(row.documentos) : [],
-  }
-}
+import { clientRepository } from '../repositories/ClientRepository'
+import { caseRepository } from '../repositories/CaseRepository'
+import { documentRepository } from '../repositories/DocumentRepository'
+import type { Client } from '../../../core/context/types'
 
 export function registerClientController(): void {
-  ipcMain.handle('db:clients:getAll', async () => {
-    const db = getDatabase()
-    const rows = await db.prepare('SELECT * FROM clients ORDER BY id ASC').all<ClientRow>()
-    return rows.map(parseClient)
+  // 1. Obtener todos los clientes (con sus relaciones de casos y documentos)
+  ipcMain.handle('db:clients:getAll', async (_event, filters) => {
+    return clientRepository.getAll(filters)
   })
 
-  ipcMain.handle('db:clients:create', async (_event, client: any) => {
-    const db = getDatabase()
-    const info = await db.prepare(`
-      INSERT INTO clients (name, phone, email, rut, status, caso, pago, documentos)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      client.name,
-      client.phone,
-      client.email || null,
-      client.rut || null,
-      client.status || 'activo',
-      client.caso ? JSON.stringify(client.caso) : null,
-      client.pago ? JSON.stringify(client.pago) : null,
-      client.documentos ? JSON.stringify(client.documentos) : '[]'
-    )
-    return {
-      ...client,
-      id: Number(info.lastInsertRowid),
-    }
+  // 2. Obtener cliente por ID
+  ipcMain.handle('db:clients:getById', async (_event, id: number) => {
+    return clientRepository.getById(id)
   })
 
-  ipcMain.handle('db:clients:update', async (_event, id: number, data: any) => {
-    const db = getDatabase()
-    const existing = await db.prepare('SELECT * FROM clients WHERE id = ?').get<ClientRow>(id)
-    if (!existing) {
-      throw new Error(`Cliente con id ${id} no encontrado`)
-    }
-
-    const current = parseClient(existing)
-    const merged = { ...current, ...data }
-
-    await db.prepare(`
-      UPDATE clients
-      SET name = ?, phone = ?, email = ?, rut = ?, status = ?, caso = ?, pago = ?, documentos = ?, updated_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(
-      merged.name,
-      merged.phone,
-      merged.email || null,
-      merged.rut || null,
-      merged.status || 'activo',
-      merged.caso ? JSON.stringify(merged.caso) : null,
-      merged.pago ? JSON.stringify(merged.pago) : null,
-      merged.documentos ? JSON.stringify(merged.documentos) : '[]',
-      id
-    )
-
-    return merged
-  })
-
-  ipcMain.handle('db:clients:delete', async (_event, id: number) => {
-    const db = getDatabase()
-    await db.prepare('DELETE FROM clients WHERE id = ?').run(id)
-    return true
-  })
-
-  ipcMain.handle('db:clients:saveAll', async (_event, clients: any[]) => {
-    const db = getDatabase()
-    await db.transaction(async () => {
-      await db.prepare('DELETE FROM clients').run()
-      const statement = db.prepare(`
-        INSERT INTO clients (id, name, phone, email, rut, status, caso, pago, documentos)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `)
-      for (const client of clients) {
-        await statement.run(
-          client.id,
-          client.name,
-          client.phone,
-          client.email || null,
-          client.rut || null,
-          client.status || 'activo',
-          client.caso ? JSON.stringify(client.caso) : null,
-          client.pago ? JSON.stringify(client.pago) : null,
-          client.documentos ? JSON.stringify(client.documentos) : '[]'
-        )
-      }
+  // 3. Crear cliente atómicamente
+  ipcMain.handle('db:clients:create', async (_event, clientData: any) => {
+    return clientRepository.create({
+      name: clientData.name,
+      phone: clientData.phone,
+      email: clientData.email,
+      rut: clientData.rut,
+      status: clientData.status,
+      caso: clientData.caso,
     })
+  })
+
+  // 4. Actualizar cliente atómicamente
+  ipcMain.handle('db:clients:update', async (_event, id: number, clientData: any) => {
+    return clientRepository.update(id, clientData)
+  })
+
+  // 5. Eliminar cliente y limpiar archivos de disco de forma segura
+  ipcMain.handle('db:clients:delete', async (_event, id: number) => {
+    return clientRepository.delete(id)
+  })
+
+  // 6. Compatibilidad no destructiva para migraciones frontend
+  ipcMain.handle('db:clients:saveAll', async (_event, clients: Client[]) => {
+    for (const client of clients) {
+      if (client.id) {
+        const existing = await clientRepository.getById(client.id)
+        if (existing) {
+          await clientRepository.update(client.id, client)
+        } else {
+          await clientRepository.create(client)
+        }
+      } else {
+        await clientRepository.create(client)
+      }
+    }
     return true
+  })
+
+  // 7. Gestión de casos
+  ipcMain.handle('db:cases:getByClientId', async (_event, clientId: number) => {
+    return caseRepository.getByClientId(clientId)
+  })
+
+  ipcMain.handle('db:cases:upsert', async (_event, clientId: number, caseData: any) => {
+    return caseRepository.upsert(clientId, caseData)
+  })
+
+  // 8. Gestión de documentos
+  ipcMain.handle('db:documents:getByClientId', async (_event, clientId: number) => {
+    return documentRepository.getByClientId(clientId)
+  })
+
+  ipcMain.handle(
+    'db:documents:upload',
+    async (_event, { clientId, originalName, fileBuffer }: { clientId: number; originalName: string; fileBuffer: Uint8Array }) => {
+      const buffer = Buffer.from(fileBuffer)
+      return documentRepository.saveDocument(clientId, originalName, buffer)
+    }
+  )
+
+  ipcMain.handle('db:documents:delete', async (_event, id: string) => {
+    return documentRepository.deleteDocument(id)
+  })
+
+  ipcMain.handle('db:documents:open', async (_event, id: string) => {
+    return documentRepository.openDocument(id)
+  })
+
+  ipcMain.handle('db:documents:showInFinder', async (_event, id: string) => {
+    return documentRepository.showInFinder(id)
   })
 }
