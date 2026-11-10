@@ -2,7 +2,7 @@ import path from 'node:path'
 import fs from 'node:fs'
 import sqlite3 from 'sqlite3'
 import { app } from 'electron'
-import { TABLES_SQL, SEED_SQL } from './schema'
+import { runDatabaseMigrations } from './migrator'
 
 export interface DatabaseStatement {
   all<T = Record<string, unknown>>(...args: unknown[]): Promise<T[]>
@@ -26,6 +26,23 @@ export function getDatabasePath(): string {
     return path.join(userDataPath, 'contact_library.db')
   } catch {
     return path.join(process.cwd(), 'contact_library.db')
+  }
+}
+
+export function getDocumentsStoragePath(): string {
+  try {
+    const userDataPath = app?.getPath ? app.getPath('userData') : process.cwd()
+    const docsPath = path.join(userDataPath, 'documents')
+    if (!fs.existsSync(docsPath)) {
+      fs.mkdirSync(docsPath, { recursive: true })
+    }
+    return docsPath
+  } catch {
+    const docsPath = path.join(process.cwd(), 'storage', 'documents')
+    if (!fs.existsSync(docsPath)) {
+      fs.mkdirSync(docsPath, { recursive: true })
+    }
+    return docsPath
   }
 }
 
@@ -174,23 +191,7 @@ export async function initDatabase(dbPath?: string): Promise<DatabaseWrapper> {
 
   try {
     await wrapper.pragma('foreign_keys = ON')
-
-    let tablesSql = TABLES_SQL
-    const tablesFile = path.join(process.cwd(), 'src', 'core', 'database', 'schema', 'tables.sql')
-    if (fs.existsSync(tablesFile)) {
-      tablesSql = fs.readFileSync(tablesFile, 'utf-8')
-    }
-    await wrapper.exec(tablesSql)
-
-    const clientCount = await wrapper.prepare('SELECT count(*) as count FROM clients').get<{ count: number }>()
-    if (!clientCount || clientCount.count === 0) {
-      let seedSql = SEED_SQL
-      const seedFile = path.join(process.cwd(), 'src', 'core', 'database', 'schema', 'seed.sql')
-      if (fs.existsSync(seedFile)) {
-        seedSql = fs.readFileSync(seedFile, 'utf-8')
-      }
-      await wrapper.exec(seedSql)
-    }
+    await runDatabaseMigrations(wrapper)
   } catch (error) {
     wrapper.close()
     throw error
