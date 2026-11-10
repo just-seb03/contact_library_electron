@@ -1,0 +1,1 @@
+export type { Payment } from '../../core/context/types';
