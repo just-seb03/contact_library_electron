@@ -1,26 +1,90 @@
 import { ipcMain } from 'electron'
-import { settingsRepository } from '../repositories/SettingsRepository'
+import { getDatabase } from '../../../core/database/connection'
+import {
+  IPC_CHANNELS,
+  createIpcSuccess,
+  createIpcError,
+  type IpcResponse,
+  type SaveSettingsDTO,
+} from '../../../shared/types/ipc'
 
 export function registerSettingsController(): void {
-  // 1. Obtener toda la configuración
+  // 1. Obtener todas las configuraciones
+  ipcMain.handle(
+    IPC_CHANNELS.SETTINGS_GET,
+    async (): Promise<IpcResponse<Record<string, unknown>>> => {
+      try {
+        const db = getDatabase()
+        const rows = await db.prepare('SELECT key, value FROM settings').all<{ key: string; value: string }>()
+        const settings: Record<string, unknown> = {}
+        for (const row of rows) {
+          try {
+            settings[row.key] = JSON.parse(row.value)
+          } catch {
+            settings[row.key] = row.value
+          }
+        }
+        return createIpcSuccess(settings)
+      } catch (error) {
+        return createIpcError(error)
+      }
+    }
+  )
+
+  // 2. Guardar lote completo de configuraciones
+  ipcMain.handle(
+    IPC_CHANNELS.SETTINGS_SAVE_ALL,
+    async (_event, settings: SaveSettingsDTO): Promise<IpcResponse<boolean>> => {
+      try {
+        if (!settings || typeof settings !== 'object') {
+          return createIpcError('Se esperaba un objeto de configuración.')
+        }
+
+        const db = getDatabase()
+        await db.transaction(async () => {
+          const statement = db.prepare(`
+            INSERT INTO settings (key, value, updated_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+          `)
+          for (const [key, value] of Object.entries(settings)) {
+            await statement.run(key, JSON.stringify(value))
+          }
+        })
+        return createIpcSuccess(true)
+      } catch (error) {
+        return createIpcError(error)
+      }
+    }
+  )
+
+  // Compatibilidad con canales heredados
   ipcMain.handle('db:settings:getAll', async () => {
-    return settingsRepository.getAll()
+    const db = getDatabase()
+    const rows = await db.prepare('SELECT key, value FROM settings').all<{ key: string; value: string }>()
+    const settings: Record<string, unknown> = {}
+    for (const row of rows) {
+      try {
+        settings[row.key] = JSON.parse(row.value)
+      } catch {
+        settings[row.key] = row.value
+      }
+    }
+    return settings
   })
 
-  // 2. Obtener una clave específica
-  ipcMain.handle('db:settings:get', async (_event, key: string) => {
-    return settingsRepository.get(key)
-  })
-
-  // 3. Establecer una clave específica
-  ipcMain.handle('db:settings:set', async (_event, key: string, value: any) => {
-    await settingsRepository.set(key, value)
-    return true
-  })
-
-  // 4. Guardar múltiples opciones (compatibilidad con saveAll)
-  ipcMain.handle('db:settings:saveAll', async (_event, settings: Record<string, any>) => {
-    await settingsRepository.setMultiple(settings)
+  ipcMain.handle('db:settings:saveAll', async (_event, settings: SaveSettingsDTO) => {
+    const db = getDatabase()
+    await db.transaction(async () => {
+      const statement = db.prepare(`
+        INSERT INTO settings (key, value, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = CURRENT_TIMESTAMP
+      `)
+      for (const [key, value] of Object.entries(settings)) {
+        await statement.run(key, JSON.stringify(value))
+      }
+    })
     return true
   })
 }

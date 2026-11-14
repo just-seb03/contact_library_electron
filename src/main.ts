@@ -5,8 +5,10 @@ import { APP_COLORS } from './core/theme/style'
 import { initDatabase, closeDatabase } from './core/database/connection'
 import { registerCalendarController } from './features/calendar/controllers/calendarController'
 import { registerClientController } from './features/clients/controllers/clientController'
+import { registerDocumentController } from './features/clients/controllers/documentController'
 import { registerPaymentController } from './features/payments/controllers/paymentController'
 import { registerSettingsController } from './features/settings/controllers/settingsController'
+import { IPC_CHANNELS, createIpcSuccess } from './shared/types/ipc'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -21,17 +23,25 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 let win: BrowserWindow | null
 
 // Configuración de los eventos para la barra de título personalizada
-ipcMain.on('window-minimize', () => win?.minimize())
-ipcMain.on('window-maximize', () => {
+const handleMinimize = () => win?.minimize()
+const handleMaximize = () => {
   if (win?.isMaximized()) {
     win?.restore()
   } else {
     win?.maximize()
   }
-})
-ipcMain.on('window-close', () => win?.close())
+}
+const handleClose = () => win?.close()
 
-// Responde al renderer con la plataforma actual
+ipcMain.on(IPC_CHANNELS.WINDOW_MINIMIZE, handleMinimize)
+ipcMain.on(IPC_CHANNELS.WINDOW_MAXIMIZE, handleMaximize)
+ipcMain.on(IPC_CHANNELS.WINDOW_CLOSE, handleClose)
+ipcMain.handle(IPC_CHANNELS.APP_GET_PLATFORM, () => createIpcSuccess(process.platform))
+
+// Compatibilidad con llamadas heredadas
+ipcMain.on('window-minimize', handleMinimize)
+ipcMain.on('window-maximize', handleMaximize)
+ipcMain.on('window-close', handleClose)
 ipcMain.handle('get-platform', () => process.platform)
 
 function createWindow() {
@@ -97,6 +107,7 @@ app.on('activate', () => {
 app.whenReady().then(async () => {
   await initDatabase()
   registerClientController()
+  registerDocumentController()
   registerPaymentController()
   registerCalendarController()
   registerSettingsController()

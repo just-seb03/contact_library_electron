@@ -18,14 +18,22 @@ export interface IpcResponse<T = unknown> {
 export const IPC_CHANNELS = {
   // Clientes
   CLIENTS_LIST: 'clients:list',
+  CLIENTS_GET_BY_ID: 'clients:getById',
   CLIENTS_CREATE: 'clients:create',
   CLIENTS_UPDATE: 'clients:update',
   CLIENTS_DELETE: 'clients:delete',
   CLIENTS_SAVE_ALL: 'clients:saveAll',
 
+  // Casos judiciales
+  CASES_GET_BY_CLIENT_ID: 'cases:getByClientId',
+  CASES_UPSERT: 'cases:upsert',
+
   // Documentos
+  DOCUMENTS_GET_BY_CLIENT_ID: 'documents:getByClientId',
   DOCUMENTS_UPLOAD: 'documents:upload',
+  DOCUMENTS_DELETE: 'documents:delete',
   DOCUMENTS_OPEN: 'documents:open',
+  DOCUMENTS_SHOW_IN_FINDER: 'documents:showInFinder',
 
   // Pagos
   PAYMENTS_LIST: 'payments:list',
@@ -52,20 +60,40 @@ export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
  * Tipos de entrada para operaciones de clientes
  */
 export type CreateClientDTO = Omit<Client, 'id'>
-export type UpdateClientDTO = { id: number; data: Partial<Client> }
-export type DeleteClientDTO = { id: number }
+export type UpdateClientDTO = Partial<Omit<Client, 'id'>>
+export interface ClientFiltersDTO {
+  search?: string
+  status?: Client['status']
+  limit?: number
+  offset?: number
+}
 
 /**
  * Tipos de entrada para operaciones de documentos
  */
 export interface UploadDocumentDTO {
   clientId: number
-  document: ClientDocument
+  name: string
+  fileBuffer?: Uint8Array | number[] | ArrayBuffer
+  dataUrl?: string
+  size?: number
 }
 
 export interface OpenDocumentDTO {
-  dataUrl?: string
+  id?: string
   filePath?: string
+  relativePath?: string
+}
+
+/**
+ * Tipos de entrada para casos judiciales
+ */
+export interface UpsertCaseDTO {
+  expediente: string
+  juzgado: string
+  materia: string
+  estado: string
+  proximaAudiencia?: string
 }
 
 /**
@@ -86,15 +114,23 @@ export interface ElectronAPIContract {
     getPlatform: () => Promise<IpcResponse<string>>
   }
   clients: {
-    list: () => Promise<IpcResponse<Client[]>>
+    list: (filters?: ClientFiltersDTO) => Promise<IpcResponse<Client[]>>
+    getById: (id: number) => Promise<IpcResponse<Client | null>>
     create: (client: CreateClientDTO) => Promise<IpcResponse<Client>>
-    update: (id: number, data: Partial<Client>) => Promise<IpcResponse<Client>>
+    update: (id: number, data: UpdateClientDTO) => Promise<IpcResponse<Client>>
     delete: (id: number) => Promise<IpcResponse<boolean>>
     saveAll: (clients: Client[]) => Promise<IpcResponse<boolean>>
   }
+  cases: {
+    getByClientId: (clientId: number) => Promise<IpcResponse<import('../../features/clients/repositories/CaseRepository').CaseEntity | null>>
+    upsert: (clientId: number, data: UpsertCaseDTO) => Promise<IpcResponse<import('../../features/clients/repositories/CaseRepository').CaseEntity>>
+  }
   documents: {
-    upload: (clientId: number, document: ClientDocument) => Promise<IpcResponse<ClientDocument>>
-    open: (document: OpenDocumentDTO) => Promise<IpcResponse<boolean>>
+    getByClientId: (clientId: number) => Promise<IpcResponse<ClientDocument[]>>
+    upload: (dto: UploadDocumentDTO) => Promise<IpcResponse<ClientDocument>>
+    delete: (id: string) => Promise<IpcResponse<boolean>>
+    open: (idOrDto: string | OpenDocumentDTO) => Promise<IpcResponse<boolean>>
+    showInFinder: (id: string) => Promise<IpcResponse<boolean>>
   }
   payments: {
     list: () => Promise<IpcResponse<Payment[]>>
