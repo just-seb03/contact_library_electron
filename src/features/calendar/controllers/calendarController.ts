@@ -1,3 +1,9 @@
+/**
+ * @file calendarController.ts
+ * @description Controlador IPC para la gestión y persistencia de eventos de agenda y audiencias en SQLite.
+ * Proporciona validación estricta de estructura y respuesta tipada Promise<IpcResponse<T>>.
+ */
+
 import { ipcMain } from 'electron'
 import { getDatabase } from '../../../core/database/connection'
 import type { CalendarEvent, CalendarEventColorId } from '../../../core/context/types'
@@ -20,6 +26,9 @@ interface CalendarEventRow {
   details: string
 }
 
+/**
+ * Mapea una fila de base de datos a la interfaz de entidad de eventos de calendario
+ */
 function parseCalendarRow(row: CalendarEventRow): CalendarEvent {
   return {
     id: row.id,
@@ -34,8 +43,11 @@ function parseCalendarRow(row: CalendarEventRow): CalendarEvent {
   }
 }
 
+/**
+ * Registra todos los handlers IPC correspondientes al dominio del calendario.
+ */
 export function registerCalendarController(): void {
-  // 1. Obtener todos los eventos del calendario
+  // [calendar:list] - Recupera los eventos ordenados cronológicamente por fecha y hora
   ipcMain.handle(
     IPC_CHANNELS.CALENDAR_LIST,
     async (): Promise<IpcResponse<CalendarEvent[]>> => {
@@ -51,7 +63,7 @@ export function registerCalendarController(): void {
     }
   )
 
-  // 2. Guardar lote completo de eventos
+  // [calendar:saveAll] - Reemplazo transaccional de eventos en SQLite
   ipcMain.handle(
     IPC_CHANNELS.CALENDAR_SAVE_ALL,
     async (_event, events: CalendarEvent[]): Promise<IpcResponse<boolean>> => {
@@ -88,7 +100,7 @@ export function registerCalendarController(): void {
     }
   )
 
-  // Compatibilidad con canales heredados
+  // --- Handlers de retrocompatibilidad transitoria ---
   ipcMain.handle('db:calendar:getAll', async () => {
     const db = getDatabase()
     return db.prepare('SELECT * FROM calendar_events ORDER BY date ASC, startTime ASC').all()

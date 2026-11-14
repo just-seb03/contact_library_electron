@@ -1109,7 +1109,7 @@ function registerClientController() {
     IPC_CHANNELS.CLIENTS_GET_BY_ID,
     async (_event, id) => {
       try {
-        if (typeof id !== "number" || isNaN(id)) {
+        if (typeof id !== "number" || isNaN(id) || id <= 0) {
           return createIpcError("ID de cliente inválido.");
         }
         const client = await clientRepository.getById(id);
@@ -1207,7 +1207,7 @@ function registerClientController() {
     IPC_CHANNELS.CASES_GET_BY_CLIENT_ID,
     async (_event, clientId) => {
       try {
-        if (typeof clientId !== "number" || isNaN(clientId)) {
+        if (typeof clientId !== "number" || isNaN(clientId) || clientId <= 0) {
           return createIpcError("ID de cliente inválido.");
         }
         const caseData = await caseRepository.getByClientId(clientId);
@@ -1221,7 +1221,7 @@ function registerClientController() {
     IPC_CHANNELS.CASES_UPSERT,
     async (_event, clientId, caseData) => {
       try {
-        if (typeof clientId !== "number" || isNaN(clientId)) {
+        if (typeof clientId !== "number" || isNaN(clientId) || clientId <= 0) {
           return createIpcError("ID de cliente inválido.");
         }
         if (!caseData || typeof caseData !== "object") {
@@ -1515,7 +1515,7 @@ function registerSettingsController() {
     async (_event, settings) => {
       try {
         if (!settings || typeof settings !== "object") {
-          return createIpcError("Se esperaba un objeto de configuración.");
+          return createIpcError("Se esperaba un objeto de configuración válido.");
         }
         const db = getDatabase();
         await db.transaction(async () => {

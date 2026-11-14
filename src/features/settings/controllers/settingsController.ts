@@ -1,3 +1,9 @@
+/**
+ * @file settingsController.ts
+ * @description Controlador IPC para la gestión y persistencia de configuración del usuario en SQLite.
+ * Almacena pares clave-valor serializados en JSON con soporte de resolución de conflictos (UPSERT).
+ */
+
 import { ipcMain } from 'electron'
 import { getDatabase } from '../../../core/database/connection'
 import {
@@ -8,8 +14,11 @@ import {
   type SaveSettingsDTO,
 } from '../../../shared/types/ipc'
 
+/**
+ * Registra todos los handlers IPC correspondientes al dominio de configuración.
+ */
 export function registerSettingsController(): void {
-  // 1. Obtener todas las configuraciones
+  // [settings:get] - Recupera todas las configuraciones almacenadas deserializándolas
   ipcMain.handle(
     IPC_CHANNELS.SETTINGS_GET,
     async (): Promise<IpcResponse<Record<string, unknown>>> => {
@@ -31,13 +40,13 @@ export function registerSettingsController(): void {
     }
   )
 
-  // 2. Guardar lote completo de configuraciones
+  // [settings:saveAll] - Guarda configuraciones actualizando o insertando según la clave (UPSERT)
   ipcMain.handle(
     IPC_CHANNELS.SETTINGS_SAVE_ALL,
     async (_event, settings: SaveSettingsDTO): Promise<IpcResponse<boolean>> => {
       try {
         if (!settings || typeof settings !== 'object') {
-          return createIpcError('Se esperaba un objeto de configuración.')
+          return createIpcError('Se esperaba un objeto de configuración válido.')
         }
 
         const db = getDatabase()
@@ -58,7 +67,7 @@ export function registerSettingsController(): void {
     }
   )
 
-  // Compatibilidad con canales heredados
+  // --- Handlers de retrocompatibilidad transitoria ---
   ipcMain.handle('db:settings:getAll', async () => {
     const db = getDatabase()
     const rows = await db.prepare('SELECT key, value FROM settings').all<{ key: string; value: string }>()

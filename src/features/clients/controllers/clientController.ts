@@ -1,3 +1,9 @@
+/**
+ * @file clientController.ts
+ * @description Controlador IPC para la gestión integral de clientes y expedientes judiciales.
+ * Incluye validación de esquemas de entrada, operaciones atómicas en SQLite y respuestas tipadas.
+ */
+
 import { ipcMain } from 'electron'
 import { clientRepository } from '../repositories/ClientRepository'
 import { caseRepository, type CaseEntity } from '../repositories/CaseRepository'
@@ -13,8 +19,11 @@ import {
   type UpsertCaseDTO,
 } from '../../../shared/types/ipc'
 
+/**
+ * Registra todos los handlers IPC correspondientes al dominio de clientes y casos.
+ */
 export function registerClientController(): void {
-  // 1. Obtener todos los clientes (con sus relaciones de casos y documentos)
+  // [clients:list] - Recupera clientes con filtros opcionales (búsqueda, estado, paginación)
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_LIST,
     async (_event, filters?: ClientFiltersDTO): Promise<IpcResponse<Client[]>> => {
@@ -27,12 +36,12 @@ export function registerClientController(): void {
     }
   )
 
-  // 2. Obtener cliente por ID
+  // [clients:getById] - Recupera un cliente por su ID numérico
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_GET_BY_ID,
     async (_event, id: number): Promise<IpcResponse<Client | null>> => {
       try {
-        if (typeof id !== 'number' || isNaN(id)) {
+        if (typeof id !== 'number' || isNaN(id) || id <= 0) {
           return createIpcError('ID de cliente inválido.')
         }
         const client = await clientRepository.getById(id)
@@ -43,7 +52,7 @@ export function registerClientController(): void {
     }
   )
 
-  // 3. Crear cliente atómicamente con validación rigurosa
+  // [clients:create] - Inserción atómica en SQLite con validación estricta de campos obligatorios
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_CREATE,
     async (_event, clientData: CreateClientDTO): Promise<IpcResponse<Client>> => {
@@ -73,7 +82,7 @@ export function registerClientController(): void {
     }
   )
 
-  // 4. Actualizar cliente con validación
+  // [clients:update] - Actualización parcial o total de datos del cliente
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_UPDATE,
     async (_event, id: number, clientData: UpdateClientDTO): Promise<IpcResponse<Client>> => {
@@ -93,7 +102,7 @@ export function registerClientController(): void {
     }
   )
 
-  // 5. Eliminar cliente y limpiar archivos
+  // [clients:delete] - Elimina el cliente en SQLite y purga sus archivos físicos de almacenamiento
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_DELETE,
     async (_event, id: number): Promise<IpcResponse<boolean>> => {
@@ -109,7 +118,7 @@ export function registerClientController(): void {
     }
   )
 
-  // 6. Guardar lote de clientes
+  // [clients:saveAll] - Sincronización masiva de clientes en SQLite
   ipcMain.handle(
     IPC_CHANNELS.CLIENTS_SAVE_ALL,
     async (_event, clients: Client[]): Promise<IpcResponse<boolean>> => {
@@ -136,12 +145,12 @@ export function registerClientController(): void {
     }
   )
 
-  // 7. Gestión de casos judiciales
+  // [cases:getByClientId] - Consulta expediente judicial asociado al cliente
   ipcMain.handle(
     IPC_CHANNELS.CASES_GET_BY_CLIENT_ID,
     async (_event, clientId: number): Promise<IpcResponse<CaseEntity | null>> => {
       try {
-        if (typeof clientId !== 'number' || isNaN(clientId)) {
+        if (typeof clientId !== 'number' || isNaN(clientId) || clientId <= 0) {
           return createIpcError('ID de cliente inválido.')
         }
         const caseData = await caseRepository.getByClientId(clientId)
@@ -152,11 +161,12 @@ export function registerClientController(): void {
     }
   )
 
+  // [cases:upsert] - Inserta o actualiza expediente judicial para un cliente
   ipcMain.handle(
     IPC_CHANNELS.CASES_UPSERT,
     async (_event, clientId: number, caseData: UpsertCaseDTO): Promise<IpcResponse<CaseEntity>> => {
       try {
-        if (typeof clientId !== 'number' || isNaN(clientId)) {
+        if (typeof clientId !== 'number' || isNaN(clientId) || clientId <= 0) {
           return createIpcError('ID de cliente inválido.')
         }
         if (!caseData || typeof caseData !== 'object') {
@@ -170,7 +180,7 @@ export function registerClientController(): void {
     }
   )
 
-  // --- Handlers heredados para compatibilidad ---
+  // --- Handlers de retrocompatibilidad transitoria ---
   ipcMain.handle('db:clients:getAll', async (_event, filters?: ClientFiltersDTO) => {
     return clientRepository.getAll(filters)
   })

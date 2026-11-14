@@ -1,3 +1,9 @@
+/**
+ * @file documentController.ts
+ * @description Controlador IPC para la gestión física y metadatos de documentos asociados a clientes.
+ * Maneja la subida atómica a disco, apertura en visor nativo (macOS/Win) y eliminación segura.
+ */
+
 import { ipcMain } from 'electron'
 import { documentRepository } from '../repositories/DocumentRepository'
 import {
@@ -11,7 +17,7 @@ import {
 import type { ClientDocument } from '../../../core/context/types'
 
 /**
- * Convierte un DataURL (base64) a Buffer de Node.js
+ * Convierte un DataURL (base64) a Buffer nativo de Node.js
  */
 function dataUrlToBuffer(dataUrl: string): Buffer {
   const base64Index = dataUrl.indexOf(';base64,')
@@ -22,8 +28,11 @@ function dataUrlToBuffer(dataUrl: string): Buffer {
   return Buffer.from(dataUrl)
 }
 
+/**
+ * Registra todos los handlers IPC correspondientes al dominio de documentos.
+ */
 export function registerDocumentController(): void {
-  // 1. Obtener documentos de un cliente
+  // [documents:getByClientId] - Lista los documentos asociados a un cliente
   ipcMain.handle(
     IPC_CHANNELS.DOCUMENTS_GET_BY_CLIENT_ID,
     async (_event, clientId: number): Promise<IpcResponse<ClientDocument[]>> => {
@@ -46,7 +55,7 @@ export function registerDocumentController(): void {
     }
   )
 
-  // 2. Subir y almacenar documento (soporta Buffer nativo o DataURL de FileReader)
+  // [documents:upload] - Guarda el archivo físico en el almacenamiento del cliente y registra metadatos en SQLite
   ipcMain.handle(
     IPC_CHANNELS.DOCUMENTS_UPLOAD,
     async (_event, dto: UploadDocumentDTO): Promise<IpcResponse<ClientDocument>> => {
@@ -58,6 +67,7 @@ export function registerDocumentController(): void {
           return createIpcError('El nombre del documento es obligatorio.')
         }
 
+        // Convierte el contenido recibido (Uint8Array o DataURL) en Buffer de Node
         let buffer: Buffer
         if (dto.fileBuffer) {
           buffer = Buffer.from(dto.fileBuffer as Uint8Array)
@@ -82,7 +92,7 @@ export function registerDocumentController(): void {
     }
   )
 
-  // 3. Eliminar documento del almacenamiento y base de datos
+  // [documents:delete] - Elimina el registro en SQLite y borra el archivo físico en disco
   ipcMain.handle(
     IPC_CHANNELS.DOCUMENTS_DELETE,
     async (_event, id: string): Promise<IpcResponse<boolean>> => {
@@ -98,7 +108,7 @@ export function registerDocumentController(): void {
     }
   )
 
-  // 4. Abrir documento con visor nativo del SO
+  // [documents:open] - Abre el archivo con la aplicación predeterminada del sistema operativo
   ipcMain.handle(
     IPC_CHANNELS.DOCUMENTS_OPEN,
     async (_event, param: string | OpenDocumentDTO): Promise<IpcResponse<boolean>> => {
@@ -118,7 +128,7 @@ export function registerDocumentController(): void {
     }
   )
 
-  // 5. Revelar documento en Finder / Explorador de archivos
+  // [documents:showInFinder] - Revela la ubicación del documento en Finder / Explorador de archivos
   ipcMain.handle(
     IPC_CHANNELS.DOCUMENTS_SHOW_IN_FINDER,
     async (_event, id: string): Promise<IpcResponse<boolean>> => {
@@ -134,7 +144,7 @@ export function registerDocumentController(): void {
     }
   )
 
-  // Canales heredados para compatibilidad
+  // --- Handlers de retrocompatibilidad transitoria ---
   ipcMain.handle('db:documents:getByClientId', async (_event, clientId: number) => {
     return documentRepository.getByClientId(clientId)
   })

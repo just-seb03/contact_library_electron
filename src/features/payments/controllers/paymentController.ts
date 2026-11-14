@@ -1,3 +1,9 @@
+/**
+ * @file paymentController.ts
+ * @description Controlador IPC para la gestión y persistencia de pagos y cobros en SQLite.
+ * Proporciona tipado estricto, mapeo de columnas snake_case y respuestas estandarizadas.
+ */
+
 import { ipcMain } from 'electron'
 import { getDatabase } from '../../../core/database/connection'
 import type { Payment } from '../../../core/context/types'
@@ -18,6 +24,9 @@ interface PaymentRow {
   status: 'completed' | 'pending' | 'overdue'
 }
 
+/**
+ * Mapea una fila de base de datos SQLite (snake_case) a la entidad Payment (camelCase)
+ */
 function parsePaymentRow(row: PaymentRow): Payment {
   return {
     id: row.id,
@@ -30,8 +39,11 @@ function parsePaymentRow(row: PaymentRow): Payment {
   }
 }
 
+/**
+ * Registra todos los handlers IPC correspondientes al dominio de pagos.
+ */
 export function registerPaymentController(): void {
-  // 1. Obtener todos los pagos
+  // [payments:list] - Recupera la lista completa de pagos ordenada descendentemente por fecha
   ipcMain.handle(
     IPC_CHANNELS.PAYMENTS_LIST,
     async (): Promise<IpcResponse<Payment[]>> => {
@@ -45,7 +57,7 @@ export function registerPaymentController(): void {
     }
   )
 
-  // 2. Guardar lote completo de pagos
+  // [payments:saveAll] - Reemplazo atómico de la tabla de pagos dentro de una transacción SQLite
   ipcMain.handle(
     IPC_CHANNELS.PAYMENTS_SAVE_ALL,
     async (_event, payments: Payment[]): Promise<IpcResponse<boolean>> => {
@@ -80,7 +92,7 @@ export function registerPaymentController(): void {
     }
   )
 
-  // Compatibilidad con canales heredados
+  // --- Handlers de retrocompatibilidad transitoria ---
   ipcMain.handle('db:payments:getAll', async () => {
     const db = getDatabase()
     return db.prepare('SELECT * FROM payments ORDER BY date DESC').all()
