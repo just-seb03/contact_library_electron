@@ -107,6 +107,10 @@ export type SaveSettingsDTO = Partial<AppSettings> | Record<string, unknown>
  * Contrato riguroso de la API expuesta por Preload en window.electronAPI
  */
 export interface ElectronAPIContract {
+  minimize: () => void
+  maximize: () => void
+  close: () => void
+  getPlatform: () => Promise<string>
   window: {
     minimize: () => void
     maximize: () => void
@@ -122,14 +126,14 @@ export interface ElectronAPIContract {
     saveAll: (clients: Client[]) => Promise<IpcResponse<boolean>>
   }
   cases: {
-    getByClientId: (clientId: number) => Promise<IpcResponse<import('../../features/clients/repositories/CaseRepository').CaseEntity | null>>
-    upsert: (clientId: number, data: UpsertCaseDTO) => Promise<IpcResponse<import('../../features/clients/repositories/CaseRepository').CaseEntity>>
+    getByClientId: (clientId: number) => Promise<IpcResponse<unknown>>
+    upsert: (clientId: number, data: UpsertCaseDTO) => Promise<IpcResponse<unknown>>
   }
   documents: {
     getByClientId: (clientId: number) => Promise<IpcResponse<ClientDocument[]>>
     upload: (dto: UploadDocumentDTO) => Promise<IpcResponse<ClientDocument>>
     delete: (id: string) => Promise<IpcResponse<boolean>>
-    open: (idOrDto: string | OpenDocumentDTO) => Promise<IpcResponse<boolean>>
+    open: (param: string | OpenDocumentDTO) => Promise<IpcResponse<boolean>>
     showInFinder: (id: string) => Promise<IpcResponse<boolean>>
   }
   payments: {
@@ -143,6 +147,19 @@ export interface ElectronAPIContract {
   settings: {
     get: () => Promise<IpcResponse<Record<string, unknown>>>
     saveAll: (settings: SaveSettingsDTO) => Promise<IpcResponse<boolean>>
+  }
+  db?: {
+    getClients: () => Promise<Client[]>
+    createClient: (client: CreateClientDTO) => Promise<Client>
+    updateClient: (id: number, data: UpdateClientDTO) => Promise<Client>
+    deleteClient: (id: number) => Promise<boolean>
+    saveAllClients: (clients: Client[]) => Promise<boolean>
+    getPayments: () => Promise<Payment[]>
+    savePayments: (payments: Payment[]) => Promise<boolean>
+    getCalendarEvents: () => Promise<CalendarEvent[]>
+    saveCalendarEvents: (events: CalendarEvent[]) => Promise<boolean>
+    getSettings: () => Promise<Record<string, unknown>>
+    saveSettings: (settings: SaveSettingsDTO) => Promise<boolean>
   }
 }
 
