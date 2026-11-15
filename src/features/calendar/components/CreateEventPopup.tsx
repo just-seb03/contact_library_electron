@@ -342,7 +342,7 @@ export function CreateEventPopup({
     setDetails(values.details);
     setErrorMessage('');
     initialValues.current = JSON.stringify(values);
-  }, [opened, selectedTime, editingEvent]);
+  }, [opened, selectedTime, editingEvent, selectedDate]);
 
   const requestClose = () => {
     if (JSON.stringify(getFormValues()) === initialValues.current) {

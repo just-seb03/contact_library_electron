@@ -8,6 +8,7 @@ import { RegisterPaymentPopup } from '../../payments/components/RegisterPaymentP
 import type { Client } from '../types';
 import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
+import { databaseService } from '../../../core/database/databaseService';
 import {
   BACK_BUTTON_STYLE,
   PAGE_CONTENT_STYLE,
@@ -36,20 +37,37 @@ export default function Cliente() {
 
   const handleUploadDocument = (file: File): Promise<void> => new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       if (typeof reader.result !== 'string' || !selectedClient) {
         reject(new Error('No se pudo leer el documento.'));
         return;
       }
-      const document: ClientDocument = {
-        id: `document-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        name: file.name,
-        dataUrl: reader.result,
-        size: file.size,
-        uploadedAt: new Date().toISOString(),
-      };
-      addClientDocument(selectedClient.id, document);
-      resolve();
+      try {
+        let document: ClientDocument = {
+          id: `document-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          name: file.name,
+          dataUrl: reader.result,
+          size: file.size,
+          uploadedAt: new Date().toISOString(),
+        };
+
+        if (databaseService.isElectronDbAvailable()) {
+          const uploaded = await databaseService.uploadDocument({
+            clientId: selectedClient.id,
+            name: file.name,
+            dataUrl: reader.result,
+            size: file.size,
+          });
+          if (uploaded) {
+            document = uploaded;
+          }
+        }
+
+        addClientDocument(selectedClient.id, document);
+        resolve();
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error('No se pudo guardar el documento.'));
+      }
     };
     reader.onerror = () => reject(reader.error ?? new Error('No se pudo leer el documento.'));
     reader.readAsDataURL(file);

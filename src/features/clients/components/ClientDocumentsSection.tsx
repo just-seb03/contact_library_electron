@@ -1,6 +1,7 @@
 import { useRef, useState, type FC } from 'react';
 import { Icon } from 'framework7-react';
 import type { ClientDocument } from '../types';
+import { databaseService } from '../../../core/database/databaseService';
 import {
   ACTION_BUTTON_STYLE,
   APP_COLORS,
@@ -30,6 +31,17 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
+
+  const handleOpenDocument = (e: React.MouseEvent, doc: ClientDocument) => {
+    if (databaseService.isElectronDbAvailable() && doc.id) {
+      e.preventDefault();
+      databaseService.openDocument(doc.id).then((opened) => {
+        if (!opened && doc.dataUrl) {
+          window.open(doc.dataUrl, '_blank');
+        }
+      });
+    }
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -86,10 +98,11 @@ export const ClientDocumentsSection: FC<ClientDocumentsSectionProps> = ({
                 <Icon f7="doc_text_fill" size="20px" style={{ color: APP_COLORS.danger, flexShrink: 0 }} />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
                   <a
-                    href={document.dataUrl}
+                    href={document.dataUrl || '#'}
                     download={document.name}
-                    style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                    title={`Descargar ${document.name}`}
+                    onClick={(e) => handleOpenDocument(e, document)}
+                    style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}
+                    title={`Abrir o descargar ${document.name}`}
                   >
                     {document.name}
                   </a>
