@@ -109,6 +109,7 @@ INSERT OR IGNORE INTO settings (key, value) VALUES
 ('hearingAlerts', 'true'),
 ('paymentReminders', 'true'),
 ('soundEffects', 'true'),
+('minimizeToTray', 'true'),
 ('accentColor', '"blue"'),
 ('lawyerName', '"Sebastián Contreras"'),
 ('lawyerEmail', '"s.contreras@estudiojuridico.cl"'),

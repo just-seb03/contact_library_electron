@@ -173,6 +173,29 @@ export default function Configuration() {
           />
         </SettingsGroup>
 
+        {/* 4. Grupo: Comportamiento de la aplicación */}
+        <SettingsGroup
+          title="Comportamiento de la aplicación"
+          footerText="Puedes salir por completo desde el icono de la bandeja del sistema (Windows) o de la barra de menús (macOS)."
+          darkMode={darkMode}
+        >
+          <SettingsRow
+            icon="tray_fill"
+            iconBgColor="#5ac8fa"
+            title="Mantener en segundo plano al cerrar"
+            subtitle="Al cerrar la ventana, la app sigue activa para no perderte alertas de audiencias y cobros"
+            control={
+              <IosSwitch
+                checked={settings.minimizeToTray}
+                onChange={(val) => updateSetting('minimizeToTray', val)}
+                darkMode={darkMode}
+                ariaLabel="Mantener en segundo plano al cerrar"
+              />
+            }
+            isLast={true}
+            darkMode={darkMode}
+          />
+        </SettingsGroup>
 
         {/* 5. Grupo: Información del Sistema */}
         <SettingsGroup title="Información del software y sistema" darkMode={darkMode}>

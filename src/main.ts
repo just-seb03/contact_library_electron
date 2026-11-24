@@ -1,15 +1,27 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, powerMonitor } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-import { APP_COLORS } from './core/theme/style'
 import { initDatabase, closeDatabase } from './core/database/connection'
 import { setupAppMenu } from './core/menu/appMenu'
+import {
+  APP_DISPLAY_NAME,
+  APP_ID,
+  createMainWindow,
+  createTray,
+  destroyTray,
+  getMainWindow,
+  isTrayActive,
+  loadSystemPreferences,
+  markQuitting,
+  notifyRunningInBackground,
+  registerWindowController,
+  showMainWindow,
+} from './core/system'
 import { registerCalendarController } from './features/calendar/controllers/calendarController'
 import { registerClientController } from './features/clients/controllers/clientController'
 import { registerDocumentController } from './features/clients/controllers/documentController'
 import { registerPaymentController } from './features/payments/controllers/paymentController'
 import { registerSettingsController } from './features/settings/controllers/settingsController'
-import { IPC_CHANNELS, createIpcSuccess } from './shared/types/ipc'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -21,146 +33,96 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
-app.name = 'Contact Library'
+// Debe fijarse antes de cualquier uso de rutas de usuario (userData) o del bloqueo de instancia única.
+app.name = APP_DISPLAY_NAME
 
-let win: BrowserWindow | null
-let isQuitting = false
-
-// Configuración de los eventos para la barra de título personalizada
-const handleMinimize = () => win?.minimize()
-const handleMaximize = () => {
-  if (win?.isMaximized()) {
-    win?.restore()
-  } else {
-    win?.maximize()
-  }
-}
-const handleClose = () => {
-  if (process.platform === 'darwin' && !isQuitting) {
-    win?.hide()
-  } else {
-    win?.close()
-  }
-}
-
-ipcMain.on(IPC_CHANNELS.WINDOW_MINIMIZE, handleMinimize)
-ipcMain.on(IPC_CHANNELS.WINDOW_MAXIMIZE, handleMaximize)
-ipcMain.on(IPC_CHANNELS.WINDOW_CLOSE, handleClose)
-ipcMain.handle(IPC_CHANNELS.APP_GET_PLATFORM, () => createIpcSuccess(process.platform))
-
-// Compatibilidad con llamadas heredadas
-ipcMain.on('window-minimize', handleMinimize)
-ipcMain.on('window-maximize', handleMaximize)
-ipcMain.on('window-close', handleClose)
-ipcMain.handle('get-platform', () => process.platform)
-
-function createWindow() {
-  const isMac = process.platform === 'darwin'
-
-  // Configurar menú de la aplicación (Menú nativo en macOS, sin barra en Windows)
-  setupAppMenu(() => win)
-
-  win = new BrowserWindow({
-    width: 1320,
-    height: 820,
-    minWidth: 1000,
-    minHeight: 640,
-    frame: false,
-    autoHideMenuBar: true,
-    titleBarStyle: isMac ? 'hidden' : 'default',
-    trafficLightPosition: isMac ? { x: 18, y: 18 } : undefined,
-    vibrancy: isMac ? 'sidebar' : undefined,
-    visualEffectState: isMac ? 'active' : undefined,
-    show: false,
-    backgroundColor: APP_COLORS.background,
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
-    },
+function openMainWindow() {
+  createMainWindow({
+    preloadPath: path.join(__dirname, 'preload.mjs'),
+    publicDir: process.env.VITE_PUBLIC,
+    rendererDist: RENDERER_DIST,
+    devServerUrl: VITE_DEV_SERVER_URL,
+    // En macOS el Dock permite reabrir siempre; en Windows/Linux solo si el icono de bandeja existe.
+    canHideToBackground: () => process.platform === 'darwin' || isTrayActive(),
+    onHiddenToBackground: notifyRunningInBackground,
   })
+}
 
-  if (!isMac) {
-    win.setMenu(null)
+/** Cierre real de la app (menú de la bandeja, Cmd+Q, apagado del sistema). */
+function quitApp() {
+  markQuitting()
+  app.quit()
+}
+
+function bootstrap() {
+  // Windows: agrupa la barra de tareas y habilita notificaciones. En desarrollo se usa el ejecutable.
+  if (process.platform === 'win32') {
+    app.setAppUserModelId(app.isPackaged ? APP_ID : process.execPath)
   }
 
-  // En macOS, al hacer clic en el semáforo rojo o pulsar Cmd+W, ocultamos la ventana
-  // para permitir la reapertura instantánea desde el Dock sin destruir la sesión.
-  win.on('close', (event) => {
-    if (isMac && !isQuitting) {
-      event.preventDefault()
-      win?.hide()
+  registerWindowController()
+
+  // Si el usuario vuelve a abrir la app (acceso directo, Dock...), mostrar la instancia existente.
+  app.on('second-instance', () => {
+    if (getMainWindow()) {
+      showMainWindow()
+    } else if (app.isReady()) {
+      openMainWindow()
     }
   })
 
-  win.once('ready-to-show', () => {
-    win?.show();
-  })
-
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
-
-  // Menú contextual nativo (clic derecho) para campos editables y selección de texto
-  win.webContents.on('context-menu', (_event, params) => {
-    const { isEditable, selectionText } = params
-
-    if (isEditable) {
-      const editContextMenu = Menu.buildFromTemplate([
-        { role: 'undo', label: 'Deshacer' },
-        { role: 'redo', label: 'Rehacer' },
-        { type: 'separator' },
-        { role: 'cut', label: 'Cortar' },
-        { role: 'copy', label: 'Copiar' },
-        { role: 'paste', label: 'Pegar' },
-        { type: 'separator' },
-        { role: 'selectAll', label: 'Seleccionar todo' },
-      ])
-      editContextMenu.popup({ window: win ?? undefined })
-    } else if (selectionText && selectionText.trim().length > 0) {
-      const selectionContextMenu = Menu.buildFromTemplate([
-        { role: 'copy', label: 'Copiar' },
-        { role: 'selectAll', label: 'Seleccionar todo' },
-      ])
-      selectionContextMenu.popup({ window: win ?? undefined })
+  app.on('window-all-closed', () => {
+    // Solo ocurre si la ventana se cerró de verdad (preferencia desactivada o sin bandeja).
+    if (process.platform !== 'darwin') {
+      app.quit()
     }
   })
 
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL)
-  } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'))
-  }
-}
+  // Cmd+Q, "Salir" del menú de macOS o de la bandeja: a partir de aquí cerrar la ventana es definitivo.
+  app.on('before-quit', () => {
+    markQuitting()
+  })
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+  app.on('will-quit', () => {
+    destroyTray()
     closeDatabase()
-    app.quit()
-    win = null
-  }
-})
+  })
 
-app.on('before-quit', () => {
-  isQuitting = true
-  closeDatabase()
-})
+  // macOS: clic en el Dock. La ventana oculta sigue existiendo, así que se muestra en vez de crear otra.
+  app.on('activate', () => {
+    if (getMainWindow()) {
+      showMainWindow()
+    } else if (app.isReady()) {
+      openMainWindow()
+    }
+  })
 
-app.on('activate', () => {
-  if (win && !win.isDestroyed()) {
-    if (win.isMinimized()) win.restore()
-    win.show()
-    win.focus()
-  } else if (BrowserWindow.getAllWindows().length === 0) {
-    createWindow()
-  }
-})
+  app.whenReady().then(async () => {
+    await initDatabase()
+    await loadSystemPreferences()
+    registerClientController()
+    registerDocumentController()
+    registerPaymentController()
+    registerCalendarController()
+    registerSettingsController()
 
-app.whenReady().then(async () => {
-  await initDatabase()
-  registerClientController()
-  registerDocumentController()
-  registerPaymentController()
-  registerCalendarController()
-  registerSettingsController()
-  createWindow()
-})
+    // Menú nativo completo en macOS (incluye Cmd+, para Ajustes); sin barra en Windows/Linux.
+    setupAppMenu(getMainWindow)
+    openMainWindow()
+    createTray({
+      publicDir: process.env.VITE_PUBLIC,
+      onOpen: () => (getMainWindow() ? showMainWindow() : openMainWindow()),
+      onQuit: quitApp,
+    })
+
+    // macOS/Linux: apagado o reinicio del sistema con la app en segundo plano.
+    powerMonitor.on('shutdown', quitApp)
+  })
+}
+
+// Una sola instancia: evita dos procesos compitiendo por la misma base de datos SQLite.
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+} else {
+  bootstrap()
+}
