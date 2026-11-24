@@ -32,6 +32,13 @@ const electronAPI: ElectronAPIContract = {
     const res: IpcResponse<string> = await ipcRenderer.invoke(IPC_CHANNELS.APP_GET_PLATFORM)
     return res.data ?? process.platform
   },
+  onNavigate: (callback: (route: string) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, route: string) => callback(route)
+    ipcRenderer.on('app:navigate', handler)
+    return () => {
+      ipcRenderer.removeListener('app:navigate', handler)
+    }
+  },
 
   // Namespace: Ventana
   window: {
