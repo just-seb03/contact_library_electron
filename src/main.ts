@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { APP_COLORS } from './core/theme/style'
@@ -98,6 +98,31 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
+  })
+
+  // Menú contextual nativo (clic derecho) para campos editables y selección de texto
+  win.webContents.on('context-menu', (_event, params) => {
+    const { isEditable, selectionText } = params
+
+    if (isEditable) {
+      const editContextMenu = Menu.buildFromTemplate([
+        { role: 'undo', label: 'Deshacer' },
+        { role: 'redo', label: 'Rehacer' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Cortar' },
+        { role: 'copy', label: 'Copiar' },
+        { role: 'paste', label: 'Pegar' },
+        { type: 'separator' },
+        { role: 'selectAll', label: 'Seleccionar todo' },
+      ])
+      editContextMenu.popup({ window: win ?? undefined })
+    } else if (selectionText && selectionText.trim().length > 0) {
+      const selectionContextMenu = Menu.buildFromTemplate([
+        { role: 'copy', label: 'Copiar' },
+        { role: 'selectAll', label: 'Seleccionar todo' },
+      ])
+      selectionContextMenu.popup({ window: win ?? undefined })
+    }
   })
 
   if (VITE_DEV_SERVER_URL) {

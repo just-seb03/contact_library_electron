@@ -46,7 +46,7 @@ export function TrafficLights({ className, style }: TrafficLightsProps) {
 
   // En macOS nativo dentro de Electron con titleBarStyle: 'hidden',
   // Electron ya pinta los semáforos reales en las coordenadas {x: 18, y: 18}.
-  // Dejamos el espacio reservado para que no se superpongan con otros elementos.
+  // Dejamos el espacio reservado con no-drag para que no interfiera el arrastre de ventana.
   if (isNativeMac) {
     return (
       <div
@@ -56,8 +56,9 @@ export function TrafficLights({ className, style }: TrafficLightsProps) {
           height: 28,
           display: 'flex',
           alignItems: 'center',
+          WebkitAppRegion: 'no-drag',
           ...style,
-        }}
+        } as CSSProperties}
         aria-hidden="true"
       />
     );
@@ -69,8 +70,9 @@ export function TrafficLights({ className, style }: TrafficLightsProps) {
     gap: 8,
     padding: '4px 2px',
     cursor: 'default',
+    WebkitAppRegion: 'no-drag',
     ...style,
-  };
+  } as CSSProperties;
 
   const baseDotStyle: CSSProperties = {
     width: 12,
