@@ -43,7 +43,7 @@ export function AppShell() {
     }
   }, [setActiveTab]);
 
-  // Atajos de teclado estilo macOS (⌘K para Spotlight, ⌘B para barra lateral)
+  // Atajos de teclado estilo macOS (⌘K para Spotlight, ⌘B para barra lateral, ⌘, para Ajustes)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -52,12 +52,22 @@ export function AppShell() {
       } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
         e.preventDefault();
         handleToggleSidebar();
+      } else if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        e.preventDefault();
+        setActiveTab('config');
+        f7ready(() => {
+          try {
+            navigateToTab('config');
+          } catch (err) {
+            console.warn('Error navegando a Ajustes:', err);
+          }
+        });
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleToggleSidebar]);
+  }, [handleToggleSidebar, setActiveTab]);
 
   return (
     <>
