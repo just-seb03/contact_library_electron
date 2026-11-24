@@ -14,6 +14,7 @@ interface NavItemConfig {
   iconColor: string;
   badge?: number | null;
   badgeColor?: string;
+  shortcut?: string;
 }
 
 export const LeftBar = () => {
@@ -109,6 +110,7 @@ export const LeftBar = () => {
       title: 'Ajustes',
       icon: 'gear_alt_fill',
       iconColor: '#8e8e93',
+      shortcut: '⌘,',
     },
   ];
 
@@ -259,6 +261,23 @@ export const LeftBar = () => {
                 >
                   {item.title}
                 </span>
+
+                {item.shortcut && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.45)',
+                      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
+                      padding: '1px 4px',
+                      borderRadius: 4,
+                      backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)',
+                      border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+                    }}
+                  >
+                    {item.shortcut}
+                  </span>
+                )}
               </div>
             </button>
           );

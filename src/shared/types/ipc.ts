@@ -111,6 +111,7 @@ export interface ElectronAPIContract {
   maximize: () => void
   close: () => void
   getPlatform: () => Promise<string>
+  onNavigate?: (callback: (route: string) => void) => () => void
   window: {
     minimize: () => void
     maximize: () => void

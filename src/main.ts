@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { APP_COLORS } from './core/theme/style'
 import { initDatabase, closeDatabase } from './core/database/connection'
+import { setupAppMenu } from './core/menu/appMenu'
 import { registerCalendarController } from './features/calendar/controllers/calendarController'
 import { registerClientController } from './features/clients/controllers/clientController'
 import { registerDocumentController } from './features/clients/controllers/documentController'
@@ -20,7 +21,10 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
 
+app.name = 'Contact Library'
+
 let win: BrowserWindow | null
+let isQuitting = false
 
 // Configuración de los eventos para la barra de título personalizada
 const handleMinimize = () => win?.minimize()
@@ -31,7 +35,13 @@ const handleMaximize = () => {
     win?.maximize()
   }
 }
-const handleClose = () => win?.close()
+const handleClose = () => {
+  if (process.platform === 'darwin' && !isQuitting) {
+    win?.hide()
+  } else {
+    win?.close()
+  }
+}
 
 ipcMain.on(IPC_CHANNELS.WINDOW_MINIMIZE, handleMinimize)
 ipcMain.on(IPC_CHANNELS.WINDOW_MAXIMIZE, handleMaximize)
@@ -47,8 +57,8 @@ ipcMain.handle('get-platform', () => process.platform)
 function createWindow() {
   const isMac = process.platform === 'darwin'
 
-  // Deshabilitar completamente el menú nativo (File, Edit, View, Window, Help)
-  Menu.setApplicationMenu(null)
+  // Configurar menú de la aplicación (Menú nativo en macOS, sin barra en Windows)
+  setupAppMenu(() => win)
 
   win = new BrowserWindow({
     width: 1320,
@@ -69,7 +79,18 @@ function createWindow() {
     },
   })
 
-  win.setMenu(null)
+  if (!isMac) {
+    win.setMenu(null)
+  }
+
+  // En macOS, al hacer clic en el semáforo rojo o pulsar Cmd+W, ocultamos la ventana
+  // para permitir la reapertura instantánea desde el Dock sin destruir la sesión.
+  win.on('close', (event) => {
+    if (isMac && !isQuitting) {
+      event.preventDefault()
+      win?.hide()
+    }
+  })
 
   win.once('ready-to-show', () => {
     win?.show();
@@ -77,6 +98,31 @@ function createWindow() {
 
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString())
+  })
+
+  // Menú contextual nativo (clic derecho) para campos editables y selección de texto
+  win.webContents.on('context-menu', (_event, params) => {
+    const { isEditable, selectionText } = params
+
+    if (isEditable) {
+      const editContextMenu = Menu.buildFromTemplate([
+        { role: 'undo', label: 'Deshacer' },
+        { role: 'redo', label: 'Rehacer' },
+        { type: 'separator' },
+        { role: 'cut', label: 'Cortar' },
+        { role: 'copy', label: 'Copiar' },
+        { role: 'paste', label: 'Pegar' },
+        { type: 'separator' },
+        { role: 'selectAll', label: 'Seleccionar todo' },
+      ])
+      editContextMenu.popup({ window: win ?? undefined })
+    } else if (selectionText && selectionText.trim().length > 0) {
+      const selectionContextMenu = Menu.buildFromTemplate([
+        { role: 'copy', label: 'Copiar' },
+        { role: 'selectAll', label: 'Seleccionar todo' },
+      ])
+      selectionContextMenu.popup({ window: win ?? undefined })
+    }
   })
 
   if (VITE_DEV_SERVER_URL) {
@@ -87,19 +133,24 @@ function createWindow() {
 }
 
 app.on('window-all-closed', () => {
-  closeDatabase()
   if (process.platform !== 'darwin') {
+    closeDatabase()
     app.quit()
     win = null
   }
 })
 
 app.on('before-quit', () => {
+  isQuitting = true
   closeDatabase()
 })
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) {
+  if (win && !win.isDestroyed()) {
+    if (win.isMinimized()) win.restore()
+    win.show()
+    win.focus()
+  } else if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
