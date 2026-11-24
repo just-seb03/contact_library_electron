@@ -1,13 +1,19 @@
 {
   "name": "contact_library_electron",
+  "productName": "Contact Library",
+  "description": "Sistema de gestión para estudios jurídicos, causas y clientes",
+  "author": "Estudio Jurídico",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
+    "build:app": "tsc && vite build",
+    "build:mac": "tsc && vite build && electron-builder --mac",
+    "build:win": "tsc && vite build && electron-builder --win",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview"
   },
   "dependencies": {
     "framework7": "^9.2.0",
