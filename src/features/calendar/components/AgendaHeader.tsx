@@ -1,11 +1,14 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
+import { CalendarViewSwitcher } from './CalendarViewSwitcher';
 
 interface AgendaHeaderProps {
   year: number;
   monthIndex: number;
   selectedDay: number;
   eventDates: ReadonlySet<string>;
+  isWeekView: boolean;
+  onToggleWeekView: () => void;
   onSelectDay?: (day: number) => void;
   onAddEvent: () => void;
 }
@@ -15,15 +18,17 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   monthIndex,
   selectedDay,
   eventDates,
+  isWeekView,
+  onToggleWeekView,
   onSelectDay,
   onAddEvent,
 }) => {
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const monthPadded = String(monthIndex + 1).padStart(2, '0');
   const rows = [
-    { start: 1, end: 8, indent: 0 },
-    { start: 9, end: 18, indent: 10 },
-    { start: 19, end: daysInMonth, indent: 20 },
+    { start: 1, end: 8 },
+    { start: 9, end: 18 },
+    { start: 19, end: daysInMonth },
   ];
 
   const headerStyle: CSSProperties = {
@@ -60,7 +65,6 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              paddingLeft: row.indent,
             }}
           >
             {Array.from({ length: Math.max(0, row.end - row.start + 1) }, (_, idx) => {
@@ -108,39 +112,50 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
         ))}
       </div>
 
-      {/* ── Derecha: Icono + grande para añadir evento ── */}
-      <button
-        type="button"
-        onClick={onAddEvent}
-        aria-label="Añadir evento"
-        title="Añadir evento"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 34,
-          height: 34,
-          padding: 0,
-          border: 'none',
-          outline: 'none',
-          backgroundColor: 'transparent',
-          color: 'var(--macos-text, #ececef)',
-          opacity: 0.85,
-          cursor: 'pointer',
-          transition: 'opacity 0.14s ease, transform 0.14s ease',
-          flexShrink: 0,
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.opacity = '1';
-          e.currentTarget.style.transform = 'scale(1.08)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.opacity = '0.85';
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <Icon f7="plus" size="24px" />
-      </button>
+      {/* ── Derecha: Píldora Día / Semana + Icono + grande ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+        <CalendarViewSwitcher
+          isWeekView={isWeekView}
+          onToggleWeekView={(isWeek) => {
+            if (isWeek !== isWeekView) {
+              onToggleWeekView();
+            }
+          }}
+        />
+
+        <button
+          type="button"
+          onClick={onAddEvent}
+          aria-label="Añadir evento"
+          title="Añadir evento"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 34,
+            height: 34,
+            padding: 0,
+            border: 'none',
+            outline: 'none',
+            backgroundColor: 'transparent',
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.85,
+            cursor: 'pointer',
+            transition: 'opacity 0.14s ease, transform 0.14s ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.transform = 'scale(1.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.85';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <Icon f7="plus" size="24px" />
+        </button>
+      </div>
     </div>
   );
 };

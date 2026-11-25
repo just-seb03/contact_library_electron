@@ -7,6 +7,7 @@ import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
 import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
+import { AgendaWeekView } from '../components/AgendaWeekView';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
 import { CreateEventPopup } from '../components/CreateEventPopup';
@@ -104,6 +105,7 @@ export default function Calendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
+  const [isWeekView, setIsWeekView] = useState(false);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -157,6 +159,9 @@ export default function Calendar() {
     ]),
     [calendarEvents, hearings]
   );
+
+  const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 900px)');
@@ -300,6 +305,11 @@ export default function Calendar() {
             monthIndex={currentMonthIndex}
             selectedDay={currentDay}
             eventDates={eventDates}
+            isWeekView={isWeekView}
+            onToggleWeekView={() => {
+              setIsWeekView((previous) => !previous);
+              setSelectedEvent(null);
+            }}
             onSelectDay={(day) => handleSelectDate(new Date(currentYear, currentMonthIndex, day))}
             onAddEvent={() => {
               setEditingEvent(null);
@@ -315,25 +325,40 @@ export default function Calendar() {
             }}
           >
             <div
+              key={isWeekView ? 'week-view' : 'day-view'}
+              className="cal-switch-anim"
               style={{
                 ...timelinePanelStyle,
                 height: compactLayout ? '50vh' : '100%',
                 flex: compactLayout ? '0 0 auto' : 1,
               }}
             >
-              <CardContent style={timelineScrollStyle}>
-                <div
-                  key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
-                  className="cal-step-anim"
-                >
-                  <AgendaTimeline
-                    todayHearings={todayHearings}
-                    calendarEvents={selectedDayEvents}
-                    onSelectEvent={setSelectedEvent}
-                    selectedDate={selectedDate}
-                  />
-                </div>
-              </CardContent>
+              {isWeekView ? (
+                <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
+                  <div key={weekStart.getTime()} className="cal-step-anim" style={{ height: '100%' }}>
+                    <AgendaWeekView
+                      selectedDate={selectedDate}
+                      calendarEvents={calendarEvents}
+                      hearings={hearings}
+                      onSelectEvent={setSelectedEvent}
+                    />
+                  </div>
+                </CardContent>
+              ) : (
+                <CardContent style={timelineScrollStyle}>
+                  <div
+                    key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
+                    className="cal-step-anim"
+                  >
+                    <AgendaTimeline
+                      todayHearings={todayHearings}
+                      calendarEvents={selectedDayEvents}
+                      onSelectEvent={setSelectedEvent}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
+                </CardContent>
+              )}
             </div>
 
             <div style={{
