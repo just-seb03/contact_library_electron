@@ -6,6 +6,7 @@ const wrapperStyle: CSSProperties = {
   position: 'fixed',
   inset: 0,
   zIndex: 0,
+  backgroundColor: 'var(--macos-canvas-bg, #18181a)',
   pointerEvents: 'none',
   overflow: 'hidden',
 };
@@ -14,18 +15,17 @@ const canvasStyle: CSSProperties = {
   width: '100%',
   height: '100%',
   display: 'block',
-  filter: 'blur(10px)',
-  transform: 'scale(1.03)',
-  opacity: 0.9,
+  filter: 'blur(1.5px)',
+  transform: 'scale(1.02)',
 };
 
 const glassVeilStyle: CSSProperties = {
   position: 'absolute',
   inset: 0,
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
+  backdropFilter: 'blur(4px)',
+  WebkitBackdropFilter: 'blur(4px)',
   background:
-    'radial-gradient(circle at 72% 38%, rgba(255, 255, 255, 0.025), transparent 62%)',
+    'radial-gradient(circle at 72% 38%, rgba(255, 255, 255, 0.03), transparent 65%)',
   pointerEvents: 'none',
 };
 

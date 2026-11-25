@@ -36,6 +36,6 @@ export function navigateToTab(tab: AppTab): void {
   }
 
   if (router.currentRoute?.url !== route) {
-    router.navigate(route);
+    router.navigate(route, { animate: false, clearPreviousHistory: true });
   }
 }
