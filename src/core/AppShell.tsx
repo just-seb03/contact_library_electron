@@ -6,6 +6,7 @@ import { UnifiedToolbar } from './components/UnifiedToolbar';
 import { SpotlightModal } from './components/SpotlightModal';
 import { SIDEBAR_SURFACE_STYLE, CONTENT_VIEW_STYLE, APP_SPACING } from './theme/style';
 import { navigateToTab } from '../navigation/navigation';
+import { useSystemNavigation } from '../navigation/useSystemNavigation';
 import { useApp } from './context/AppContext';
 
 export function AppShell() {
@@ -24,24 +25,8 @@ export function AppShell() {
     });
   }, []);
 
-  // Escuchar navegación disparada por el sistema operativo (ej. Cmd+, en macOS para Ajustes)
-  useEffect(() => {
-    if (window.electronAPI?.onNavigate) {
-      const unsubscribe = window.electronAPI.onNavigate((route) => {
-        if (route === '/settings/' || route === 'config') {
-          setActiveTab('config');
-          f7ready(() => {
-            try {
-              navigateToTab('config');
-            } catch (err) {
-              console.warn('Error navegando a Ajustes desde menú de sistema:', err);
-            }
-          });
-        }
-      });
-      return unsubscribe;
-    }
-  }, [setActiveTab]);
+  // Navegación disparada por el sistema operativo (Cmd+, en macOS, clic en notificaciones...)
+  useSystemNavigation();
 
   // Atajos de teclado estilo macOS (⌘K para Spotlight, ⌘B para barra lateral, ⌘, para Ajustes)
   useEffect(() => {

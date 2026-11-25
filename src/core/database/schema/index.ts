@@ -80,6 +80,19 @@ CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar_events(date);
 CREATE INDEX IF NOT EXISTS idx_calendar_client_id ON calendar_events(client_id);
 `;
 
+/**
+ * v2: notificaciones ya enviadas. El `id` es el ID determinista de la notificación
+ * (ver `createNotificationId`), por lo que un mismo aviso nunca se registra dos veces.
+ */
+export const NOTIFICATION_LOG_SQL = `
+CREATE TABLE IF NOT EXISTS notification_log (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  sent_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_notification_log_sent_at ON notification_log (sent_at);
+`;
+
 export const SEED_SQL = `
 INSERT OR IGNORE INTO clients (id, name, phone, email, rut, status) VALUES
 (1, 'El manzano', '+56 9 8765 4321', 'contacto@elmanzano.cl', '76.123.456-7', 'activo'),
@@ -106,9 +119,11 @@ INSERT OR IGNORE INTO calendar_events (id, title, date, start_time, end_time, co
 ('cal-seed-4', 'Audiencia: Carlos Mendoza', '2026-10-22', '14:00', '15:00', 'lavender', 15, 6, '3° Juzgado Civil de Santiago - EXP-2026-155');
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
+('calendarAlerts', 'true'),
 ('hearingAlerts', 'true'),
 ('paymentReminders', 'true'),
 ('soundEffects', 'true'),
+('minimizeToTray', 'true'),
 ('accentColor', '"blue"'),
 ('lawyerName', '"Sebastián Contreras"'),
 ('lawyerEmail', '"s.contreras@estudiojuridico.cl"'),

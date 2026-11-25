@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Page } from 'framework7-react';
 
 import { useApp } from '../../../core/context/AppContext';
+import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 import { PaymentsHeader } from '../components/pagosHeader';
 import { PaymentsStats } from '../components/pagosStatistics';
 import { PaymentsFilterBar } from '../components/pagosFilter';
@@ -10,6 +11,9 @@ import { PaymentsTable } from '../components/pagosTable';
 import { RegisterPaymentPopup } from '../components/RegisterPaymentPopup';
 import type { Payment } from '../types';
 import { PAGE_CONTENT_STYLE } from '../../../core/theme/style';
+
+/** Tiempo que la fila de un pago queda resaltada al abrirse desde una notificación. */
+const PAYMENT_HIGHLIGHT_MS = 4000;
 
 function parsePaymentDate(value: string): Date | null {
   const match = value.match(/^(\d{1,2})\s+([A-Za-z]{3}),\s+(\d{4})$/);
@@ -34,6 +38,20 @@ export default function PaymentsPage() {
     startDate: '',
     endDate: '',
   });
+  const [highlightedPaymentId, setHighlightedPaymentId] = useState<string | null>(null);
+
+  // Apertura desde fuera de la página (clic en una notificación): resaltar la fila del pago.
+  useNavigationFocus('payment', ({ id }) => {
+    if (!payments.some((payment) => payment.id === id)) return false;
+    setHighlightedPaymentId(id);
+    return true;
+  });
+
+  useEffect(() => {
+    if (!highlightedPaymentId) return;
+    const timer = setTimeout(() => setHighlightedPaymentId(null), PAYMENT_HIGHLIGHT_MS);
+    return () => clearTimeout(timer);
+  }, [highlightedPaymentId]);
 
   const totalIngresos = payments
     .filter((p) => p.status === 'completed')
@@ -74,6 +92,7 @@ export default function PaymentsPage() {
         />
         <PaymentsTable
           payments={filteredPayments}
+          highlightedPaymentId={highlightedPaymentId}
           onEdit={setEditingPayment}
           onDelete={deletePayment}
         />

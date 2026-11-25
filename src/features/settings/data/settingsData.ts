@@ -24,9 +24,13 @@ export const MAC_ACCENT_COLORS: AccentColorOption[] = [
 ];
 
 export interface AppSettings {
+  /** Aviso previo de eventos del calendario (según "Aviso previo" de cada evento). */
+  calendarAlerts: boolean;
   hearingAlerts: boolean;
   paymentReminders: boolean;
   soundEffects: boolean;
+  /** Al cerrar la ventana, la app sigue activa en la bandeja / barra de menús. */
+  minimizeToTray: boolean;
   accentColor: AppleAccentColor;
   lawyerName: string;
   lawyerEmail: string;
@@ -34,9 +38,11 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
+  calendarAlerts: true,
   hearingAlerts: true,
   paymentReminders: true,
   soundEffects: true,
+  minimizeToTray: true,
   accentColor: 'blue',
   lawyerName: 'Sebastián Contreras',
   lawyerEmail: 's.contreras@estudiojuridico.cl',
