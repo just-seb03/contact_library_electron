@@ -37,7 +37,19 @@ export const UnifiedToolbar: FC = () => {
   } as CSSProperties;
 
   return (
-    <header style={toolbarStyle}>
+    <header style={toolbarStyle} className="chrome-top-enter">
+      <style>{`
+        @keyframes chromeTopEnter {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .chrome-top-enter {
+          animation: chromeTopEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chrome-top-enter { animation: none !important; transform: none !important; }
+        }
+      `}</style>
       {/* ── Izquierda: Controles de ventana + Fecha actual con transparencia ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...noDragStyle }}>
         <TrafficLights />

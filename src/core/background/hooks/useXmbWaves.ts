@@ -41,20 +41,22 @@ export function useXmbWaves({ canvasRef, darkMode }: UseXmbWavesOptions): void {
     const computeWaveY = (
       x: number,
       time: number,
-      ribbon: (typeof XMB_WAVE_RIBBONS)[number]
+      ribbon: (typeof XMB_WAVE_RIBBONS)[number],
+      introProgress: number
     ): number => {
       const nx = x / width;
-      const baseY = height * ribbon.yRatio;
+      const baseY = height * ribbon.yRatio + (1 - introProgress) * 18;
+      const amplitude = ribbon.amplitude * (0.35 + 0.65 * introProgress);
       const primary =
         Math.sin(nx * Math.PI * 2 * ribbon.frequency + time * ribbon.speed + ribbon.phase) *
-        ribbon.amplitude;
+        amplitude;
       const secondary =
         Math.sin(
           nx * Math.PI * 2 * ribbon.secondaryFrequency -
             time * ribbon.speed * 0.65 +
             ribbon.phase * 1.4
         ) *
-        (ribbon.amplitude * 0.36);
+        (amplitude * 0.36);
       // Envolvente suave para que los bordes laterales respiren sin cortes bruscos
       const edgeFade = 0.72 + 0.28 * Math.sin(nx * Math.PI);
       return baseY + (primary + secondary) * edgeFade;
@@ -62,15 +64,19 @@ export function useXmbWaves({ canvasRef, darkMode }: UseXmbWavesOptions): void {
 
     const drawFrame = (time: number) => {
       ctx.clearRect(0, 0, width, height);
+      const rawIntro = reducedMotionQuery.matches ? 1 : Math.min(1, time / 0.65);
+      const introProgress = 1 - Math.pow(1 - rawIntro, 3);
+      ctx.save();
+      ctx.globalAlpha = introProgress;
 
       for (const ribbon of XMB_WAVE_RIBBONS) {
-        const startY = computeWaveY(0, time, ribbon);
+        const startY = computeWaveY(0, time, ribbon, introProgress);
         const crestPoints: Array<{ x: number; y: number }> = [{ x: 0, y: startY }];
 
         for (let x = SAMPLE_STEP_PX; x < width; x += SAMPLE_STEP_PX) {
-          crestPoints.push({ x, y: computeWaveY(x, time, ribbon) });
+          crestPoints.push({ x, y: computeWaveY(x, time, ribbon, introProgress) });
         }
-        crestPoints.push({ x: width, y: computeWaveY(width, time, ribbon) });
+        crestPoints.push({ x: width, y: computeWaveY(width, time, ribbon, introProgress) });
 
         // 1. Relleno translúcido en degradado hacia abajo (cinta XMB)
         ctx.beginPath();
@@ -118,6 +124,8 @@ export function useXmbWaves({ canvasRef, darkMode }: UseXmbWavesOptions): void {
         ctx.lineWidth = ribbon.lineWidth;
         ctx.stroke();
       }
+
+      ctx.restore();
     };
 
     const tick = (now: number) => {

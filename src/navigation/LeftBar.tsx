@@ -210,7 +210,19 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
   );
 
   const navElement = (
-    <nav style={containerStyle} aria-label="Navegación principal">
+    <nav style={containerStyle} className="chrome-nav-enter" aria-label="Navegación principal">
+      <style>{`
+        @keyframes chromeNavEnter {
+          from { opacity: 0; transform: translateY(12px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .chrome-nav-enter {
+          animation: chromeNavEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chrome-nav-enter { animation: none !important; transform: none !important; }
+        }
+      `}</style>
       {renderNavItems(navItems)}
 
       {onOpenSpotlight && (

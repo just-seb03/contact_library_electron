@@ -34,6 +34,28 @@ export default function Dashboard() {
           font-style: normal;
           font-display: swap;
         }
+        @keyframes dashEnter {
+          from {
+            opacity: 0;
+            transform: translateY(16px) scale(0.975);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .dash-anim {
+          opacity: 0;
+          animation: dashEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .dash-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
       `}</style>
 
       <div
@@ -63,9 +85,12 @@ export default function Dashboard() {
           >
             {!hasPending ? (
               <>
-                <span style={{ whiteSpace: 'nowrap' }}>Hoy es un día</span>
+                <span className="dash-anim" style={{ whiteSpace: 'nowrap', display: 'inline-block', animationDelay: '40ms' }}>
+                  Hoy es un día
+                </span>
                 <br />
                 <span
+                  className="dash-anim"
                   style={{
                     fontFamily: "'Brother Signature', Georgia, serif",
                     fontWeight: 400,
@@ -74,6 +99,7 @@ export default function Dashboard() {
                     letterSpacing: '0.03em',
                     display: 'inline-block',
                     marginTop: 8,
+                    animationDelay: '110ms',
                   }}
                 >
                   tranquilo
@@ -81,9 +107,12 @@ export default function Dashboard() {
               </>
             ) : (
               <>
-                <span style={{ whiteSpace: 'nowrap' }}>Agenda del</span>
+                <span className="dash-anim" style={{ whiteSpace: 'nowrap', display: 'inline-block', animationDelay: '40ms' }}>
+                  Agenda del
+                </span>
                 <br />
                 <span
+                  className="dash-anim"
                   style={{
                     fontFamily: "'Brother Signature', Georgia, serif",
                     fontWeight: 400,
@@ -92,6 +121,7 @@ export default function Dashboard() {
                     letterSpacing: '0.03em',
                     display: 'inline-block',
                     marginTop: 8,
+                    animationDelay: '110ms',
                   }}
                 >
                   día
@@ -115,6 +145,7 @@ export default function Dashboard() {
         >
           {/* Cuadro grueso principal: estado de reuniones */}
           <div
+            className="dash-anim"
             style={{
               ...glassCardBase,
               padding: '22px 24px',
@@ -123,6 +154,7 @@ export default function Dashboard() {
               flexDirection: 'column',
               justifyContent: 'center',
               gap: 6,
+              animationDelay: '140ms',
             }}
           >
             <div
@@ -152,6 +184,7 @@ export default function Dashboard() {
 
           {/* Segundo cuadro grueso: estado de pagos */}
           <div
+            className="dash-anim"
             style={{
               ...glassCardBase,
               padding: '22px 24px',
@@ -160,6 +193,7 @@ export default function Dashboard() {
               flexDirection: 'column',
               justifyContent: 'center',
               gap: 6,
+              animationDelay: '200ms',
             }}
           >
             <div
@@ -189,6 +223,7 @@ export default function Dashboard() {
 
           {/* Cuadros inferiores a la mitad de grosor, difuminados y desvaneciéndose */}
           <div
+            className="dash-anim"
             aria-hidden="true"
             style={{
               position: 'absolute',
@@ -199,6 +234,7 @@ export default function Dashboard() {
               flexDirection: 'column',
               gap: 10,
               pointerEvents: 'none',
+              animationDelay: '260ms',
             }}
           >
             {GHOST_OPACITIES.map((opacity, index) => (
