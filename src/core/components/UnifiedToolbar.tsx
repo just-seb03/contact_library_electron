@@ -1,10 +1,19 @@
-import type { FC, CSSProperties } from 'react';
+import { useMemo, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import { useApp } from '../context/AppContext';
 import { TrafficLights } from '../windowControls/TrafficLights';
 
 export const UnifiedToolbar: FC = () => {
   const { activeTab, hearings, clients } = useApp();
+
+  const todayLabel = useMemo(() => {
+    return new Intl.DateTimeFormat('es-CL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date());
+  }, []);
 
   const toolbarStyle: CSSProperties = {
     height: 52,
@@ -29,9 +38,21 @@ export const UnifiedToolbar: FC = () => {
 
   return (
     <header style={toolbarStyle}>
-      {/* ── Izquierda: Controles de ventana (cerrar, minimizar, maximizar) ── */}
-      <div style={{ display: 'flex', alignItems: 'center', ...noDragStyle }}>
+      {/* ── Izquierda: Controles de ventana + Fecha actual con transparencia ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...noDragStyle }}>
         <TrafficLights />
+        <span
+          style={{
+            fontSize: 12,
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.58,
+            textTransform: 'capitalize',
+            whiteSpace: 'nowrap',
+            letterSpacing: '0.01em',
+          }}
+        >
+          {todayLabel}
+        </span>
       </div>
 
       {/* ── Derecha: Contadores contextuales ── */}
