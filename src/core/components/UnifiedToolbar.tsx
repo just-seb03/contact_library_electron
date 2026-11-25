@@ -18,7 +18,6 @@ export const UnifiedToolbar: FC = () => {
     backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.82))',
     backdropFilter: 'blur(25px) saturate(180%)',
     WebkitBackdropFilter: 'blur(25px) saturate(180%)',
-    borderBottom: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     WebkitAppRegion: 'drag',
     zIndex: 400,
     position: 'relative',
