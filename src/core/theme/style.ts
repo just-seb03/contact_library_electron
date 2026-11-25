@@ -59,7 +59,8 @@ export const APP_COLORS = {
   warningTint: rgba(APP_COLOR_RGB.warning, 0.1),
 
   // Colores semánticos derivados del RGB base
-  primary: 'var(--macos-accent-color, #007aff)',
+  primary: 'var(--macos-accent-color, #0056b8)',
+  onPrimary: 'var(--macos-on-accent, #ffffff)',
   success: rgbToHex(APP_COLOR_RGB.success),
   warning: rgbToHex(APP_COLOR_RGB.warning),
   danger: rgbToHex(APP_COLOR_RGB.danger),

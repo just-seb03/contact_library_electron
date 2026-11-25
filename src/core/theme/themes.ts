@@ -1,3 +1,5 @@
+import { hctToHex, hexToHct, hexToRgba } from './colorScience';
+
 export type AppThemeId = 'default' | 'coffee';
 
 export interface ThemeModeTokens {
@@ -33,38 +35,144 @@ export interface AppThemeDefinition {
   id: AppThemeId;
   label: string;
   description: string;
-  /** Color de acento sugerido (opcional) para mostrar en la tarjeta del selector */
+  /** Color semilla de acento sugerido */
   swatchHex: string;
   light: ThemeModeTokens;
   dark: ThemeModeTokens;
 }
 
 /**
- * Convierte un color hexadecimal (#RRGGBB) a formato `rgba(r, g, b, alpha)`.
+ * Genera los pares Claro/Oscuro de un tema neutro/tinte siguiendo los principios HCT:
+ * - Misma familia de matiz (Hue) y croma controlado en todas las superficies.
+ * - Separación de luminancia perceptual |Tone_fg - Tone_bg| >= 50 en textos y controles.
  */
-function hexToRgba(hex: string, alpha: number): string {
-  const clean = hex.replace('#', '');
-  const r = parseInt(clean.substring(0, 2), 16);
-  const g = parseInt(clean.substring(2, 4), 16);
-  const b = parseInt(clean.substring(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+interface HctThemeSeed {
+  id: AppThemeId;
+  label: string;
+  description: string;
+  swatchHex: string;
+  neutralHue: number;
+  neutralChromaLight: number;
+  neutralChromaDark: number;
+  /** Overrides opcionales para conservar tonos característicos validados en claro */
+  lightOverrides?: Partial<ThemeModeTokens>;
+  darkOverrides?: Partial<ThemeModeTokens>;
+}
+
+function buildHctTheme(seed: HctThemeSeed): AppThemeDefinition {
+  const { neutralHue: h, neutralChromaLight: cL, neutralChromaDark: cD } = seed;
+
+  // Modo Claro: superficies T=84..100, textos T=14..46 (dT >= 50 frente a canvas T=97)
+  const lCanvas = hctToHex(h, cL * 0.4, 97);
+  const lCard = '#ffffff';
+  const lInput = hctToHex(h, cL * 0.6, 94.5);
+  const lSidebar = hctToHex(h, cL * 0.85, 92);
+  const lText = hctToHex(h, Math.min(12, cL * 1.4), 14);
+  const lTextSec = hctToHex(h, cL, 39);
+  const lTextMuted = hctToHex(h, cL, 43);
+
+  const baseLight: ThemeModeTokens = {
+    canvasBg: lCanvas,
+    cardBg: lCard,
+    modalBg: lCard,
+    inputBg: lInput,
+    sidebarGlass: hexToRgba(lSidebar, 0.86),
+    toolbarGlass: hexToRgba(lCard, 0.84),
+    hoverBg: hexToRgba(lText, 0.045),
+    activeBg: hexToRgba(lText, 0.08),
+    subtleBg: hexToRgba(lText, 0.03),
+    text: lText,
+    textSecondary: lTextSec,
+    textMuted: lTextMuted,
+    cardBorder: hexToRgba(lText, 0.08),
+    hairlineBorder: hexToRgba(lText, 0.08),
+    divider: hexToRgba(lText, 0.06),
+    scrollbarThumb: hexToRgba(lTextSec, 0.28),
+    scrollbarThumbHover: hexToRgba(lTextSec, 0.45),
+    dangerSurface: 'rgba(255, 59, 48, 0.10)',
+    dangerBorder: 'rgba(255, 59, 48, 0.25)',
+    preview: {
+      canvas: lCanvas,
+      sidebar: lSidebar,
+      card: lCard,
+      muted: hctToHex(h, cL, 78),
+    },
+  };
+
+  // Modo Oscuro: superficies T=9.5..27, textos T=71..94 (dT >= 49..84 incluso en inputs T=22)
+  const dCanvas = hctToHex(h, cD * 0.75, 10.5);
+  const dCardBase = hctToHex(h, cD, 15.2);
+  const dSidebar = hctToHex(h, cD * 0.75, 11.5);
+  const dInput = hctToHex(h, cD * 1.05, 22);
+  const dActive = hctToHex(h, cD * 1.2, 27);
+  const dText = hctToHex(h, Math.min(12, cD * 1.3), 93);
+  const dTextSec = hctToHex(h, cD * 1.15, 75);
+  const dTextMuted = hctToHex(h, cD, 71);
+
+  const baseDark: ThemeModeTokens = {
+    canvasBg: dCanvas,
+    cardBg: dCardBase,
+    modalBg: hctToHex(h, cD, 16.5),
+    inputBg: dInput,
+    sidebarGlass: hexToRgba(dSidebar, 0.88),
+    toolbarGlass: hexToRgba(dCanvas, 0.86),
+    hoverBg: hexToRgba(dText, 0.07),
+    activeBg: dActive,
+    subtleBg: hexToRgba(dText, 0.045),
+    text: dText,
+    textSecondary: dTextSec,
+    textMuted: dTextMuted,
+    cardBorder: hexToRgba(dText, 0.09),
+    hairlineBorder: hexToRgba(dText, 0.09),
+    divider: hexToRgba(dText, 0.08),
+    scrollbarThumb: hexToRgba(dTextSec, 0.26),
+    scrollbarThumbHover: hexToRgba(dTextSec, 0.44),
+    dangerSurface: 'rgba(255, 59, 48, 0.16)',
+    dangerBorder: 'rgba(255, 59, 48, 0.34)',
+    preview: {
+      canvas: dCanvas,
+      sidebar: dSidebar,
+      card: dCardBase,
+      muted: dInput,
+    },
+  };
+
+  const light: ThemeModeTokens = {
+    ...baseLight,
+    ...seed.lightOverrides,
+    preview: { ...baseLight.preview, ...seed.lightOverrides?.preview },
+  };
+  const dark: ThemeModeTokens = {
+    ...baseDark,
+    ...seed.darkOverrides,
+    preview: { ...baseDark.preview, ...seed.darkOverrides?.preview },
+  };
+
+  return {
+    id: seed.id,
+    label: seed.label,
+    description: seed.description,
+    swatchHex: seed.swatchHex,
+    light,
+    dark,
+  };
 }
 
 /**
- * Catálogo centralizado de temas de la aplicación.
- * Para agregar un nuevo tema en el futuro, solo añade una nueva entrada aquí
- * con sus variantes `light` y `dark`.
+ * Catálogo centralizado de temas de la aplicación (calibrados con ciencia HCT).
+ * Para agregar un nuevo tema en el futuro, basta con añadir una llamada a `buildHctTheme`.
  */
 export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
-  default: {
+  default: buildHctTheme({
     id: 'default',
     label: 'Predeterminado',
     description: 'Estética nativa de macOS',
     swatchHex: '#007aff',
-    light: {
+    neutralHue: 264,
+    neutralChromaLight: 2.5,
+    neutralChromaDark: 2.5,
+    lightOverrides: {
       canvasBg: '#f5f5f7',
-      cardBg: '#ffffff',
-      modalBg: '#ffffff',
       inputBg: '#ffffff',
       sidebarGlass: 'rgba(246, 246, 248, 0.82)',
       toolbarGlass: 'rgba(255, 255, 255, 0.82)',
@@ -72,15 +180,6 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
       activeBg: 'rgba(0, 0, 0, 0.07)',
       subtleBg: 'rgba(0, 0, 0, 0.03)',
       text: '#1c1c1e',
-      textSecondary: '#8e8e93',
-      textMuted: 'rgba(60, 60, 67, 0.6)',
-      cardBorder: 'rgba(0, 0, 0, 0.08)',
-      hairlineBorder: 'rgba(0, 0, 0, 0.08)',
-      divider: 'rgba(0, 0, 0, 0.06)',
-      scrollbarThumb: 'rgba(0, 0, 0, 0.16)',
-      scrollbarThumbHover: 'rgba(0, 0, 0, 0.28)',
-      dangerSurface: 'rgba(255, 59, 48, 0.10)',
-      dangerBorder: 'rgba(255, 59, 48, 0.25)',
       preview: {
         canvas: '#f5f5f7',
         sidebar: '#e5e5ea',
@@ -88,7 +187,7 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
         muted: '#c7c7cc',
       },
     },
-    dark: {
+    darkOverrides: {
       canvasBg: '#1e1e20',
       cardBg: 'rgba(38, 38, 42, 0.85)',
       modalBg: '#242426',
@@ -96,18 +195,9 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
       sidebarGlass: 'rgba(28, 28, 30, 0.82)',
       toolbarGlass: 'rgba(30, 30, 34, 0.82)',
       hoverBg: 'rgba(255, 255, 255, 0.06)',
-      activeBg: 'rgba(255, 255, 255, 0.10)',
+      activeBg: 'rgba(255, 255, 255, 0.11)',
       subtleBg: 'rgba(255, 255, 255, 0.04)',
       text: '#ffffff',
-      textSecondary: '#8e8e93',
-      textMuted: 'rgba(235, 235, 245, 0.55)',
-      cardBorder: 'rgba(255, 255, 255, 0.08)',
-      hairlineBorder: 'rgba(255, 255, 255, 0.08)',
-      divider: 'rgba(255, 255, 255, 0.08)',
-      scrollbarThumb: 'rgba(255, 255, 255, 0.18)',
-      scrollbarThumbHover: 'rgba(255, 255, 255, 0.32)',
-      dangerSurface: 'rgba(255, 59, 48, 0.15)',
-      dangerBorder: 'rgba(255, 59, 48, 0.32)',
       preview: {
         canvas: '#1e1e20',
         sidebar: '#2c2c2e',
@@ -115,14 +205,17 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
         muted: '#48484a',
       },
     },
-  },
+  }),
 
-  coffee: {
+  coffee: buildHctTheme({
     id: 'coffee',
     label: 'Café',
     description: 'Tonos cálidos espresso y crema',
     swatchHex: '#6D4C41',
-    light: {
+    neutralHue: 37.5,
+    neutralChromaLight: 9,
+    neutralChromaDark: 7.2,
+    lightOverrides: {
       canvasBg: '#FCF9F5',
       cardBg: '#F7F2EB',
       modalBg: '#FCF9F5',
@@ -134,14 +227,10 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
       subtleBg: hexToRgba('#EAE3CC', 0.65),
       text: '#3C2A21',
       textSecondary: '#5D4E46',
-      textMuted: hexToRgba('#5D4E46', 0.78),
-      cardBorder: hexToRgba('#3C2A21', 0.10),
-      hairlineBorder: hexToRgba('#3C2A21', 0.12),
-      divider: hexToRgba('#3C2A21', 0.09),
+      // Tone 36 garantiza >= 4.5:1 incluso sobre el sidebar #D6D2C4
+      textMuted: hctToHex(37.5, 9, 36),
       scrollbarThumb: hexToRgba('#6D4C41', 0.28),
       scrollbarThumbHover: hexToRgba('#6D4C41', 0.45),
-      dangerSurface: 'rgba(255, 59, 48, 0.10)',
-      dangerBorder: 'rgba(255, 59, 48, 0.25)',
       preview: {
         canvas: '#FCF9F5',
         sidebar: '#D6D2C4',
@@ -149,34 +238,29 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
         muted: '#E6D3C8',
       },
     },
-    dark: {
+    darkOverrides: {
       canvasBg: '#1F1916',
       cardBg: '#2E2420',
       modalBg: '#2E2420',
-      inputBg: '#464233',
-      sidebarGlass: hexToRgba('#1C2522', 0.90),
+      // Sidebar, input y active armonizados al mismo matiz espresso (Hue 37.5°) con dT >= 50
+      sidebarGlass: hexToRgba(hctToHex(37.5, 5.5, 11), 0.90),
       toolbarGlass: hexToRgba('#1F1916', 0.88),
-      hoverBg: hexToRgba('#6E5B53', 0.35),
-      activeBg: '#6E5B53',
-      subtleBg: hexToRgba('#464233', 0.55),
+      hoverBg: hexToRgba('#E6D3C8', 0.09),
+      activeBg: hctToHex(37.5, 9, 27),
+      subtleBg: hexToRgba('#E6D3C8', 0.05),
       text: '#E6D3C8',
-      textSecondary: '#A89E95',
-      textMuted: hexToRgba('#A89E95', 0.78),
-      cardBorder: hexToRgba('#E6D3C8', 0.10),
-      hairlineBorder: hexToRgba('#E6D3C8', 0.10),
-      divider: hexToRgba('#E6D3C8', 0.09),
-      scrollbarThumb: hexToRgba('#8B6E60', 0.35),
-      scrollbarThumbHover: hexToRgba('#8B6E60', 0.55),
-      dangerSurface: 'rgba(255, 59, 48, 0.16)',
-      dangerBorder: 'rgba(255, 59, 48, 0.34)',
+      textSecondary: hctToHex(37.5, 8.5, 74),
+      textMuted: hctToHex(37.5, 7.5, 71),
+      scrollbarThumb: hexToRgba('#E6D3C8', 0.24),
+      scrollbarThumbHover: hexToRgba('#E6D3C8', 0.40),
       preview: {
         canvas: '#1F1916',
-        sidebar: '#1C2522',
+        sidebar: hctToHex(37.5, 5.5, 11),
         card: '#2E2420',
-        muted: '#464233',
+        muted: hctToHex(37.5, 7.5, 22),
       },
     },
-  },
+  }),
 };
 
 export const THEME_LIST: AppThemeDefinition[] = Object.values(APP_THEMES);
@@ -186,8 +270,16 @@ export const THEME_LIST: AppThemeDefinition[] = Object.values(APP_THEMES);
  * con respaldo seguro al tema predeterminado.
  */
 export function getThemeTokens(themeId: AppThemeId | string | undefined, darkMode: boolean): ThemeModeTokens {
-  const theme = (themeId && themeId in APP_THEMES ? APP_THEMES[themeId as AppThemeId] : APP_THEMES.default);
+  const theme = themeId && themeId in APP_THEMES ? APP_THEMES[themeId as AppThemeId] : APP_THEMES.default;
   return darkMode ? theme.dark : theme.light;
+}
+
+/**
+ * Devuelve el color de acento representativo de un tema adaptado al modo (Tone Swapping).
+ */
+export function getThemeSwatchHex(theme: AppThemeDefinition, darkMode: boolean): string {
+  const { hue, chroma } = hexToHct(theme.swatchHex);
+  return hctToHex(hue, chroma, darkMode ? 78 : 38);
 }
 
 /**
@@ -219,4 +311,3 @@ export function themeTokensToCssVars(tokens: ThemeModeTokens): Record<string, st
     '--macos-danger-border': tokens.dangerBorder,
   };
 }
-

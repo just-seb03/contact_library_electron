@@ -182,7 +182,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   fontSize: 13,
                   fontWeight: isToday || isSelected ? 700 : 500,
                   color: isToday
-                    ? '#ffffff'
+                    ? 'var(--macos-on-accent, #ffffff)'
                     : 'var(--macos-text, #1c1c1e)',
                   backgroundColor: isToday
                     ? 'var(--macos-accent-color, #007aff)'

@@ -325,9 +325,9 @@ export function AddClientPopup({
               type="submit"
               fill
               style={{
-                backgroundColor: 'var(--macos-accent-color, #007aff)',
+                backgroundColor: 'var(--macos-accent-color, #0056b8)',
                 borderRadius: 7,
-                color: '#ffffff',
+                color: 'var(--macos-on-accent, #ffffff)',
                 fontSize: 13,
                 fontWeight: 600,
                 padding: '0 18px',

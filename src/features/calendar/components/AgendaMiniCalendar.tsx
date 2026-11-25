@@ -232,7 +232,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                       ? 'var(--macos-text, #1c1c1e)'
                       : 'transparent',
                     color: todayMatch
-                      ? '#ffffff'
+                      ? 'var(--macos-on-accent, #ffffff)'
                       : selectedMatch
                       ? 'var(--macos-canvas-bg, #ffffff)'
                       : cell.isCurrentMonth

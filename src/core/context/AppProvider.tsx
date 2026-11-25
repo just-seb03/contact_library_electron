@@ -20,7 +20,7 @@ import {
 import { parseHearing } from './hearingUtils';
 import {
   DEFAULT_SETTINGS,
-  MAC_ACCENT_COLORS,
+  resolveAccentTokens,
   type AppSettings,
 } from '../../features/settings/data/settingsData';
 import { databaseService } from '../database/databaseService';
@@ -55,27 +55,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {
       // fallback
     }
-    const selected = MAC_ACCENT_COLORS.find((c) => c.id === settings.accentColor) ?? MAC_ACCENT_COLORS[0];
-    const hex = selected.hex;
-    const cleanHex = hex.replace('#', '');
-    const r = parseInt(cleanHex.substring(0, 2), 16);
-    const g = parseInt(cleanHex.substring(2, 4), 16);
-    const b = parseInt(cleanHex.substring(4, 6), 16);
-    const rgb = `${r}, ${g}, ${b}`;
-
+    const { cssVars } = resolveAccentTokens(settings.accentColor, darkMode);
     const root = document.documentElement;
-    root.style.setProperty('--macos-accent-color', hex);
-    root.style.setProperty('--macos-accent-color-rgb', rgb);
-    root.style.setProperty('--macos-accent-tint', `rgba(${rgb}, 0.12)`);
-    root.style.setProperty('--macos-accent-tint-subtle', `rgba(${rgb}, 0.08)`);
-    root.style.setProperty('--macos-accent-tint-status', `rgba(${rgb}, 0.15)`);
-    root.style.setProperty('--macos-accent-tint-hover', `rgba(${rgb}, 0.18)`);
-    root.style.setProperty('--macos-accent-tint-active', `rgba(${rgb}, 0.26)`);
-    root.style.setProperty('--f7-theme-color', hex);
-    root.style.setProperty('--f7-theme-color-rgb', rgb);
-    root.style.setProperty('--f7-theme-color-shade', hex);
-    root.style.setProperty('--f7-toggle-active-color', hex);
-  }, [settings]);
+    for (const [key, value] of Object.entries(cssVars)) {
+      root.style.setProperty(key, value);
+    }
+  }, [settings, darkMode]);
 
   const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));

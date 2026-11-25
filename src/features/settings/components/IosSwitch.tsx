@@ -50,7 +50,7 @@ export const IosSwitch: React.FC<IosSwitchProps> = ({
     width: 24,
     height: 24,
     borderRadius: '50%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: checked ? 'var(--macos-on-accent, #ffffff)' : '#FFFFFF',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2), 0 0 1px rgba(0, 0, 0, 0.15)',
     transform: checked ? 'translateX(18px)' : 'translateX(0px)',
     transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.2, 1)',

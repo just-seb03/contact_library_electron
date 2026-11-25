@@ -1,6 +1,6 @@
 import type { FC, CSSProperties } from 'react';
-import { MAC_ACCENT_COLORS, type AppleAccentColor } from '../data/settingsData';
-import { APP_THEMES, THEME_LIST, type AppThemeId } from '../../../core/theme/themes';
+import { getAccentHexForMode, MAC_ACCENT_COLORS, type AppleAccentColor } from '../data/settingsData';
+import { APP_THEMES, getThemeSwatchHex, THEME_LIST, type AppThemeId } from '../../../core/theme/themes';
 
 interface SettingsAppearanceSelectorProps {
   darkMode: boolean;
@@ -222,7 +222,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                 >
                   <span style={{ flex: 1, backgroundColor: currentModePreview.sidebar }} />
                   <span style={{ flex: 1, backgroundColor: currentModePreview.canvas }} />
-                  <span style={{ width: 7, backgroundColor: theme.swatchHex }} />
+                  <span style={{ width: 7, backgroundColor: getThemeSwatchHex(theme, darkMode) }} />
                 </span>
 
                 <span style={{ minWidth: 0, flex: 1 }}>
@@ -273,6 +273,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           {MAC_ACCENT_COLORS.map((item) => {
             const isSelected = accentColor === item.id;
+            const adaptiveHex = getAccentHexForMode(item.id, darkMode);
             return (
               <button
                 key={item.id}
@@ -284,14 +285,14 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                   width: 22,
                   height: 22,
                   borderRadius: '50%',
-                  backgroundColor: item.hex,
+                  backgroundColor: adaptiveHex,
                   border: 'none',
                   padding: 0,
                   cursor: 'pointer',
                   position: 'relative',
                   outline: 'none',
                   boxShadow: isSelected
-                    ? `0 0 0 2px var(--macos-card-bg, #ffffff), 0 0 0 4px ${item.hex}`
+                    ? `0 0 0 2px var(--macos-card-bg, #ffffff), 0 0 0 4px ${adaptiveHex}`
                     : 'none',
                   transform: isSelected ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.15s ease',

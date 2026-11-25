@@ -121,11 +121,11 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
                 width: 24,
                 height: 24,
                 borderRadius: 6,
-                backgroundColor: 'var(--macos-accent-color, #007aff)',
+                backgroundColor: 'var(--macos-accent-color, #0056b8)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#ffffff',
+                color: 'var(--macos-on-accent, #ffffff)',
               }}
             >
               <Icon f7="person_crop_circle" size="14px" />
@@ -214,8 +214,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
                 padding: '0 16px',
                 borderRadius: 6,
                 border: 'none',
-                backgroundColor: 'var(--macos-accent-color, #007aff)',
-                color: '#ffffff',
+                backgroundColor: 'var(--macos-accent-color, #0056b8)',
+                color: 'var(--macos-on-accent, #ffffff)',
                 fontSize: 12.5,
                 fontWeight: 600,
                 cursor: 'pointer',
