@@ -88,6 +88,8 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
       {event ? (
         <div
+          key={'id' in event ? event.id : 'selected-hearing'}
+          className="cal-switch-anim"
           style={{
             backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.02))',
             borderRadius: 10,

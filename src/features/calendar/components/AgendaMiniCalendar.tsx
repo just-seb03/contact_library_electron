@@ -192,7 +192,11 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
       </div>
 
       {/* ── Grilla de días del mes con puntos de eventos Apple ── */}
-      <div style={daysGridStyle}>
+      <div
+        key={`${viewYear}-${viewMonth}`}
+        className="cal-switch-anim"
+        style={daysGridStyle}
+      >
         {cells.map((cell, idx) => {
           const todayMatch = isToday(cell.day, cell.isCurrentMonth);
           const cellDate = new Date(

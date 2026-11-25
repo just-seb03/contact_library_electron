@@ -118,23 +118,29 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
     <div style={headerStyle}>
       {/* ── Izquierda: Insignia de fecha + Título de fecha + Botones Hoy / Flechas ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={badgeContainerStyle}>
-          <span style={badgeMonthStyle}>{monthShort}</span>
-          <span style={badgeDayStyle}>{day}</span>
-        </div>
+        <div
+          key={`${day}-${monthShort}-${fullDateLabel}`}
+          className="cal-step-anim"
+          style={{ display: 'flex', alignItems: 'center', gap: 14 }}
+        >
+          <div style={badgeContainerStyle}>
+            <span style={badgeMonthStyle}>{monthShort}</span>
+            <span style={badgeDayStyle}>{day}</span>
+          </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span
-            style={{
-              fontSize: 17,
-              fontWeight: 650,
-              color: 'var(--macos-text, #1c1c1e)',
-              lineHeight: 1.3,
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {fullDateLabel}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span
+              style={{
+                fontSize: 17,
+                fontWeight: 650,
+                color: 'var(--macos-text, #1c1c1e)',
+                lineHeight: 1.3,
+                letterSpacing: '-0.01em',
+              }}
+            >
+              {fullDateLabel}
+            </span>
+          </div>
         </div>
 
         {/* Grupo de navegación: Hoy, ‹, › */}

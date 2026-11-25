@@ -91,7 +91,7 @@ const undoBannerStyle: CSSProperties = {
 const timelineScrollStyle: CSSProperties = {
   height: '100%',
   boxSizing: 'border-box',
-  padding: '8px 0 68px 0',
+  padding: 0,
   minHeight: 0,
   overflowX: 'hidden',
   overflowY: 'auto',
@@ -266,13 +266,43 @@ export default function Calendar() {
             transform: translateY(0) scale(1);
           }
         }
+        @keyframes calSwitch {
+          from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.988);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes calStep {
+          from {
+            opacity: 0;
+            transform: translateX(10px) scale(0.992);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+          }
+        }
         .cal-anim {
           opacity: 0;
           animation: calEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           will-change: transform, opacity;
         }
+        .cal-switch-anim {
+          animation: calSwitch 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .cal-step-anim {
+          animation: calStep 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
         @media (prefers-reduced-motion: reduce) {
-          .cal-anim {
+          .cal-anim,
+          .cal-switch-anim,
+          .cal-step-anim {
             opacity: 1;
             animation: none !important;
             transform: none !important;
@@ -323,28 +353,39 @@ export default function Calendar() {
               overflowY: compactLayout ? 'auto' : 'hidden',
             }}
           >
-            <div style={{
-              ...timelinePanelStyle,
-              height: compactLayout ? '50vh' : '100%',
-              flex: compactLayout ? '0 0 auto' : 1,
-            }}>
+            <div
+              key={isWeekView ? 'week-view' : 'day-view'}
+              className="cal-switch-anim"
+              style={{
+                ...timelinePanelStyle,
+                height: compactLayout ? '50vh' : '100%',
+                flex: compactLayout ? '0 0 auto' : 1,
+              }}
+            >
               {isWeekView ? (
                 <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
-                  <AgendaWeekView
-                    selectedDate={selectedDate}
-                    calendarEvents={calendarEvents}
-                    hearings={hearings}
-                    onSelectEvent={setSelectedEvent}
-                  />
+                  <div key={weekStart.getTime()} className="cal-step-anim" style={{ height: '100%' }}>
+                    <AgendaWeekView
+                      selectedDate={selectedDate}
+                      calendarEvents={calendarEvents}
+                      hearings={hearings}
+                      onSelectEvent={setSelectedEvent}
+                    />
+                  </div>
                 </CardContent>
               ) : (
                 <CardContent style={timelineScrollStyle}>
-                  <AgendaTimeline
-                    todayHearings={todayHearings}
-                    calendarEvents={selectedDayEvents}
-                    onSelectEvent={setSelectedEvent}
-                    selectedDate={selectedDate}
-                  />
+                  <div
+                    key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
+                    className="cal-step-anim"
+                  >
+                    <AgendaTimeline
+                      todayHearings={todayHearings}
+                      calendarEvents={selectedDayEvents}
+                      onSelectEvent={setSelectedEvent}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
                 </CardContent>
               )}
             </div>

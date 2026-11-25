@@ -15,7 +15,7 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const HOUR_HEIGHT = 68;
 const HOUR_COLUMN_WIDTH = 74;
 const EVENT_LEFT = HOUR_COLUMN_WIDTH + 14;
-const TIMELINE_TOP_PADDING = 12;
+const TIMELINE_TOP_PADDING = 4;
 
 function formatMinutesOfDay(minutes: number, formatter: Intl.DateTimeFormat): string {
   const time = new Date(2000, 0, 1);
@@ -96,8 +96,9 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
 
   const containerStyle: CSSProperties = {
     position: 'relative',
-    minHeight: HOURS.length * HOUR_HEIGHT,
+    height: HOURS.length * HOUR_HEIGHT + TIMELINE_TOP_PADDING,
     paddingTop: TIMELINE_TOP_PADDING,
+    boxSizing: 'border-box',
     userSelect: 'none',
   };
 
