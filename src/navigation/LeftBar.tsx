@@ -113,7 +113,8 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
       {items.map((item) => {
         const isActive = activeTab === item.id;
         const inactiveColor = 'var(--macos-text-secondary, rgba(60, 60, 67, 0.55))';
-        const activeColor = 'var(--macos-text, #1c1c1e)';
+        const activeColor = '#ffffff';
+        const hoverColor = 'var(--macos-text, #1c1c1e)';
         return (
           <button
             key={item.id}
@@ -126,21 +127,24 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 32,
+              gap: isActive ? 6 : 0,
+              width: isActive ? 'auto' : 32,
               height: 32,
-              padding: 0,
-              border: 'none',
+              padding: isActive ? '0 12px' : 0,
+              borderRadius: isActive ? 999 : 0,
+              border: isActive ? '1px solid rgba(255, 255, 255, 0.14)' : 'none',
               outline: 'none',
               cursor: 'pointer',
-              backgroundColor: 'transparent',
+              backgroundColor: isActive ? '#1c1c1e' : 'transparent',
               color: isActive ? activeColor : inactiveColor,
-              transition: 'color 0.12s ease, transform 0.08s ease',
+              boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.18)' : 'none',
+              transition: 'all 0.16s ease',
               boxSizing: 'border-box',
               flexShrink: 0,
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.color = activeColor;
+                e.currentTarget.style.color = hoverColor;
               }
             }}
             onMouseLeave={(e) => {
@@ -151,26 +155,39 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
           >
             <Icon
               f7={isActive ? item.activeIcon : item.icon}
-              size="19px"
+              size={isActive ? '16px' : '19px'}
               style={{
                 color: 'currentColor',
                 transition: 'color 0.12s ease',
               }}
             />
 
+            {isActive && (
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {item.title}
+              </span>
+            )}
+
             {/* Indicador numérico monocromo sobre el icono */}
             {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: 0,
-                  right: -2,
+                  top: isActive ? -4 : 0,
+                  right: isActive ? -4 : -2,
                   minWidth: 15,
                   height: 15,
                   padding: '0 4px',
                   borderRadius: 8,
-                  backgroundColor: 'var(--macos-text, #1c1c1e)',
-                  color: 'var(--macos-canvas-bg, #ffffff)',
+                  backgroundColor: isActive ? '#ffffff' : 'var(--macos-text, #1c1c1e)',
+                  color: isActive ? '#1c1c1e' : 'var(--macos-canvas-bg, #ffffff)',
                   fontSize: 9,
                   fontWeight: 700,
                   display: 'flex',
