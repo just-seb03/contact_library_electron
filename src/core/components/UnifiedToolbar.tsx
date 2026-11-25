@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import { TrafficLights } from '../windowControls/TrafficLights';
 
 export const UnifiedToolbar: FC = () => {
-  const { activeTab, hearings, clients } = useApp();
+  const { activeTab, clients } = useApp();
 
   const todayLabel = useMemo(() => {
     return new Intl.DateTimeFormat('es-CL', {
@@ -69,25 +69,6 @@ export const UnifiedToolbar: FC = () => {
 
       {/* ── Derecha: Contadores contextuales ── */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...noDragStyle }}>
-        {activeTab === 'calendar' && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              padding: '4px 8px',
-              borderRadius: 6,
-              backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.1))',
-              color: '#ff3b30',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Icon f7="clock" size="12px" />
-            <span>{hearings.length} audiencias</span>
-          </div>
-        )}
-
         {activeTab === 'cliente' && (
           <div
             style={{

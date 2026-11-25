@@ -1,4 +1,4 @@
-import { useState, useEffect, type FC, type CSSProperties } from 'react';
+import { useState, useEffect, useRef, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { HearingEvent } from '../../../core/context/types';
 import type { CalendarEvent } from '../types';
@@ -53,7 +53,20 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   onSelectEvent,
   selectedDate = new Date(),
 }) => {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
+
+  // Al iniciar el calendario, desplazar automáticamente a la hora actual
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      const scrollParent = rootRef.current?.closest('.card-content') ?? rootRef.current?.parentElement;
+      if (!scrollParent) return;
+      const now = new Date();
+      const targetTop = Math.max(0, (now.getHours() + now.getMinutes() / 60) * HOUR_HEIGHT - 120);
+      scrollParent.scrollTop = targetTop;
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, []);
 
   // Actualizador en tiempo real de la hora actual de Apple
   useEffect(() => {
@@ -83,7 +96,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   const containerStyle: CSSProperties = {
     position: 'relative',
     minHeight: HOURS.length * HOUR_HEIGHT,
-    paddingTop: 8,
+    paddingTop: 12,
     userSelect: 'none',
   };
 
@@ -115,7 +128,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   };
 
   return (
-    <div style={containerStyle}>
+    <div ref={rootRef} style={containerStyle}>
       {/* Fondo tenue de la columna horaria */}
       <div
         style={{
@@ -134,7 +147,14 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
       {/* Filas horarias */}
       {HOURS.map((hour) => (
         <div key={hour} style={hourRowStyle}>
-          <div style={hourLabelStyle}>{formatHour(hour, hourFormatter)}</div>
+          <div
+            style={{
+              ...hourLabelStyle,
+              transform: hour === 0 ? 'translateY(0px)' : 'translateY(-7px)',
+            }}
+          >
+            {formatHour(hour, hourFormatter)}
+          </div>
           <div style={hourCellStyle} />
         </div>
       ))}

@@ -85,7 +85,11 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
 
   useEffect(() => {
     if (containerRef.current) {
-      containerRef.current.scrollTop = 8 * HOUR_HEIGHT;
+      const now = new Date();
+      containerRef.current.scrollTop = Math.max(
+        0,
+        (now.getHours() + now.getMinutes() / 60) * HOUR_HEIGHT - 120
+      );
     }
   }, [weekStartTime]);
 
