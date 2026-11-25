@@ -32,7 +32,7 @@ const calendarCardStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  height: 'calc(100vh - 118px)',
+  height: 'calc(100vh - 172px)',
   minHeight: 320,
   margin: 0,
   border: '1px solid rgba(255, 255, 255, 0.08)',
