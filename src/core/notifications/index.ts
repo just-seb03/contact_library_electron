@@ -1,7 +1,7 @@
 /**
  * @file index.ts
  * @description API pública del módulo de notificaciones (proceso main).
- * Se ampliará con el scheduler (paso 6).
+ * Uso desde main.ts: initNotificationService → registerNotificationProvider → startNotificationScheduler.
  */
 
 export {
@@ -29,6 +29,13 @@ export {
   showNotification,
   type NotificationServiceOptions,
 } from './notificationService'
+export {
+  refreshNotifications,
+  registerNotificationProvider,
+  startNotificationScheduler,
+  stopNotificationScheduler,
+  type NotificationSchedulerOptions,
+} from './notificationScheduler'
 export {
   createNotificationAdapter,
   type CreateNotificationAdapterOptions,

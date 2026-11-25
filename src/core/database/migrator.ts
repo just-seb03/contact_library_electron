@@ -1,5 +1,5 @@
 import type { DatabaseWrapper } from './connection'
-import { TABLES_SQL, SEED_SQL } from './schema'
+import { TABLES_SQL, SEED_SQL, NOTIFICATION_LOG_SQL } from './schema'
 
 interface TableColumnInfo {
   cid: number
@@ -25,8 +25,36 @@ interface OldClientRow {
 /**
  * Ejecuta migraciones automáticas sobre la base de datos SQLite.
  * Utiliza PRAGMA user_version para llevar el control de versiones sin perder información.
+ * Cada migración comprueba la versión actual y solo se aplica si hace falta.
  */
 export async function runDatabaseMigrations(db: DatabaseWrapper): Promise<void> {
+  await migrateToV1(db)
+  await migrateToV2(db)
+}
+
+async function getUserVersion(db: DatabaseWrapper): Promise<number> {
+  const row = await db.prepare('PRAGMA user_version;').get<{ user_version: number }>()
+  return row?.user_version ?? 0
+}
+
+/**
+ * v2: registro de notificaciones enviadas (`notification_log`), para no repetir avisos
+ * entre reinicios de la app.
+ */
+async function migrateToV2(db: DatabaseWrapper): Promise<void> {
+  if ((await getUserVersion(db)) >= 2) return
+
+  await db.transaction(async () => {
+    await db.exec(NOTIFICATION_LOG_SQL)
+    await db.pragma('user_version = 2')
+  })
+  console.log('[SQLite Migrator] Esquema v2 (registro de notificaciones) aplicado con éxito.')
+}
+
+/**
+ * v1: esquema normalizado inicial (y migración desde el esquema antiguo con columnas JSON).
+ */
+async function migrateToV1(db: DatabaseWrapper): Promise<void> {
   const versionRow = await db.prepare('PRAGMA user_version;').get<{ user_version: number }>()
   const currentVersion = versionRow?.user_version ?? 0
 

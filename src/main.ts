@@ -7,6 +7,10 @@ import {
   createNotificationAdapter,
   disposeNotificationService,
   initNotificationService,
+  refreshNotifications,
+  registerNotificationProvider,
+  startNotificationScheduler,
+  stopNotificationScheduler,
 } from './core/notifications'
 import {
   APP_DISPLAY_NAME,
@@ -29,6 +33,9 @@ import { registerClientController } from './features/clients/controllers/clientC
 import { registerDocumentController } from './features/clients/controllers/documentController'
 import { registerPaymentController } from './features/payments/controllers/paymentController'
 import { registerSettingsController } from './features/settings/controllers/settingsController'
+import { calendarNotificationProvider } from './features/calendar/notifications/calendarNotificationProvider'
+import { hearingNotificationProvider } from './features/clients/notifications/hearingNotificationProvider'
+import { paymentNotificationProvider } from './features/payments/notifications/paymentNotificationProvider'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -109,6 +116,7 @@ function bootstrap() {
   // de tiempo para no quedar colgados) y luego se vuelve a pedir la salida.
   let isDatabaseClosed = false
   app.on('will-quit', (event) => {
+    stopNotificationScheduler()
     disposeNotificationService()
     destroyTray()
     if (isDatabaseClosed) return
@@ -157,6 +165,13 @@ function bootstrap() {
       onOpen: revealMainWindow,
       navigate: navigateMainWindow,
     })
+    registerNotificationProvider(calendarNotificationProvider)
+    registerNotificationProvider(hearingNotificationProvider)
+    registerNotificationProvider(paymentNotificationProvider)
+    startNotificationScheduler()
+
+    // Al volver de la suspensión, revisar de inmediato (sin esperar al siguiente tick).
+    powerMonitor.on('resume', () => void refreshNotifications())
 
     // macOS/Linux: apagado o reinicio del sistema con la app en segundo plano.
     powerMonitor.on('shutdown', quitApp)
