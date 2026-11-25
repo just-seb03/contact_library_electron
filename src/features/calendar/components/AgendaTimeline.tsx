@@ -152,10 +152,10 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           <div
             style={{
               ...hourLabelStyle,
-              transform: hour === 0 ? 'translateY(0px)' : 'translateY(-7px)',
+              transform: 'translateY(-7px)',
             }}
           >
-            {formatHour(hour, hourFormatter)}
+            {hour === 0 ? '' : formatHour(hour, hourFormatter)}
           </div>
           <div style={hourCellStyle} />
         </div>

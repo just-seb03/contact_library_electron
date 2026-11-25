@@ -32,10 +32,9 @@ const calendarCardStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
-  maxWidth: 980,
   height: 'calc(100vh - 118px)',
   minHeight: 320,
-  margin: '0 auto',
+  margin: 0,
   border: '1px solid rgba(255, 255, 255, 0.08)',
   boxShadow: '0 12px 32px rgba(0, 0, 0, 0.24)',
   overflow: 'hidden',
@@ -288,7 +287,7 @@ export default function Calendar() {
         style={{
           width: '100%',
           minWidth: 0,
-          padding: '12px 32px 0 32px',
+          padding: '12px 24px 0 24px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}
