@@ -21,8 +21,10 @@
                   purple: { hex: '#e6abff', on: '#322935' },
                   pink: { hex: '#ffaaae', on: '#372829' },
                   red: { hex: '#ffaca1', on: '#372927' },
+                  burgundy: { hex: '#D67A87', on: '#221415' },
                   orange: { hex: '#ffb062', on: '#37291d' },
                   green: { hex: '#4ddb6a', on: '#242f23' },
+                  forest: { hex: '#6EB396', on: '#141d19' },
                   coffee: { hex: '#e3b7a9', on: '#322a28' },
                   graphite: { hex: '#c1c0c6', on: '#2c2c2d' }
                 }
@@ -31,8 +33,10 @@
                   purple: { hex: '#8827b7', on: '#ffffff' },
                   pink: { hex: '#b60033', on: '#ffffff' },
                   red: { hex: '#b70008', on: '#ffffff' },
+                  burgundy: { hex: '#7A1F2B', on: '#ffffff' },
                   orange: { hex: '#864b00', on: '#ffffff' },
                   green: { hex: '#006825', on: '#ffffff' },
+                  forest: { hex: '#1E5641', on: '#ffffff' },
                   coffee: { hex: '#735246', on: '#ffffff' },
                   graphite: { hex: '#59595e', on: '#ffffff' }
                 };
@@ -57,7 +61,16 @@
             root.style.setProperty('--f7-toggle-active-color', hex);
             root.style.setProperty('--f7-button-fill-text-color', entry.on);
 
-            if (parsed.themeId === 'coffee') {
+            var bootSnapshot = localStorage.getItem('contact_library_boot_palette');
+            if (bootSnapshot) {
+              var snap = JSON.parse(bootSnapshot);
+              if (snap.canvas) root.style.setProperty('--macos-canvas-bg', snap.canvas);
+              if (snap.card) root.style.setProperty('--macos-card-bg', snap.card);
+              if (snap.sidebar) root.style.setProperty('--macos-sidebar-glass', snap.sidebar);
+              if (snap.input) root.style.setProperty('--macos-input-bg', snap.input);
+              if (snap.text) root.style.setProperty('--macos-text', snap.text);
+              if (snap.canvas) root.style.setProperty('--f7-page-bg-color', snap.canvas);
+            } else if (parsed.themeId === 'coffee') {
               var canvas = isDark ? '#1F1916' : '#FCF9F5';
               var card = isDark ? '#2E2420' : '#F7F2EB';
               var text = isDark ? '#E6D3C8' : '#3C2A21';

@@ -90,6 +90,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     for (const [key, value] of Object.entries(cssVars)) {
       root.style.setProperty(key, value);
     }
+    try {
+      localStorage.setItem(
+        'contact_library_boot_palette',
+        JSON.stringify({
+          canvas: tokens.canvasBg,
+          card: tokens.cardBg,
+          sidebar: tokens.sidebarGlass,
+          input: tokens.inputBg,
+          text: tokens.text,
+        })
+      );
+    } catch {
+      // fallback
+    }
     root.style.colorScheme = darkMode ? 'dark' : 'light';
     window.electronAPI?.setTheme?.({
       isDark: darkMode,

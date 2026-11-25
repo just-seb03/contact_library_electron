@@ -6,16 +6,20 @@ export type AppleAccentColor =
   | 'purple'
   | 'pink'
   | 'red'
+  | 'burgundy'
   | 'orange'
   | 'green'
+  | 'forest'
   | 'coffee'
   | 'graphite';
 
 export interface AccentColorOption {
   id: AppleAccentColor;
   label: string;
-  /** Color semilla en sRGB (Hue/Chroma base en HCT) */
+  /** Color semilla en sRGB (y color explícito en modo claro si define `darkHex`) */
   hex: string;
+  /** Color explícito opcional para modo oscuro */
+  darkHex?: string;
 }
 
 export const MAC_ACCENT_COLORS: AccentColorOption[] = [
@@ -23,8 +27,10 @@ export const MAC_ACCENT_COLORS: AccentColorOption[] = [
   { id: 'purple', label: 'Morado', hex: '#af52de' },
   { id: 'pink', label: 'Rosa', hex: '#ff2d55' },
   { id: 'red', label: 'Rojo', hex: '#ff3b30' },
+  { id: 'burgundy', label: 'Borgoña', hex: '#7A1F2B', darkHex: '#D67A87' },
   { id: 'orange', label: 'Naranja', hex: '#ff9500' },
   { id: 'green', label: 'Verde', hex: '#34c759' },
+  { id: 'forest', label: 'Botella', hex: '#1E5641', darkHex: '#6EB396' },
   { id: 'coffee', label: 'Café', hex: '#6D4C41' },
   { id: 'graphite', label: 'Grafito', hex: '#8e8e93' },
 ];
@@ -49,6 +55,9 @@ const DARK_ACCENT_TONE = 78;
  */
 export function getAccentHexForMode(accentColor: AppleAccentColor | string, darkMode: boolean): string {
   const selected = MAC_ACCENT_COLORS.find((c) => c.id === accentColor) ?? MAC_ACCENT_COLORS[0];
+  if (selected.darkHex) {
+    return darkMode ? selected.darkHex : selected.hex;
+  }
   const { hue, chroma } = hexToHct(selected.hex);
   const targetTone = darkMode ? DARK_ACCENT_TONE : LIGHT_ACCENT_TONE;
   return hctToHex(hue, chroma, targetTone);
@@ -59,12 +68,10 @@ export function getAccentHexForMode(accentColor: AppleAccentColor | string, dark
  */
 export function resolveAccentTokens(accentColor: AppleAccentColor | string, darkMode: boolean): ResolvedAccentTokens {
   const selected = MAC_ACCENT_COLORS.find((c) => c.id === accentColor) ?? MAC_ACCENT_COLORS[0];
-  const { hue, chroma } = hexToHct(selected.hex);
-  const targetTone = darkMode ? DARK_ACCENT_TONE : LIGHT_ACCENT_TONE;
-
-  const accentHex = hctToHex(hue, chroma, targetTone);
-  const onAccentHex = darkMode ? deriveOnColor(accentHex, 60) : '#ffffff';
-  const gradientEndHex = hctToHex(hue + 24, Math.max(chroma, 12), targetTone);
+  const accentHex = getAccentHexForMode(accentColor, darkMode);
+  const { hue, chroma, tone } = hexToHct(accentHex);
+  const onAccentHex = darkMode ? deriveOnColor(accentHex, 58) : '#ffffff';
+  const gradientEndHex = hctToHex(hue + 24, Math.max(chroma, 12), selected.darkHex ? tone : (darkMode ? DARK_ACCENT_TONE : LIGHT_ACCENT_TONE));
 
   const [r, g, b] = hexToRgb(accentHex);
   const rgb = `${r}, ${g}, ${b}`;

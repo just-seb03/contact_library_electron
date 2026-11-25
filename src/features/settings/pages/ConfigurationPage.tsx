@@ -11,6 +11,7 @@ import {
   SOFTWARE_INFO,
   type AppleAccentColor,
 } from '../data/settingsData';
+import { APP_THEMES } from '../../../core/theme/themes';
 
 export default function Configuration() {
   const { darkMode, toggleDarkMode, settings, updateSetting, updateSettings } = useApp();
@@ -113,7 +114,14 @@ export default function Configuration() {
             darkMode={darkMode}
             onToggleDarkMode={toggleDarkMode}
             themeId={settings.themeId ?? 'default'}
-            onChangeTheme={(themeId) => updateSetting('themeId', themeId)}
+            onChangeTheme={(themeId) => {
+              const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
+              updateSettings(
+                recommendedAccent
+                  ? { themeId, accentColor: recommendedAccent }
+                  : { themeId }
+              );
+            }}
             accentColor={settings.accentColor}
             onChangeAccentColor={handleAccentColorChange}
           />

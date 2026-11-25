@@ -1,6 +1,7 @@
 import { hctToHex, hexToHct, hexToRgba } from './colorScience';
+import type { AppleAccentColor } from '../../features/settings/data/settingsData';
 
-export type AppThemeId = 'default' | 'coffee';
+export type AppThemeId = 'default' | 'coffee' | 'legal_library' | 'estrado';
 
 export interface ThemeModeTokens {
   canvasBg: string;
@@ -35,8 +36,12 @@ export interface AppThemeDefinition {
   id: AppThemeId;
   label: string;
   description: string;
-  /** Color semilla de acento sugerido */
+  /** Color de acento en modo claro (y semilla por defecto) */
   swatchHex: string;
+  /** Color de acento explícito en modo oscuro (opcional; si falta se calcula con HCT) */
+  swatchDarkHex?: string;
+  /** Color de realce sugerido al seleccionar este tema */
+  recommendedAccent: AppleAccentColor;
   light: ThemeModeTokens;
   dark: ThemeModeTokens;
 }
@@ -51,6 +56,8 @@ interface HctThemeSeed {
   label: string;
   description: string;
   swatchHex: string;
+  swatchDarkHex?: string;
+  recommendedAccent: AppleAccentColor;
   neutralHue: number;
   neutralChromaLight: number;
   neutralChromaDark: number;
@@ -153,6 +160,8 @@ function buildHctTheme(seed: HctThemeSeed): AppThemeDefinition {
     label: seed.label,
     description: seed.description,
     swatchHex: seed.swatchHex,
+    swatchDarkHex: seed.swatchDarkHex,
+    recommendedAccent: seed.recommendedAccent,
     light,
     dark,
   };
@@ -168,6 +177,7 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
     label: 'Predeterminado',
     description: 'Estética nativa de macOS',
     swatchHex: '#007aff',
+    recommendedAccent: 'blue',
     neutralHue: 264,
     neutralChromaLight: 2.5,
     neutralChromaDark: 2.5,
@@ -212,6 +222,7 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
     label: 'Café',
     description: 'Tonos cálidos espresso y crema',
     swatchHex: '#6D4C41',
+    recommendedAccent: 'coffee',
     neutralHue: 37.5,
     neutralChromaLight: 9,
     neutralChromaDark: 7.2,
@@ -261,6 +272,90 @@ export const APP_THEMES: Record<AppThemeId, AppThemeDefinition> = {
       },
     },
   }),
+
+  legal_library: buildHctTheme({
+    id: 'legal_library',
+    label: 'Biblioteca Jurídica',
+    description: 'Verde botella y salvia editorial',
+    swatchHex: '#1E5641',
+    swatchDarkHex: '#6EB396',
+    recommendedAccent: 'forest',
+    neutralHue: 165,
+    neutralChromaLight: 5.5,
+    neutralChromaDark: 7.5,
+    lightOverrides: {
+      canvasBg: '#F7F9F7',
+      cardBg: '#ffffff',
+      modalBg: '#ffffff',
+      sidebarGlass: hexToRgba('#EAEFE9', 0.88),
+      toolbarGlass: hexToRgba('#F7F9F7', 0.86),
+      text: '#19231D',
+      scrollbarThumb: hexToRgba('#1E5641', 0.24),
+      scrollbarThumbHover: hexToRgba('#1E5641', 0.40),
+      preview: {
+        canvas: '#F7F9F7',
+        sidebar: '#EAEFE9',
+        card: '#ffffff',
+        muted: hctToHex(165, 5.5, 78),
+      },
+    },
+    darkOverrides: {
+      canvasBg: '#131A16',
+      sidebarGlass: hexToRgba('#1C2620', 0.90),
+      toolbarGlass: hexToRgba('#131A16', 0.88),
+      text: '#DFE8E2',
+      scrollbarThumb: hexToRgba('#6EB396', 0.28),
+      scrollbarThumbHover: hexToRgba('#6EB396', 0.45),
+      preview: {
+        canvas: '#131A16',
+        sidebar: '#1C2620',
+        card: hctToHex(165, 7.5, 15.2),
+        muted: hctToHex(165, 7.875, 22),
+      },
+    },
+  }),
+
+  estrado: buildHctTheme({
+    id: 'estrado',
+    label: 'Estrado',
+    description: 'Borgoña y grafito editorial',
+    swatchHex: '#7A1F2B',
+    swatchDarkHex: '#D67A87',
+    recommendedAccent: 'burgundy',
+    neutralHue: 355,
+    neutralChromaLight: 2.5,
+    neutralChromaDark: 4,
+    lightOverrides: {
+      canvasBg: '#FCFAFA',
+      cardBg: '#ffffff',
+      modalBg: '#ffffff',
+      sidebarGlass: hexToRgba('#F2ECEC', 0.88),
+      toolbarGlass: hexToRgba('#FCFAFA', 0.86),
+      text: '#211A1B',
+      scrollbarThumb: hexToRgba('#7A1F2B', 0.22),
+      scrollbarThumbHover: hexToRgba('#7A1F2B', 0.38),
+      preview: {
+        canvas: '#FCFAFA',
+        sidebar: '#F2ECEC',
+        card: '#ffffff',
+        muted: hctToHex(355, 2.5, 78),
+      },
+    },
+    darkOverrides: {
+      canvasBg: '#1A1617',
+      sidebarGlass: hexToRgba('#262022', 0.90),
+      toolbarGlass: hexToRgba('#1A1617', 0.88),
+      text: '#EAE2E3',
+      scrollbarThumb: hexToRgba('#D67A87', 0.28),
+      scrollbarThumbHover: hexToRgba('#D67A87', 0.45),
+      preview: {
+        canvas: '#1A1617',
+        sidebar: '#262022',
+        card: hctToHex(355, 4, 15.2),
+        muted: hctToHex(355, 4.2, 22),
+      },
+    },
+  }),
 };
 
 export const THEME_LIST: AppThemeDefinition[] = Object.values(APP_THEMES);
@@ -278,6 +373,12 @@ export function getThemeTokens(themeId: AppThemeId | string | undefined, darkMod
  * Devuelve el color de acento representativo de un tema adaptado al modo (Tone Swapping).
  */
 export function getThemeSwatchHex(theme: AppThemeDefinition, darkMode: boolean): string {
+  if (darkMode && theme.swatchDarkHex) {
+    return theme.swatchDarkHex;
+  }
+  if (!darkMode && theme.swatchDarkHex) {
+    return theme.swatchHex;
+  }
   const { hue, chroma } = hexToHct(theme.swatchHex);
   return hctToHex(hue, chroma, darkMode ? 78 : 38);
 }
