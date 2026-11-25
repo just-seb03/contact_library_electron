@@ -18,7 +18,7 @@ interface NavItemConfig {
 }
 
 export const LeftBar = () => {
-  const { activeTab, setActiveTab, clients, hearings, payments, settings } = useApp();
+  const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
 
   const handleSelect = (tab: AppTab) => {
     setActiveTab(tab);
@@ -28,17 +28,6 @@ export const LeftBar = () => {
   const pendingPaymentsCount = payments.filter(
     (p) => p.status === 'pending' || p.status === 'overdue'
   ).length;
-
-  const getInitials = (name?: string) => {
-    if (!name || !name.trim()) return 'CL';
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
-  const lawyerName = settings?.lawyerName?.trim() || 'Estudio Jurídico';
-  const lawyerFirm = settings?.lawyerFirm?.trim() || 'Activo • macOS';
-  const initials = getInitials(settings?.lawyerName);
 
   useEffect(() => {
     f7ready(() => {
@@ -298,101 +287,6 @@ export const LeftBar = () => {
         }}
       >
         {renderNavItems(navItems)}
-      </div>
-
-      {/* ── Pie de la barra lateral (Perfil del Usuario reflejado desde Ajustes) ── */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => handleSelect('config')}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleSelect('config');
-          }
-        }}
-        title="Ver ajustes y perfil de usuario"
-        style={{
-          padding: '12px 14px',
-          borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
-          cursor: 'pointer',
-          transition: 'background-color 0.12s ease',
-          userSelect: 'none',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))';
-        }}
-      >
-        <div
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--macos-accent-color, #0056b8), var(--macos-accent-gradient-end, #5336c7))',
-            color: 'var(--macos-on-accent, #ffffff)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            fontWeight: 700,
-            flexShrink: 0,
-            boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.3))',
-            letterSpacing: '0.5px',
-          }}
-        >
-          {initials}
-        </div>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: 'var(--macos-text, #1c1c1e)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {lawyerName}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: 'var(--macos-text-secondary, #8e8e93)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              overflow: 'hidden',
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#34c759',
-                display: 'inline-block',
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {lawyerFirm}
-            </span>
-          </div>
-        </div>
       </div>
     </nav>
   );
