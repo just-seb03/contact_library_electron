@@ -36,23 +36,16 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
 
   return (
     <header style={toolbarStyle}>
-      {/* ── Izquierda: Controles de ventana (cerrar, minimizar, maximizar) ── */}
-      <div style={{ display: 'flex', alignItems: 'center', ...noDragStyle }}>
+      {/* ── Izquierda: Controles de ventana + Buscador estilo Spotlight al lado ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0, ...noDragStyle }}>
         <TrafficLights />
-      </div>
 
-      {/* ── Centro de la ventana en eje X: Buscador estilo Spotlight ── */}
-      <div
-        style={{
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: 'min(360px, calc(100% - 220px))',
-          display: 'flex',
-          justifyContent: 'center',
-          ...noDragStyle,
-        }}
-      >
+        <div
+          style={{
+            width: 'min(340px, 100%)',
+            display: 'flex',
+          }}
+        >
         <button
           type="button"
           onClick={onOpenSpotlight}
@@ -90,6 +83,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
             ⌘K
           </kbd>
         </button>
+        </div>
       </div>
 
       {/* ── Derecha: Contadores contextuales ── */}
