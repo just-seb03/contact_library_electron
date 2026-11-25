@@ -138,7 +138,7 @@ export default function Dashboard() {
                         style={{
                           fontSize: '15px',
                           fontWeight: 600,
-                          color: '#1c1c1e',
+                          color: 'var(--macos-text, #1c1c1e)',
                           display: 'block',
                           marginBottom: '8px',
                           overflow: 'hidden',
