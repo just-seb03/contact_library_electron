@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
+import brotherSignatureFont from '../../../../assets/fonts/Brother Signature.otf';
 
 const glassCardBase: CSSProperties = {
   borderRadius: 16,
@@ -25,12 +26,22 @@ export default function Dashboard() {
 
   return (
     <Page noNavbar noToolbar>
+      <style>{`
+        @font-face {
+          font-family: 'Brother Signature';
+          src: url('${brotherSignatureFont}') format('opentype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+      `}</style>
+
       <div
         style={{
           minHeight: 'calc(100vh - 52px)',
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(300px, 0.85fr)',
+          gridTemplateColumns: 'minmax(0, 0.95fr) minmax(360px, 1.05fr)',
           alignItems: 'center',
           gap: 40,
           padding: '24px 48px 64px 48px',
@@ -56,12 +67,13 @@ export default function Dashboard() {
                 <br />
                 <span
                   style={{
-                    fontFamily: 'Georgia, "Times New Roman", Palatino, serif',
-                    fontStyle: 'italic',
+                    fontFamily: "'Brother Signature', Georgia, serif",
                     fontWeight: 400,
-                    fontSize: '1.16em',
-                    letterSpacing: '0.05em',
-                    opacity: 0.94,
+                    fontSize: '1.38em',
+                    letterSpacing: '0.04em',
+                    opacity: 0.95,
+                    display: 'inline-block',
+                    marginTop: 6,
                   }}
                 >
                   tranquilo
@@ -73,12 +85,13 @@ export default function Dashboard() {
                 <br />
                 <span
                   style={{
-                    fontFamily: 'Georgia, "Times New Roman", Palatino, serif',
-                    fontStyle: 'italic',
+                    fontFamily: "'Brother Signature', Georgia, serif",
                     fontWeight: 400,
-                    fontSize: '1.16em',
-                    letterSpacing: '0.05em',
-                    opacity: 0.94,
+                    fontSize: '1.38em',
+                    letterSpacing: '0.04em',
+                    opacity: 0.95,
+                    display: 'inline-block',
+                    marginTop: 6,
                   }}
                 >
                   día
@@ -88,22 +101,23 @@ export default function Dashboard() {
           </h1>
         </div>
 
-        {/* ── Mitad derecha: Pila de cuadros glass tipo Apple ── */}
+        {/* ── Mitad derecha: Pila de cuadros glass tipo Apple alineada con el texto ── */}
         <div
           style={{
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
             width: '100%',
-            maxWidth: 420,
+            maxWidth: 520,
             justifySelf: 'end',
+            paddingTop: 150,
           }}
         >
           {/* Cuadro grueso principal: estado de reuniones */}
           <div
             style={{
               ...glassCardBase,
-              padding: '22px 22px',
+              padding: '22px 24px',
               minHeight: 84,
               display: 'flex',
               flexDirection: 'column',
@@ -140,7 +154,7 @@ export default function Dashboard() {
           <div
             style={{
               ...glassCardBase,
-              padding: '22px 22px',
+              padding: '22px 24px',
               minHeight: 84,
               display: 'flex',
               flexDirection: 'column',
