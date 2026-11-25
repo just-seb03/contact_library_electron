@@ -1,15 +1,14 @@
 import type { CSSProperties } from 'react';
-import {
-  APP_SHADOWS,
-  APP_SPACING,
-} from '../../core/theme/style';
+import { APP_SPACING } from '../../core/theme/style';
 
 export const PAYMENT_SURFACE_STYLE: CSSProperties = {
-  backgroundColor: 'var(--macos-card-bg, #ffffff)',
-  color: 'var(--macos-text, #1c1c1e)',
-  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
-  borderRadius: APP_SPACING.itemRadius,
-  boxShadow: APP_SHADOWS.section,
+  backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  color: 'var(--macos-text, #ececef)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  borderRadius: 16,
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
 };
 
 export const PAYMENT_CONTROL_STYLE: CSSProperties = {
@@ -17,10 +16,10 @@ export const PAYMENT_CONTROL_STYLE: CSSProperties = {
   boxSizing: 'border-box',
   minHeight: 40,
   padding: '9px 12px',
-  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.15))',
-  borderRadius: APP_SPACING.controlRadius,
-  backgroundColor: 'var(--macos-input-bg, #ffffff)',
-  color: 'var(--macos-text, #1c1c1e)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  borderRadius: 10,
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  color: 'var(--macos-text, #ececef)',
   fontSize: 14,
   fontFamily: 'inherit',
 };

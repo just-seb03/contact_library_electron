@@ -78,24 +78,82 @@ export default function PaymentsPage() {
     return matchesId && matchesStartDate && matchesEndDate;
   });
 
+  const filterKey = `${filters.invoiceId}-${filters.startDate}-${filters.endDate}-${filteredPayments.length}`;
+
   return (
     <Page noNavbar noToolbar>
-      <div style={{ ...PAGE_CONTENT_STYLE, overflowY: 'auto' }}>
-        <PaymentsHeader onRegisterPayment={() => setIsRegisterPopupOpen(true)} />
-        <PaymentsStats
-          totalIngresos={totalIngresos}
-          totalPendientes={totalPendientes}
-          totalVencidos={totalVencidos}
-        />
-        <PaymentsFilterBar
-          onApplyFilters={setFilters}
-        />
-        <PaymentsTable
-          payments={filteredPayments}
-          highlightedPaymentId={highlightedPaymentId}
-          onEdit={setEditingPayment}
-          onDelete={deletePayment}
-        />
+      <style>{`
+        @keyframes payEnter {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes payFilterSwitch {
+          from {
+            opacity: 0;
+            transform: translateY(6px) scale(0.992);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .pay-anim {
+          opacity: 0;
+          animation: payEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .pay-filter-anim {
+          animation: payFilterSwitch 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .pay-anim,
+          .pay-filter-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
+      <div
+        style={{
+          ...PAGE_CONTENT_STYLE,
+          height: 'calc(100vh - 58px)',
+          padding: '12px 24px 84px 24px',
+          overflowY: 'auto',
+          maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+        }}
+      >
+        <div className="pay-anim" style={{ animationDelay: '40ms' }}>
+          <PaymentsHeader onRegisterPayment={() => setIsRegisterPopupOpen(true)} />
+        </div>
+        <div className="pay-anim" style={{ animationDelay: '90ms' }}>
+          <PaymentsStats
+            totalIngresos={totalIngresos}
+            totalPendientes={totalPendientes}
+            totalVencidos={totalVencidos}
+          />
+        </div>
+        <div className="pay-anim" style={{ animationDelay: '140ms' }}>
+          <PaymentsFilterBar
+            onApplyFilters={setFilters}
+          />
+        </div>
+        <div key={filterKey} className="pay-filter-anim">
+          <PaymentsTable
+            payments={filteredPayments}
+            highlightedPaymentId={highlightedPaymentId}
+            onEdit={setEditingPayment}
+            onDelete={deletePayment}
+          />
+        </div>
       </div>
       <RegisterPaymentPopup
         opened={isRegisterPopupOpen}

@@ -26,34 +26,31 @@ export const PaymentsStats = ({
         label: 'Ingresos cobrados',
         value: formatCLP(totalIngresos),
         icon: 'arrow_down_left',
-        color: '#34c759',
       },
       {
         label: 'Por cobrar',
         value: formatCLP(totalPendientes),
-        icon: 'clock_fill',
-        color: '#ff9500',
+        icon: 'clock',
       },
       {
         label: 'Vencidos',
         value: formatCLP(totalVencidos),
-        icon: 'exclamationmark_circle_fill',
-        color: '#ff3b30',
+        icon: 'exclamationmark_circle',
       },
-    ].map(({ label, value, icon, color }) => (
+    ].map(({ label, value, icon }) => (
       <article
         key={label}
         style={{
           ...PAYMENT_SURFACE_STYLE,
           minWidth: 0,
-          padding: '15px 16px',
+          padding: '16px 18px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, color }}>
-          <Icon f7={icon} size="17px" />
-          <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12, fontWeight: 600 }}>{label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--macos-text-secondary, #a4a4ab)' }}>
+          <Icon f7={icon} size="15px" />
+          <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.02em' }}>{label}</span>
         </div>
-        <div style={{ marginTop: 9, color: 'var(--macos-text, #1c1c1e)', fontSize: 'clamp(18px, 2.2vw, 25px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
+        <div style={{ marginTop: 10, color: 'var(--macos-text, #ececef)', fontSize: 'clamp(18px, 2.2vw, 24px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
           {value}
         </div>
       </article>

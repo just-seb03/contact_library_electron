@@ -30,20 +30,20 @@ export const PaymentsTable: FC<TableProps> = ({ payments, highlightedPaymentId, 
 
   const headerCellStyle = {
     padding: '12px 14px',
-    color: 'var(--macos-text-secondary, #6e6e73)',
+    color: 'var(--macos-text-secondary, #a4a4ab)',
     fontSize: '11px',
     fontWeight: 700,
     textAlign: 'left' as const,
     textTransform: 'uppercase' as const,
     letterSpacing: '0.04em',
     whiteSpace: 'nowrap' as const,
-    borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
   };
   const cellStyle = {
     padding: '14px',
-    color: 'var(--macos-text, #1c1c1e)',
+    color: 'var(--macos-text, #ececef)',
     fontSize: '14px',
-    borderTop: '1px solid var(--macos-card-border, rgba(60, 60, 67, 0.12))',
+    borderTop: '1px solid rgba(255, 255, 255, 0.06)',
     textAlign: 'left' as const,
   };
 
