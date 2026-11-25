@@ -184,11 +184,13 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   padding: '4px 10px',
                   borderRadius: 8,
                   backgroundColor: isSelected
-                    ? 'var(--macos-text, #ececef)'
+                    ? 'var(--macos-active-bg, #323237)'
                     : isToday
                     ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
                     : 'transparent',
-                  border: isToday && !isSelected
+                  border: isSelected
+                    ? '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.35))'
+                    : isToday
                     ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.4))'
                     : '1px solid transparent',
                 }}
@@ -197,9 +199,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   style={{
                     fontSize: 10,
                     fontWeight: 700,
-                    color: isSelected
-                      ? 'var(--macos-canvas-bg, #18181a)'
-                      : 'var(--macos-text-secondary, #8e8e93)',
+                    color: 'var(--macos-text-secondary, #8e8e93)',
                     letterSpacing: '0.04em',
                   }}
                 >
@@ -209,9 +209,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   style={{
                     fontSize: 13,
                     fontWeight: isToday || isSelected ? 700 : 500,
-                    color: isSelected
-                      ? 'var(--macos-canvas-bg, #18181a)'
-                      : 'var(--macos-text, #1c1c1e)',
+                    color: 'var(--macos-text, #1c1c1e)',
                   }}
                 >
                   {dayFormatter.format(day)}

@@ -113,7 +113,7 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
       {items.map((item) => {
         const isActive = activeTab === item.id;
         const inactiveColor = 'var(--macos-text-secondary, rgba(60, 60, 67, 0.55))';
-        const activeColor = '#ffffff';
+        const activeColor = 'var(--macos-text, #ececef)';
         const hoverColor = 'var(--macos-text, #1c1c1e)';
         return (
           <button
@@ -132,12 +132,12 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
               height: 32,
               padding: isActive ? '0 12px' : 0,
               borderRadius: isActive ? 999 : 0,
-              border: isActive ? '1px solid rgba(255, 255, 255, 0.14)' : 'none',
+              border: isActive ? '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))' : 'none',
               outline: 'none',
               cursor: 'pointer',
-              backgroundColor: isActive ? '#1c1c1e' : 'transparent',
+              backgroundColor: isActive ? 'var(--macos-active-bg, #323237)' : 'transparent',
               color: isActive ? activeColor : inactiveColor,
-              boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.18)' : 'none',
+              boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.16)' : 'none',
               transition: 'all 0.16s ease',
               boxSizing: 'border-box',
               flexShrink: 0,
@@ -186,8 +186,12 @@ export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
                   height: 15,
                   padding: '0 4px',
                   borderRadius: 8,
-                  backgroundColor: isActive ? '#ffffff' : 'var(--macos-text, #1c1c1e)',
-                  color: isActive ? '#1c1c1e' : 'var(--macos-canvas-bg, #ffffff)',
+                  backgroundColor: isActive
+                    ? 'var(--macos-accent-color, #59595e)'
+                    : 'var(--macos-text, #1c1c1e)',
+                  color: isActive
+                    ? 'var(--macos-on-accent, #ffffff)'
+                    : 'var(--macos-canvas-bg, #ffffff)',
                   fontSize: 9,
                   fontWeight: 700,
                   display: 'flex',

@@ -28,13 +28,13 @@ export const CalendarViewSwitcher: FC<CalendarViewSwitcherProps> = ({
     fontWeight: active ? 600 : 500,
     cursor: 'pointer',
     backgroundColor: active
-      ? 'var(--macos-text, #1c1c1e)'
+      ? 'var(--macos-active-bg, #323237)'
       : 'transparent',
     color: active
-      ? 'var(--macos-canvas-bg, #ffffff)'
+      ? 'var(--macos-text, #ececef)'
       : 'var(--macos-text-muted, #888890)',
     boxShadow: active
-      ? '0 1px 4px rgba(0, 0, 0, 0.2)'
+      ? '0 1px 4px rgba(0, 0, 0, 0.14)'
       : 'none',
     transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
   });
