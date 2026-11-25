@@ -26,9 +26,9 @@ function to24HourTime(time: string): string | null {
 }
 
 const calendarCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: 'rgba(255, 255, 255, 0.038)',
+  ['--f7-card-bg-color' as string]: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
   ['--f7-card-border-radius' as string]: '18px',
-  backgroundColor: 'rgba(255, 255, 255, 0.038)',
+  backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
   backdropFilter: 'blur(24px) saturate(160%)',
   WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   display: 'flex',
@@ -37,8 +37,8 @@ const calendarCardStyle: CSSProperties = {
   height: 'calc(100vh - 172px)',
   minHeight: 320,
   margin: 0,
-  border: '1px solid rgba(255, 255, 255, 0.08)',
-  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.24)',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
   overflow: 'hidden',
   maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
   WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
@@ -347,8 +347,8 @@ export default function Calendar() {
               ...sidebarPanelStyle,
               width: compactLayout ? '100%' : 300,
               minWidth: compactLayout ? 0 : 300,
-              borderLeft: compactLayout ? 'none' : '1px solid rgba(255, 255, 255, 0.07)',
-              borderTop: compactLayout ? '1px solid rgba(255, 255, 255, 0.07)' : 'none',
+              borderLeft: compactLayout ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.16))',
+              borderTop: compactLayout ? '1px solid var(--macos-divider, rgba(128, 128, 136, 0.16))' : 'none',
             }}>
               <AgendaMiniCalendar
                 selectedDate={selectedDate}

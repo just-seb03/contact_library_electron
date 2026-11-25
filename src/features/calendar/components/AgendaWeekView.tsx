@@ -100,7 +100,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     .replace('.', '')
     .toUpperCase();
 
-  const borderColor = 'rgba(255, 255, 255, 0.07)';
+  const borderColor = 'var(--macos-divider, rgba(128, 128, 136, 0.14))';
 
   const containerStyle: CSSProperties = {
     minWidth: 0,
@@ -120,17 +120,15 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   const headerCellStyle: CSSProperties = {
     position: 'sticky',
     top: 0,
-    zIndex: 6,
+    zIndex: 12,
     height: HEADER_HEIGHT,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 2,
-    backgroundColor: 'rgba(24, 24, 26, 0.72)',
+    gap: 6,
+    backgroundColor: 'var(--macos-modal-bg, #242428)',
     borderBottom: `1px solid ${borderColor}`,
     borderRight: `1px solid ${borderColor}`,
-    backdropFilter: 'blur(20px)',
   };
 
   const hourCellStyle: CSSProperties = {
@@ -161,60 +159,64 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
           style={{
             ...headerCellStyle,
             left: 0,
-            zIndex: 7,
-            position: 'sticky',
+            zIndex: 14,
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: '0.06em',
-            color: 'var(--macos-text-secondary, #a4a4ab)',
+            color: 'var(--macos-text-secondary, #8e8e93)',
           }}
         >
           {monthLabel}
         </div>
 
-        {/* Encabezados de días de la semana (LUN, MAR... + número con insignia Apple) */}
+        {/* Encabezados de días de la semana (LUN 23) */}
         {days.map((day, index) => {
           const isSelected = toDateKey(day) === toDateKey(selectedDate);
           const isToday = toDateKey(day) === todayKey;
 
           return (
             <div key={dateKeys[index]} style={headerCellStyle}>
-              <span
+              <div
                 style={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: isToday
-                    ? 'var(--macos-accent-color, #007aff)'
-                    : 'var(--macos-text-secondary, #8e8e93)',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                {formatWeekday(index)}
-              </span>
-
-              <span
-                style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: '50%',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: 13,
-                  fontWeight: isToday || isSelected ? 700 : 500,
-                  color: isToday
-                    ? 'var(--macos-on-accent, #ffffff)'
-                    : 'var(--macos-text, #1c1c1e)',
-                  backgroundColor: isToday
-                    ? 'var(--macos-accent-color, #007aff)'
-                    : isSelected
-                    ? 'var(--macos-active-bg, rgba(0, 0, 0, 0.08))'
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 8,
+                  backgroundColor: isSelected
+                    ? 'var(--macos-text, #ececef)'
+                    : isToday
+                    ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
                     : 'transparent',
-                  boxShadow: isToday ? '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))' : 'none',
+                  border: isToday && !isSelected
+                    ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.4))'
+                    : '1px solid transparent',
                 }}
               >
-                {dayFormatter.format(day)}
-              </span>
+                <span
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: isSelected
+                      ? 'var(--macos-canvas-bg, #18181a)'
+                      : 'var(--macos-text-secondary, #8e8e93)',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  {formatWeekday(index)}
+                </span>
+                <span
+                  style={{
+                    fontSize: 13,
+                    fontWeight: isToday || isSelected ? 700 : 500,
+                    color: isSelected
+                      ? 'var(--macos-canvas-bg, #18181a)'
+                      : 'var(--macos-text, #1c1c1e)',
+                  }}
+                >
+                  {dayFormatter.format(day)}
+                </span>
+              </div>
             </div>
           );
         })}
@@ -230,7 +232,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
 
               return (
                 <div key={`${hour}-${currentDayKey}`} style={dayCellStyle}>
-                  {/* Contorno claro en el bloque horario actual de Hoy */}
+                  {/* Contorno en el bloque horario actual de Hoy */}
                   {isTodayColumn && hour === currentHour && (
                     <div
                       aria-hidden="true"
@@ -238,12 +240,28 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                         position: 'absolute',
                         inset: '2px 4px',
                         borderRadius: 8,
-                        border: '1.5px solid rgba(236, 236, 239, 0.42)',
-                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        border: '1.5px solid var(--macos-text-secondary, rgba(120, 120, 128, 0.55))',
+                        backgroundColor: 'var(--macos-subtle-bg, rgba(120, 120, 128, 0.06))',
                         zIndex: 3,
                         pointerEvents: 'none',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'flex-end',
+                        padding: '4px 6px',
                       }}
-                    />
+                    >
+                      <span
+                        style={{
+                          fontFamily: 'Georgia, "Times New Roman", serif',
+                          fontStyle: 'italic',
+                          fontSize: 10.5,
+                          color: 'var(--macos-text-secondary, #8e8e93)',
+                          opacity: 0.85,
+                        }}
+                      >
+                        estás aquí
+                      </span>
+                    </div>
                   )}
 
                   {/* Renderizado de eventos en la primera fila horaria (con top absoluto) */}

@@ -161,7 +161,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
         </div>
       ))}
 
-      {/* ── Contorno claro en el bloque horario actual ── */}
+      {/* ── Contorno en el bloque horario actual (adaptado a claro/oscuro) ── */}
       {isToday && (
         <div
           aria-hidden="true"
@@ -172,13 +172,29 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
             top: currentHourTop + 2,
             height: HOUR_HEIGHT - 4,
             borderRadius: 10,
-            border: '1.5px solid rgba(236, 236, 239, 0.42)',
-            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            border: '1.5px solid var(--macos-text-secondary, rgba(120, 120, 128, 0.55))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(120, 120, 128, 0.06))',
             boxSizing: 'border-box',
             zIndex: 2,
             pointerEvents: 'none',
+            display: 'flex',
+            alignItems: 'flex-start',
+            justifyContent: 'flex-end',
+            padding: '6px 12px',
           }}
-        />
+        >
+          <span
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontStyle: 'italic',
+              fontSize: 12,
+              color: 'var(--macos-text-secondary, #8e8e93)',
+              opacity: 0.85,
+            }}
+          >
+            estás aquí
+          </span>
+        </div>
       )}
 
       {/* ── Chips de Audiencias (Judiciales) ── */}

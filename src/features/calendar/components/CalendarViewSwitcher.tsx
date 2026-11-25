@@ -14,8 +14,8 @@ export const CalendarViewSwitcher: FC<CalendarViewSwitcherProps> = ({
     alignItems: 'center',
     padding: 3,
     borderRadius: 999,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.1))',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
     userSelect: 'none',
   };
 
@@ -28,10 +28,10 @@ export const CalendarViewSwitcher: FC<CalendarViewSwitcherProps> = ({
     fontWeight: active ? 600 : 500,
     cursor: 'pointer',
     backgroundColor: active
-      ? 'rgba(255, 255, 255, 0.14)'
+      ? 'var(--macos-text, #1c1c1e)'
       : 'transparent',
     color: active
-      ? 'var(--macos-text, #ececef)'
+      ? 'var(--macos-canvas-bg, #ffffff)'
       : 'var(--macos-text-muted, #888890)',
     boxShadow: active
       ? '0 1px 4px rgba(0, 0, 0, 0.2)'
