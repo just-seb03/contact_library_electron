@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Page, Panel, View, f7ready } from 'framework7-react';
+import { View, f7ready } from 'framework7-react';
 import routes from '../navigation/routes';
 import { LeftBar } from '../navigation/LeftBar';
 import { UnifiedToolbar } from './components/UnifiedToolbar';
 import { SpotlightModal } from './components/SpotlightModal';
-import { SIDEBAR_SURFACE_STYLE, CONTENT_VIEW_STYLE, APP_SPACING } from './theme/style';
+import { CONTENT_VIEW_STYLE } from './theme/style';
 import { navigateToTab } from '../navigation/navigation';
 import { useSystemNavigation } from '../navigation/useSystemNavigation';
 import { useApp } from './context/AppContext';
@@ -69,33 +69,13 @@ export function AppShell() {
         }
       `}</style>
 
-      {/* ── Barra Lateral estilo Source List de macOS ── */}
-      <Panel
-        left
-        visibleBreakpoint={0}
-        backdrop={false}
-        style={SIDEBAR_SURFACE_STYLE}
-      >
-        <View style={SIDEBAR_SURFACE_STYLE}>
-          <Page
-            pageContent={false}
-            noNavbar
-            noToolbar
-            style={SIDEBAR_SURFACE_STYLE}
-          >
-            <LeftBar />
-          </Page>
-        </View>
-      </Panel>
-
-      {/* ── Área Principal de Contenido con Unified Toolbar (al lado, sin superponerse) ── */}
+      {/* ── Área Principal de Contenido a ancho completo con Unified Toolbar ── */}
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          marginLeft: `${APP_SPACING.sidebarWidth}px`,
-          width: `calc(100% - ${APP_SPACING.sidebarWidth}px)`,
+          width: '100%',
           overflow: 'hidden',
           boxSizing: 'border-box',
         }}
@@ -114,6 +94,9 @@ export function AppShell() {
           }}
         />
       </div>
+
+      {/* ── Navegación flotante monocroma en esquina inferior izquierda ── */}
+      <LeftBar />
 
       {/* ── Buscador Rápido Spotlight (⌘K) ── */}
       <SpotlightModal

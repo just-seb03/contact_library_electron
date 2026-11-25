@@ -1,7 +1,7 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import { useApp } from '../context/AppContext';
-import { APP_SPACING } from '../theme/style';
+import { TrafficLights } from '../windowControls/TrafficLights';
 
 interface UnifiedToolbarProps {
   onOpenSpotlight: () => void;
@@ -18,7 +18,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
     width: '100%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     padding: '0 16px',
     boxSizing: 'border-box',
     backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.82))',
@@ -36,13 +36,18 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
 
   return (
     <header style={toolbarStyle}>
+      {/* ── Izquierda: Controles de ventana (cerrar, minimizar, maximizar) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', ...noDragStyle }}>
+        <TrafficLights />
+      </div>
+
       {/* ── Centro de la ventana en eje X: Buscador estilo Spotlight ── */}
       <div
         style={{
           position: 'absolute',
-          left: `calc(50vw - ${APP_SPACING.sidebarWidth}px)`,
+          left: '50%',
           transform: 'translateX(-50%)',
-          width: 'min(360px, calc(100% - 32px))',
+          width: 'min(360px, calc(100% - 220px))',
           display: 'flex',
           justifyContent: 'center',
           ...noDragStyle,

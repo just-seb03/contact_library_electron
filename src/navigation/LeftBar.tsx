@@ -4,8 +4,6 @@ import type { Router as Framework7Router } from 'framework7/types';
 import { useApp } from '../core/context/AppContext';
 import type { AppTab } from '../core/context/types';
 import { navigateToTab, getAppTabForRoute } from './navigation';
-import { TrafficLights } from '../core/windowControls/TrafficLights';
-import { MACOS_THEME } from '../core/theme/style';
 
 interface NavItemConfig {
   id: AppTab;
@@ -94,17 +92,14 @@ export const LeftBar = () => {
   ];
 
   const containerStyle: CSSProperties = {
-    height: '100%',
-    width: '100%',
+    position: 'fixed',
+    left: 16,
+    bottom: 14,
+    zIndex: 500,
     display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
-    backdropFilter: MACOS_THEME.backdropBlur,
-    WebkitBackdropFilter: MACOS_THEME.backdropBlur,
-    color: 'var(--macos-text, #1c1c1e)',
+    alignItems: 'center',
     userSelect: 'none',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
+    pointerEvents: 'auto',
   };
 
   const renderNavItems = (items: NavItemConfig[]) => (
@@ -193,38 +188,7 @@ export const LeftBar = () => {
 
   return (
     <nav style={containerStyle} aria-label="Navegación principal">
-      {/* ── Cabecera de la barra lateral (Traffic Lights + Arrastre) ── */}
-      <div
-        style={{
-          height: 52,
-          minHeight: 52,
-          padding: '0 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          WebkitAppRegion: 'drag',
-          borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-        } as CSSProperties}
-      >
-        <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
-          <TrafficLights />
-        </div>
-      </div>
-
-      {/* ── Espacio flexible para anclar la navegación abajo a la izquierda ── */}
-      <div style={{ flex: 1 }} />
-
-      {/* ── Fila horizontal de iconos monocromos en esquina inferior izquierda ── */}
-      <div
-        style={{
-          padding: '12px 12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-        }}
-      >
-        {renderNavItems(navItems)}
-      </div>
+      {renderNavItems(navItems)}
     </nav>
   );
 };
