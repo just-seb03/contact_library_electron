@@ -95,7 +95,7 @@ export const LeftBar = () => {
     position: 'fixed',
     left: 16,
     bottom: 14,
-    zIndex: 500,
+    zIndex: 4500,
     display: 'flex',
     alignItems: 'center',
     userSelect: 'none',
