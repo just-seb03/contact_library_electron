@@ -1,4 +1,5 @@
 import { useEffect, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon, f7, f7ready } from 'framework7-react';
 import type { Router as Framework7Router } from 'framework7/types';
 import { useApp } from '../core/context/AppContext';
@@ -95,7 +96,7 @@ export const LeftBar = () => {
     position: 'fixed',
     left: 16,
     bottom: 14,
-    zIndex: 4500,
+    zIndex: 9000,
     display: 'flex',
     alignItems: 'center',
     userSelect: 'none',
@@ -186,11 +187,13 @@ export const LeftBar = () => {
     </div>
   );
 
-  return (
+  const navElement = (
     <nav style={containerStyle} aria-label="Navegación principal">
       {renderNavItems(navItems)}
     </nav>
   );
+
+  return typeof document !== 'undefined' ? createPortal(navElement, document.body) : navElement;
 };
 
 export const Sidebar = LeftBar;
