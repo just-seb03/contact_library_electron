@@ -263,10 +263,10 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
         style={{
           width: 580,
           maxWidth: '92vw',
-          backgroundColor: darkMode ? 'rgba(34, 34, 38, 0.94)' : 'rgba(255, 255, 255, 0.94)',
+          backgroundColor: 'var(--macos-modal-bg, rgba(255, 255, 255, 0.94))',
           borderRadius: 14,
           boxShadow: '0 20px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.12)',
-          border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
+          border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
@@ -281,13 +281,13 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
             alignItems: 'center',
             gap: 12,
             padding: '14px 18px',
-            borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+            borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
           }}
         >
           <Icon
             f7="search"
             size="20px"
-            style={{ color: '#007aff', flexShrink: 0 }}
+            style={{ color: 'var(--macos-accent-color, #007aff)', flexShrink: 0 }}
           />
           <input
             ref={inputRef}
@@ -305,7 +305,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
               background: 'transparent',
               fontSize: 17,
               fontWeight: 450,
-              color: darkMode ? '#ffffff' : '#1c1c1e',
+              color: 'var(--macos-text, #1c1c1e)',
               fontFamily: 'inherit',
             }}
           />
@@ -315,8 +315,8 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
               fontWeight: 500,
               padding: '3px 6px',
               borderRadius: 5,
-              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
-              color: darkMode ? '#a1a1aa' : '#8e8e93',
+              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
+              color: 'var(--macos-text-secondary, #8e8e93)',
             }}
           >
             ESC
@@ -337,7 +337,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
               style={{
                 padding: '32px 16px',
                 textAlign: 'center',
-                color: darkMode ? '#8e8e93' : '#8e8e93',
+                color: 'var(--macos-text-secondary, #8e8e93)',
                 fontSize: 14,
               }}
             >
@@ -362,9 +362,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                     borderRadius: 8,
                     cursor: 'pointer',
                     backgroundColor: isSelected
-                      ? darkMode
-                        ? 'rgba(0, 122, 255, 0.25)'
-                        : 'rgba(0, 122, 255, 0.12)'
+                      ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
                       : 'transparent',
                     transition: 'background-color 0.1s ease',
                   }}
@@ -398,9 +396,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                           fontWeight: 550,
                           color: isSelected
                             ? 'var(--macos-accent-color, #007aff)'
-                            : darkMode
-                            ? '#ffffff'
-                            : '#1c1c1e',
+                            : 'var(--macos-text, #1c1c1e)',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
@@ -411,7 +407,7 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                       <div
                         style={{
                           fontSize: 12,
-                          color: darkMode ? '#a1a1aa' : '#8e8e93',
+                          color: 'var(--macos-text-secondary, #8e8e93)',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
@@ -432,10 +428,10 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
                         borderRadius: 10,
                         backgroundColor: isSelected
                           ? 'var(--macos-accent-tint-active, rgba(0, 122, 255, 0.2))'
-                          : darkMode
-                          ? 'rgba(255, 255, 255, 0.08)'
-                          : 'rgba(0, 0, 0, 0.05)',
-                        color: isSelected ? 'var(--macos-accent-color, #007aff)' : darkMode ? '#c7c7cc' : '#636366',
+                          : 'var(--macos-hover-bg, rgba(0, 0, 0, 0.05))',
+                        color: isSelected
+                          ? 'var(--macos-accent-color, #007aff)'
+                          : 'var(--macos-text-muted, #636366)',
                         flexShrink: 0,
                         marginLeft: 8,
                       }}
@@ -456,10 +452,10 @@ export const SpotlightModal: FC<SpotlightModalProps> = ({ isOpen, onClose }) => 
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '8px 16px',
-            borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+            borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
             fontSize: 11,
-            color: darkMode ? '#8e8e93' : '#8e8e93',
-            backgroundColor: darkMode ? 'rgba(20, 20, 22, 0.4)' : 'rgba(245, 245, 247, 0.5)',
+            color: 'var(--macos-text-secondary, #8e8e93)',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
           }}
         >
           <div style={{ display: 'flex', gap: 14 }}>

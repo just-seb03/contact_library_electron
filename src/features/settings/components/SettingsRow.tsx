@@ -21,7 +21,6 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
   subtitle,
   control,
   isLast = false,
-  darkMode = false,
   onClick,
 }) => {
   const rowStyle: CSSProperties = {
@@ -62,13 +61,13 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
   const titleStyle: CSSProperties = {
     fontSize: 13.5,
     fontWeight: 550,
-    color: darkMode ? '#f2f2f7' : '#1c1c1e',
+    color: 'var(--macos-text, #1c1c1e)',
     lineHeight: 1.3,
   };
 
   const subtitleStyle: CSSProperties = {
     fontSize: 11.5,
-    color: darkMode ? 'rgba(235, 235, 245, 0.45)' : '#8e8e93',
+    color: 'var(--macos-text-secondary, #8e8e93)',
     marginTop: 2,
     lineHeight: 1.35,
   };
@@ -86,9 +85,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
       onClick={onClick}
       onMouseEnter={(e) => {
         if (onClick) {
-          e.currentTarget.style.backgroundColor = darkMode
-            ? 'rgba(255, 255, 255, 0.04)'
-            : 'rgba(0, 0, 0, 0.02)';
+          e.currentTarget.style.backgroundColor = 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.02))';
         }
       }}
       onMouseLeave={(e) => {
@@ -117,9 +114,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
             right: 0,
             left: 58,
             height: 1,
-            backgroundColor: darkMode
-              ? 'rgba(255, 255, 255, 0.06)'
-              : 'rgba(0, 0, 0, 0.05)',
+            backgroundColor: 'var(--macos-divider, rgba(0, 0, 0, 0.05))',
             pointerEvents: 'none',
           }}
         />

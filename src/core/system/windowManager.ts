@@ -4,10 +4,10 @@
  * y el comportamiento "cerrar = ocultar en segundo plano" (estilo Discord).
  */
 
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import path from 'node:path'
 import { APP_COLORS } from '../theme/style'
-import { IPC_CHANNELS, createIpcSuccess } from '../../shared/types/ipc'
+import { IPC_CHANNELS, createIpcSuccess, type SetThemeDTO } from '../../shared/types/ipc'
 import type { NavigationRequest } from '../../shared/types/navigation'
 import { attachContextMenu } from '../menu/contextMenu'
 import { getSystemPreferences } from './preferences'
@@ -155,6 +155,15 @@ export function registerWindowController(): void {
   ipcMain.on(IPC_CHANNELS.WINDOW_MAXIMIZE, handleMaximize)
   ipcMain.on(IPC_CHANNELS.WINDOW_CLOSE, handleClose)
   ipcMain.handle(IPC_CHANNELS.APP_GET_PLATFORM, () => createIpcSuccess(process.platform))
+
+  // Sincroniza el tema nativo (menús, diálogos) y el color de fondo de la ventana con el tema activo.
+  ipcMain.on(IPC_CHANNELS.APP_SET_THEME, (_event, payload?: Partial<SetThemeDTO>) => {
+    nativeTheme.themeSource = payload?.isDark ? 'dark' : 'light'
+    const target = getMainWindow()
+    if (target && payload?.backgroundColor && /^#[0-9a-fA-F]{6}$/.test(payload.backgroundColor)) {
+      target.setBackgroundColor(payload.backgroundColor)
+    }
+  })
 
   // Compatibilidad con llamadas heredadas
   ipcMain.on('window-minimize', handleMinimize)

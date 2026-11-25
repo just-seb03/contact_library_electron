@@ -11,6 +11,7 @@ import {
   SOFTWARE_INFO,
   type AppleAccentColor,
 } from '../data/settingsData';
+import { APP_THEMES } from '../../../core/theme/themes';
 
 export default function Configuration() {
   const { darkMode, toggleDarkMode, settings, updateSetting, updateSettings } = useApp();
@@ -41,14 +42,14 @@ export default function Configuration() {
     fontSize: 28,
     fontWeight: 700,
     letterSpacing: '-0.025em',
-    color: darkMode ? '#FFFFFF' : '#1C1C1E',
+    color: 'var(--macos-text, #1c1c1e)',
     margin: 0,
     lineHeight: 1.2,
   };
 
   const descriptionStyle: CSSProperties = {
     fontSize: 13.5,
-    color: darkMode ? '#a1a1aa' : '#8E8E93',
+    color: 'var(--macos-text-secondary, #8e8e93)',
     marginTop: 6,
     marginBottom: 24,
     lineHeight: 1.45,
@@ -57,8 +58,8 @@ export default function Configuration() {
   const versionBadgeStyle: CSSProperties = {
     fontSize: 12,
     fontWeight: 600,
-    color: darkMode ? '#c7c7cc' : '#636366',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+    color: 'var(--macos-text-muted, #636366)',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.05))',
     padding: '4px 8px',
     borderRadius: 6,
     fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
@@ -71,7 +72,7 @@ export default function Configuration() {
     fontSize: 12,
     fontWeight: 600,
     color: '#34C759',
-    backgroundColor: darkMode ? 'rgba(52, 199, 89, 0.12)' : 'rgba(52, 199, 89, 0.1)',
+    backgroundColor: 'rgba(52, 199, 89, 0.12)',
     padding: '3px 8px',
     borderRadius: 12,
   };
@@ -112,6 +113,15 @@ export default function Configuration() {
           <SettingsAppearanceSelector
             darkMode={darkMode}
             onToggleDarkMode={toggleDarkMode}
+            themeId={settings.themeId ?? 'default'}
+            onChangeTheme={(themeId) => {
+              const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
+              updateSettings(
+                recommendedAccent
+                  ? { themeId, accentColor: recommendedAccent }
+                  : { themeId }
+              );
+            }}
             accentColor={settings.accentColor}
             onChangeAccentColor={handleAccentColorChange}
           />
@@ -254,7 +264,7 @@ export default function Configuration() {
           style={{
             textAlign: 'center',
             fontSize: 11.5,
-            color: darkMode ? '#71717a' : '#a1a1aa',
+            color: 'var(--macos-text-muted, #a1a1aa)',
             marginTop: 32,
             userSelect: 'none',
           }}

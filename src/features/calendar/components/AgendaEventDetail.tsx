@@ -1,6 +1,5 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
-import { useApp } from '../../../core/context/AppContext';
 import type { CalendarEvent } from '../types';
 import type { HearingEvent } from '../../../core/context/types';
 
@@ -42,11 +41,9 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const { darkMode } = useApp();
-
   const containerStyle: CSSProperties = {
     padding: '16px 14px',
-    borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
+    borderTop: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     userSelect: 'none',
   };
 
@@ -55,7 +52,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
     fontWeight: 700,
     textTransform: 'uppercase',
     letterSpacing: '0.04em',
-    color: darkMode ? '#8e8e93' : '#8e8e93',
+    color: 'var(--macos-text-secondary, #8e8e93)',
     marginBottom: 12,
   };
 
@@ -64,7 +61,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
     alignItems: 'flex-start',
     gap: 8,
     fontSize: 12.5,
-    color: darkMode ? '#d1d1d6' : '#48484a',
+    color: 'var(--macos-text-muted, #48484a)',
     lineHeight: 1.4,
   };
 
@@ -76,9 +73,9 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
     height: 28,
     padding: '0 10px',
     borderRadius: 6,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+    backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: 12,
     fontWeight: 500,
     cursor: 'pointer',
@@ -92,10 +89,10 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
       {event ? (
         <div
           style={{
-            backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.02)',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.02))',
             borderRadius: 10,
             padding: '12px 14px',
-            border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.06))',
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
@@ -107,7 +104,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
               style={{
                 fontSize: 14,
                 fontWeight: 650,
-                color: darkMode ? '#ffffff' : '#1c1c1e',
+                color: 'var(--macos-text, #1c1c1e)',
                 lineHeight: 1.3,
               }}
             >
@@ -186,10 +183,10 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: darkMode ? '#a1a1aa' : '#636366',
+                color: 'var(--macos-text-muted, #636366)',
                 padding: '6px 8px',
                 borderRadius: 6,
-                backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.2)' : 'rgba(0, 0, 0, 0.03)',
+                backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
                 whiteSpace: 'pre-wrap',
                 marginTop: 2,
               }}
@@ -215,8 +212,8 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
                 style={{
                   ...actionButtonStyle,
                   color: '#ff3b30',
-                  borderColor: darkMode ? 'rgba(255, 59, 48, 0.3)' : 'rgba(255, 59, 48, 0.2)',
-                  backgroundColor: 'rgba(255, 59, 48, 0.08)',
+                  borderColor: 'var(--macos-danger-border, rgba(255, 59, 48, 0.25))',
+                  backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.10))',
                 }}
                 onClick={() => onDelete?.(event)}
               >
@@ -235,7 +232,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
             flexDirection: 'column',
             alignItems: 'center',
             gap: 8,
-            color: darkMode ? '#8e8e93' : '#8e8e93',
+            color: 'var(--macos-text-secondary, #8e8e93)',
           }}
         >
           <Icon f7="calendar_badge_clock" size="32px" style={{ opacity: 0.5 }} />

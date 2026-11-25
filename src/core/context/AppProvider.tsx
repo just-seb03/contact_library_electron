@@ -20,10 +20,11 @@ import {
 import { parseHearing } from './hearingUtils';
 import {
   DEFAULT_SETTINGS,
-  MAC_ACCENT_COLORS,
+  resolveAccentTokens,
   type AppSettings,
 } from '../../features/settings/data/settingsData';
 import { databaseService } from '../database/databaseService';
+import { getThemeTokens, themeTokensToCssVars } from '../theme/themes';
 import type { NavigationTarget } from '../../shared/types/navigation';
 
 /** Si ninguna página consume el foco en este tiempo (elemento borrado, etc.), se descarta. */
@@ -72,27 +73,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch {
       // fallback
     }
-    const selected = MAC_ACCENT_COLORS.find((c) => c.id === settings.accentColor) ?? MAC_ACCENT_COLORS[0];
-    const hex = selected.hex;
-    const cleanHex = hex.replace('#', '');
-    const r = parseInt(cleanHex.substring(0, 2), 16);
-    const g = parseInt(cleanHex.substring(2, 4), 16);
-    const b = parseInt(cleanHex.substring(4, 6), 16);
-    const rgb = `${r}, ${g}, ${b}`;
-
+    const { cssVars } = resolveAccentTokens(settings.accentColor, darkMode);
     const root = document.documentElement;
-    root.style.setProperty('--macos-accent-color', hex);
-    root.style.setProperty('--macos-accent-color-rgb', rgb);
-    root.style.setProperty('--macos-accent-tint', `rgba(${rgb}, 0.12)`);
-    root.style.setProperty('--macos-accent-tint-subtle', `rgba(${rgb}, 0.08)`);
-    root.style.setProperty('--macos-accent-tint-status', `rgba(${rgb}, 0.15)`);
-    root.style.setProperty('--macos-accent-tint-hover', `rgba(${rgb}, 0.18)`);
-    root.style.setProperty('--macos-accent-tint-active', `rgba(${rgb}, 0.26)`);
-    root.style.setProperty('--f7-theme-color', hex);
-    root.style.setProperty('--f7-theme-color-rgb', rgb);
-    root.style.setProperty('--f7-theme-color-shade', hex);
-    root.style.setProperty('--f7-toggle-active-color', hex);
-  }, [settings]);
+    for (const [key, value] of Object.entries(cssVars)) {
+      root.style.setProperty(key, value);
+    }
+  }, [settings, darkMode]);
 
   const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
@@ -112,31 +98,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     if (darkMode) {
       root.classList.add('dark');
       document.body.classList.add('dark');
-      root.style.setProperty('--f7-page-bg-color', '#1e1e20');
-      root.style.setProperty('--f7-card-bg-color', 'rgba(38, 38, 42, 0.85)');
-      root.style.setProperty('--macos-canvas-bg', '#1e1e20');
-      root.style.setProperty('--macos-card-bg', 'rgba(38, 38, 42, 0.85)');
-      root.style.setProperty('--macos-modal-bg', '#242426');
-      root.style.setProperty('--macos-input-bg', 'rgba(255, 255, 255, 0.08)');
-      root.style.setProperty('--macos-text', '#ffffff');
-      root.style.setProperty('--macos-text-secondary', '#8e8e93');
-      root.style.setProperty('--macos-card-border', 'rgba(255, 255, 255, 0.08)');
-      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
       document.body.classList.remove('dark');
-      root.style.setProperty('--f7-page-bg-color', '#f5f5f7');
-      root.style.setProperty('--f7-card-bg-color', '#ffffff');
-      root.style.setProperty('--macos-canvas-bg', '#f5f5f7');
-      root.style.setProperty('--macos-card-bg', '#ffffff');
-      root.style.setProperty('--macos-modal-bg', '#ffffff');
-      root.style.setProperty('--macos-input-bg', '#ffffff');
-      root.style.setProperty('--macos-text', '#1c1c1e');
-      root.style.setProperty('--macos-text-secondary', '#8e8e93');
-      root.style.setProperty('--macos-card-border', 'rgba(0, 0, 0, 0.08)');
-      root.style.colorScheme = 'light';
     }
-  }, [darkMode]);
+
+    const tokens = getThemeTokens(settings.themeId, darkMode);
+    const cssVars = themeTokensToCssVars(tokens);
+    for (const [key, value] of Object.entries(cssVars)) {
+      root.style.setProperty(key, value);
+    }
+    try {
+      localStorage.setItem(
+        'contact_library_boot_palette',
+        JSON.stringify({
+          canvas: tokens.canvasBg,
+          card: tokens.cardBg,
+          sidebar: tokens.sidebarGlass,
+          input: tokens.inputBg,
+          text: tokens.text,
+        })
+      );
+    } catch {
+      // fallback
+    }
+    root.style.colorScheme = darkMode ? 'dark' : 'light';
+    window.electronAPI?.setTheme?.({
+      isDark: darkMode,
+      backgroundColor: tokens.canvasBg,
+    });
+  }, [darkMode, settings.themeId]);
 
   // Carga inicial sincronizada desde SQLite al iniciar en Electron
   useEffect(() => {

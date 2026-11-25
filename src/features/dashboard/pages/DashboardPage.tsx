@@ -100,7 +100,15 @@ export default function Dashboard() {
                 Audiencias de hoy
               </span>
               {todayHearings.length > 0 && (
-                <Badge color="blue" style={{ fontSize: '11px', padding: '0 6px', backgroundColor: 'var(--macos-accent-color, #007aff)' }}>
+                <Badge
+                  color="blue"
+                  style={{
+                    fontSize: '11px',
+                    padding: '0 6px',
+                    backgroundColor: 'var(--macos-accent-color, #0056b8)',
+                    color: 'var(--macos-on-accent, #ffffff)',
+                  }}
+                >
                   {todayHearings.length}
                 </Badge>
               )}
@@ -138,7 +146,7 @@ export default function Dashboard() {
                         style={{
                           fontSize: '15px',
                           fontWeight: 600,
-                          color: '#1c1c1e',
+                          color: 'var(--macos-text, #1c1c1e)',
                           display: 'block',
                           marginBottom: '8px',
                           overflow: 'hidden',

@@ -18,7 +18,7 @@ interface NavItemConfig {
 }
 
 export const LeftBar = () => {
-  const { activeTab, setActiveTab, clients, hearings, payments, darkMode, settings } = useApp();
+  const { activeTab, setActiveTab, clients, hearings, payments, settings } = useApp();
 
   const handleSelect = (tab: AppTab) => {
     setActiveTab(tab);
@@ -119,11 +119,11 @@ export const LeftBar = () => {
     width: '100%',
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: darkMode ? MACOS_THEME.sidebarGlassDark : MACOS_THEME.sidebarGlass,
+    backgroundColor: 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
     backdropFilter: MACOS_THEME.backdropBlur,
     WebkitBackdropFilter: MACOS_THEME.backdropBlur,
-    color: darkMode ? '#ffffff' : '#1c1c1e',
-    borderRight: darkMode ? MACOS_THEME.hairlineBorderDark : MACOS_THEME.hairlineBorder,
+    color: 'var(--macos-text, #1c1c1e)',
+    borderRight: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     userSelect: 'none',
     boxSizing: 'border-box',
     overflow: 'hidden',
@@ -138,7 +138,7 @@ export const LeftBar = () => {
           fontWeight: 700,
           letterSpacing: '0.05em',
           textTransform: 'uppercase',
-          color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.55)',
+          color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
         }}
       >
         {title}
@@ -163,15 +163,11 @@ export const LeftBar = () => {
                 cursor: 'pointer',
                 textAlign: 'left',
                 backgroundColor: isActive
-                  ? darkMode
-                    ? 'var(--macos-accent-tint-active, rgba(0, 122, 255, 0.26))'
-                    : 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
+                  ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
                   : 'transparent',
                 color: isActive
                   ? 'var(--macos-accent-color, #007aff)'
-                  : darkMode
-                  ? '#f2f2f7'
-                  : '#1c1c1e',
+                  : 'var(--macos-text, #1c1c1e)',
                 fontWeight: isActive ? 600 : 450,
                 fontSize: 13,
                 transition: 'background-color 0.12s ease, transform 0.08s ease',
@@ -180,9 +176,7 @@ export const LeftBar = () => {
               }}
               onMouseEnter={(e) => {
                 if (!isActive) {
-                  e.currentTarget.style.backgroundColor = darkMode
-                    ? 'rgba(255, 255, 255, 0.06)'
-                    : 'rgba(0, 0, 0, 0.04)';
+                  e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
                 }
               }}
               onMouseLeave={(e) => {
@@ -201,9 +195,7 @@ export const LeftBar = () => {
                     borderRadius: 6,
                     backgroundColor: isActive
                       ? 'var(--macos-accent-color, #007aff)'
-                      : darkMode
-                      ? 'rgba(255, 255, 255, 0.08)'
-                      : `${item.iconColor}14`,
+                      : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -237,9 +229,7 @@ export const LeftBar = () => {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: darkMode
-                          ? '0 0 0 2px #1e1e20, 0 1px 3px rgba(0,0,0,0.5)'
-                          : '0 0 0 2px #f6f6f8, 0 1px 3px rgba(0,0,0,0.2)',
+                        boxShadow: '0 0 0 2px var(--macos-canvas-bg, #f5f5f7), 0 1px 3px rgba(0,0,0,0.25)',
                         lineHeight: 1,
                         pointerEvents: 'none',
                         zIndex: 2,
@@ -267,12 +257,12 @@ export const LeftBar = () => {
                     style={{
                       fontSize: 10,
                       fontWeight: 500,
-                      color: darkMode ? 'rgba(235, 235, 245, 0.45)' : 'rgba(60, 60, 67, 0.45)',
+                      color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
                       fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
                       padding: '1px 4px',
                       borderRadius: 4,
-                      backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)',
-                      border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)',
+                      backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
+                      border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
                     }}
                   >
                     {item.shortcut}
@@ -310,7 +300,7 @@ export const LeftBar = () => {
           alignItems: 'center',
           justifyContent: 'space-between',
           WebkitAppRegion: 'drag',
-          borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.04)' : '1px solid rgba(0, 0, 0, 0.03)',
+          borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
         } as CSSProperties}
       >
         <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
@@ -347,24 +337,20 @@ export const LeftBar = () => {
         title="Ver ajustes y perfil de usuario"
         style={{
           padding: '12px 14px',
-          borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.06)',
+          borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.15)' : 'rgba(255, 255, 255, 0.3)',
+          backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
           cursor: 'pointer',
           transition: 'background-color 0.12s ease',
           userSelect: 'none',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = darkMode
-            ? 'rgba(255, 255, 255, 0.06)'
-            : 'rgba(255, 255, 255, 0.55)';
+          e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = darkMode
-            ? 'rgba(0, 0, 0, 0.15)'
-            : 'rgba(255, 255, 255, 0.3)';
+          e.currentTarget.style.backgroundColor = 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))';
         }}
       >
         <div
@@ -372,8 +358,8 @@ export const LeftBar = () => {
             width: 32,
             height: 32,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--macos-accent-color, #007aff), #5856d6)',
-            color: '#ffffff',
+            background: 'linear-gradient(135deg, var(--macos-accent-color, #0056b8), var(--macos-accent-gradient-end, #5336c7))',
+            color: 'var(--macos-on-accent, #ffffff)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -391,7 +377,7 @@ export const LeftBar = () => {
             style={{
               fontSize: 13,
               fontWeight: 600,
-              color: darkMode ? '#ffffff' : '#1c1c1e',
+              color: 'var(--macos-text, #1c1c1e)',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -402,7 +388,7 @@ export const LeftBar = () => {
           <div
             style={{
               fontSize: 11,
-              color: darkMode ? '#a1a1aa' : '#8e8e93',
+              color: 'var(--macos-text-secondary, #8e8e93)',
               display: 'flex',
               alignItems: 'center',
               gap: 4,

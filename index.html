@@ -9,35 +9,80 @@
       (function() {
         try {
           var saved = localStorage.getItem('contact_library_settings');
+          var isDark = localStorage.getItem('contact_library_dark_mode') === 'true';
+          var root = document.documentElement;
+          if (isDark) root.classList.add('dark');
+
           if (saved) {
             var parsed = JSON.parse(saved);
-            var map = {
-              blue: '#007aff',
-              purple: '#af52de',
-              pink: '#ff2d55',
-              red: '#ff3b30',
-              orange: '#ff9500',
-              green: '#34c759',
-              graphite: '#8e8e93'
-            };
-            var hex = map[parsed.accentColor] || '#007aff';
+            var map = isDark
+              ? {
+                  blue: { hex: '#a4c1ff', on: '#282c35' },
+                  purple: { hex: '#e6abff', on: '#322935' },
+                  pink: { hex: '#ffaaae', on: '#372829' },
+                  red: { hex: '#ffaca1', on: '#372927' },
+                  burgundy: { hex: '#D67A87', on: '#221415' },
+                  orange: { hex: '#ffb062', on: '#37291d' },
+                  green: { hex: '#4ddb6a', on: '#242f23' },
+                  forest: { hex: '#6EB396', on: '#141d19' },
+                  coffee: { hex: '#e3b7a9', on: '#322a28' },
+                  graphite: { hex: '#c1c0c6', on: '#2c2c2d' }
+                }
+              : {
+                  blue: { hex: '#0056b8', on: '#ffffff' },
+                  purple: { hex: '#8827b7', on: '#ffffff' },
+                  pink: { hex: '#b60033', on: '#ffffff' },
+                  red: { hex: '#b70008', on: '#ffffff' },
+                  burgundy: { hex: '#7A1F2B', on: '#ffffff' },
+                  orange: { hex: '#864b00', on: '#ffffff' },
+                  green: { hex: '#006825', on: '#ffffff' },
+                  forest: { hex: '#1E5641', on: '#ffffff' },
+                  coffee: { hex: '#735246', on: '#ffffff' },
+                  graphite: { hex: '#59595e', on: '#ffffff' }
+                };
+            var entry = map[parsed.accentColor] || map.blue;
+            var hex = entry.hex;
             var clean = hex.replace('#', '');
             var r = parseInt(clean.substring(0, 2), 16);
             var g = parseInt(clean.substring(2, 4), 16);
             var b = parseInt(clean.substring(4, 6), 16);
             var rgb = r + ', ' + g + ', ' + b;
-            var root = document.documentElement;
             root.style.setProperty('--macos-accent-color', hex);
             root.style.setProperty('--macos-accent-color-rgb', rgb);
-            root.style.setProperty('--macos-accent-tint', 'rgba(' + rgb + ', 0.12)');
-            root.style.setProperty('--macos-accent-tint-subtle', 'rgba(' + rgb + ', 0.08)');
-            root.style.setProperty('--macos-accent-tint-status', 'rgba(' + rgb + ', 0.15)');
-            root.style.setProperty('--macos-accent-tint-hover', 'rgba(' + rgb + ', 0.18)');
-            root.style.setProperty('--macos-accent-tint-active', 'rgba(' + rgb + ', 0.26)');
+            root.style.setProperty('--macos-on-accent', entry.on);
+            root.style.setProperty('--macos-accent-tint', 'rgba(' + rgb + ', ' + (isDark ? '0.16' : '0.12') + ')');
+            root.style.setProperty('--macos-accent-tint-subtle', 'rgba(' + rgb + ', ' + (isDark ? '0.12' : '0.08') + ')');
+            root.style.setProperty('--macos-accent-tint-status', 'rgba(' + rgb + ', ' + (isDark ? '0.18' : '0.15') + ')');
+            root.style.setProperty('--macos-accent-tint-hover', 'rgba(' + rgb + ', ' + (isDark ? '0.22' : '0.18') + ')');
+            root.style.setProperty('--macos-accent-tint-active', 'rgba(' + rgb + ', ' + (isDark ? '0.28' : '0.26') + ')');
             root.style.setProperty('--f7-theme-color', hex);
             root.style.setProperty('--f7-theme-color-rgb', rgb);
             root.style.setProperty('--f7-theme-color-shade', hex);
             root.style.setProperty('--f7-toggle-active-color', hex);
+            root.style.setProperty('--f7-button-fill-text-color', entry.on);
+
+            var bootSnapshot = localStorage.getItem('contact_library_boot_palette');
+            if (bootSnapshot) {
+              var snap = JSON.parse(bootSnapshot);
+              if (snap.canvas) root.style.setProperty('--macos-canvas-bg', snap.canvas);
+              if (snap.card) root.style.setProperty('--macos-card-bg', snap.card);
+              if (snap.sidebar) root.style.setProperty('--macos-sidebar-glass', snap.sidebar);
+              if (snap.input) root.style.setProperty('--macos-input-bg', snap.input);
+              if (snap.text) root.style.setProperty('--macos-text', snap.text);
+              if (snap.canvas) root.style.setProperty('--f7-page-bg-color', snap.canvas);
+            } else if (parsed.themeId === 'coffee') {
+              var canvas = isDark ? '#1F1916' : '#FCF9F5';
+              var card = isDark ? '#2E2420' : '#F7F2EB';
+              var text = isDark ? '#E6D3C8' : '#3C2A21';
+              var sidebar = isDark ? 'rgba(36, 28, 25, 0.90)' : 'rgba(214, 210, 196, 0.88)';
+              var input = isDark ? '#3f322d' : '#EAE3CC';
+              root.style.setProperty('--macos-canvas-bg', canvas);
+              root.style.setProperty('--macos-card-bg', card);
+              root.style.setProperty('--macos-sidebar-glass', sidebar);
+              root.style.setProperty('--macos-input-bg', input);
+              root.style.setProperty('--macos-text', text);
+              root.style.setProperty('--f7-page-bg-color', canvas);
+            }
           }
         } catch (e) {}
       })();
@@ -45,30 +90,45 @@
     <style>
       :root {
         --apple-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-        --macos-accent-color: #007aff;
-        --macos-accent-color-rgb: 0, 122, 255;
-        --macos-accent-tint: rgba(0, 122, 255, 0.12);
-        --macos-accent-tint-subtle: rgba(0, 122, 255, 0.08);
-        --macos-accent-tint-status: rgba(0, 122, 255, 0.15);
-        --macos-accent-tint-hover: rgba(0, 122, 255, 0.18);
-        --macos-accent-tint-active: rgba(0, 122, 255, 0.26);
-        --f7-theme-color: #007aff;
-        --f7-theme-color-rgb: 0, 122, 255;
-        --f7-theme-color-shade: #007aff;
-        --f7-toggle-active-color: #007aff;
+        --macos-accent-color: #0056b8;
+        --macos-accent-color-rgb: 0, 86, 184;
+        --macos-on-accent: #ffffff;
+        --macos-accent-gradient-end: #5336c7;
+        --macos-accent-tint: rgba(0, 86, 184, 0.12);
+        --macos-accent-tint-subtle: rgba(0, 86, 184, 0.08);
+        --macos-accent-tint-status: rgba(0, 86, 184, 0.15);
+        --macos-accent-tint-hover: rgba(0, 86, 184, 0.18);
+        --macos-accent-tint-active: rgba(0, 86, 184, 0.26);
+        --f7-theme-color: #0056b8;
+        --f7-theme-color-rgb: 0, 86, 184;
+        --f7-theme-color-shade: #0056b8;
+        --f7-toggle-active-color: #0056b8;
+        --f7-button-fill-text-color: #ffffff;
         --macos-canvas-bg: #f5f5f7;
         --macos-card-bg: #ffffff;
         --macos-modal-bg: #ffffff;
         --macos-input-bg: #ffffff;
+        --macos-sidebar-glass: rgba(246, 246, 248, 0.82);
+        --macos-toolbar-glass: rgba(255, 255, 255, 0.82);
+        --macos-hover-bg: rgba(0, 0, 0, 0.04);
+        --macos-active-bg: rgba(0, 0, 0, 0.07);
+        --macos-subtle-bg: rgba(0, 0, 0, 0.03);
         --macos-text: #1c1c1e;
-        --macos-text-secondary: #8e8e93;
+        --macos-text-secondary: #5c5c5e;
+        --macos-text-muted: #666567;
         --macos-card-border: rgba(0, 0, 0, 0.08);
+        --macos-hairline-border: rgba(0, 0, 0, 0.08);
+        --macos-divider: rgba(0, 0, 0, 0.06);
+        --macos-scrollbar-thumb: rgba(0, 0, 0, 0.16);
+        --macos-scrollbar-thumb-hover: rgba(0, 0, 0, 0.28);
+        --macos-danger-surface: rgba(255, 59, 48, 0.10);
+        --macos-danger-border: rgba(255, 59, 48, 0.25);
         --f7-page-bg-color: #f5f5f7;
         --f7-card-bg-color: #ffffff;
       }
       ::selection {
-        background-color: var(--macos-accent-color, #007aff);
-        color: #ffffff;
+        background-color: var(--macos-accent-color, #0056b8);
+        color: var(--macos-on-accent, #ffffff);
       }
       * {
         box-sizing: border-box;
@@ -94,33 +154,41 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.16);
+        background: var(--macos-scrollbar-thumb, rgba(0, 0, 0, 0.16));
         border-radius: 6px;
       }
-      .dark ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.18);
-      }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.28);
-      }
-      .dark ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.32);
+        background: var(--macos-scrollbar-thumb-hover, rgba(0, 0, 0, 0.28));
       }
 
-      /* Soporte global de Modo Oscuro nativo de macOS */
-      html.dark,
-      body.dark {
+      /* Respaldo inicial de Modo Oscuro en html (los estilos inline de AppProvider en :root tienen prioridad) */
+      html.dark {
         --macos-canvas-bg: #1e1e20;
         --macos-card-bg: rgba(38, 38, 42, 0.85);
         --macos-modal-bg: #242426;
         --macos-input-bg: rgba(255, 255, 255, 0.08);
+        --macos-sidebar-glass: rgba(28, 28, 30, 0.82);
+        --macos-toolbar-glass: rgba(30, 30, 34, 0.82);
+        --macos-hover-bg: rgba(255, 255, 255, 0.06);
+        --macos-active-bg: rgba(255, 255, 255, 0.11);
+        --macos-subtle-bg: rgba(255, 255, 255, 0.04);
         --macos-text: #ffffff;
-        --macos-text-secondary: #8e8e93;
+        --macos-text-secondary: #bab8bb;
+        --macos-text-muted: #afadaf;
         --macos-card-border: rgba(255, 255, 255, 0.08);
+        --macos-hairline-border: rgba(255, 255, 255, 0.08);
+        --macos-divider: rgba(255, 255, 255, 0.08);
+        --macos-scrollbar-thumb: rgba(255, 255, 255, 0.18);
+        --macos-scrollbar-thumb-hover: rgba(255, 255, 255, 0.32);
+        --macos-danger-surface: rgba(255, 59, 48, 0.15);
+        --macos-danger-border: rgba(255, 59, 48, 0.32);
         --f7-page-bg-color: #1e1e20;
         --f7-card-bg-color: rgba(38, 38, 42, 0.85);
-        background-color: #1e1e20;
-        color: #ffffff;
+      }
+      html.dark,
+      body.dark {
+        background-color: var(--macos-canvas-bg);
+        color: var(--macos-text);
         color-scheme: dark;
       }
       .dark #root,
@@ -129,13 +197,13 @@
       .dark #content-view,
       .dark .page,
       .dark .page-content {
-        background-color: #1e1e20 !important;
-        color: #ffffff;
+        background-color: var(--macos-canvas-bg) !important;
+        color: var(--macos-text);
       }
       .dark .card {
-        background-color: rgba(38, 38, 42, 0.85) !important;
-        color: #ffffff !important;
-        border-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: var(--macos-card-bg) !important;
+        color: var(--macos-text) !important;
+        border-color: var(--macos-card-border) !important;
       }
       .dark input,
       .dark select,
@@ -143,27 +211,27 @@
         color-scheme: dark;
       }
       .dark select option {
-        background-color: #242426;
-        color: #ffffff;
+        background-color: var(--macos-modal-bg);
+        color: var(--macos-text);
       }
       .dark .popover,
       .dark .popover-inner,
       .dark .calendar,
       .dark .calendar-modal {
-        background-color: #242426 !important;
-        color: #ffffff !important;
+        background-color: var(--macos-modal-bg) !important;
+        color: var(--macos-text) !important;
       }
       .dark .calendar-month-selector,
       .dark .calendar-year-selector,
       .dark .calendar-day {
-        color: #ffffff !important;
+        color: var(--macos-text) !important;
       }
       .dark .calendar-day.calendar-day-next,
       .dark .calendar-day.calendar-day-prev {
-        color: rgba(255, 255, 255, 0.3) !important;
+        color: var(--macos-text-muted) !important;
       }
       .dark .calendar-week-header {
-        color: #8e8e93 !important;
+        color: var(--macos-text-secondary) !important;
       }
     </style>
   </head>

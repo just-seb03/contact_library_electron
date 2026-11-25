@@ -42,10 +42,10 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
     justifyContent: 'space-between',
     padding: '0 16px',
     boxSizing: 'border-box',
-    backgroundColor: darkMode ? 'rgba(30, 30, 34, 0.82)' : 'rgba(255, 255, 255, 0.82)',
+    backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.82))',
     backdropFilter: 'blur(25px) saturate(180%)',
     WebkitBackdropFilter: 'blur(25px) saturate(180%)',
-    borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.07)',
+    borderBottom: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     WebkitAppRegion: 'drag',
     zIndex: 400,
     position: 'relative',
@@ -63,9 +63,9 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
     height: 30,
     padding: '0 10px',
     borderRadius: 7,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.9)',
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: 12,
     fontWeight: 500,
     cursor: 'pointer',
@@ -93,13 +93,13 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
             width: 30,
             height: 30,
             borderRadius: 7,
-            border: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.08)',
-            backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.03)',
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            color: darkMode ? '#a1a1aa' : '#555558',
+            color: 'var(--macos-text-muted, #555558)',
             transition: 'background-color 0.12s ease',
           }}
         >
@@ -111,7 +111,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
             style={{
               fontSize: 15,
               fontWeight: 650,
-              color: darkMode ? '#ffffff' : '#1c1c1e',
+              color: 'var(--macos-text, #1c1c1e)',
               letterSpacing: '-0.01em',
             }}
           >
@@ -121,7 +121,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
             <span
               style={{
                 fontSize: 12,
-                color: darkMode ? '#8e8e93' : '#8e8e93',
+                color: 'var(--macos-text-secondary, #8e8e93)',
                 fontWeight: 450,
               }}
             >
@@ -149,9 +149,9 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
             height: 30,
             padding: '0 12px',
             borderRadius: 8,
-            border: darkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.09)',
-            backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.25)' : 'rgba(0, 0, 0, 0.04)',
-            color: darkMode ? '#8e8e93' : '#8e8e93',
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.09))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
+            color: 'var(--macos-text-secondary, #8e8e93)',
             fontSize: 12.5,
             display: 'flex',
             alignItems: 'center',
@@ -170,9 +170,9 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
               fontWeight: 600,
               padding: '2px 5px',
               borderRadius: 4,
-              backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
-              color: darkMode ? '#c7c7cc' : '#636366',
-              border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
+              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
+              color: 'var(--macos-text-muted, #636366)',
+              border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
             }}
           >
             ⌘K
@@ -207,7 +207,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
               fontWeight: 500,
               padding: '4px 8px',
               borderRadius: 6,
-              backgroundColor: darkMode ? 'rgba(255, 59, 48, 0.15)' : 'rgba(255, 59, 48, 0.1)',
+              backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.1))',
               color: '#ff3b30',
               display: 'flex',
               alignItems: 'center',
@@ -226,7 +226,7 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
               fontWeight: 500,
               padding: '4px 8px',
               borderRadius: 6,
-              backgroundColor: darkMode ? 'rgba(88, 86, 214, 0.15)' : 'rgba(88, 86, 214, 0.1)',
+              backgroundColor: 'rgba(88, 86, 214, 0.12)',
               color: '#5856d6',
               display: 'flex',
               alignItems: 'center',

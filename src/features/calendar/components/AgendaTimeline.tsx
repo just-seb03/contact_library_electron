@@ -1,6 +1,5 @@
 import { useState, useEffect, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
-import { useApp } from '../../../core/context/AppContext';
 import type { HearingEvent } from '../../../core/context/types';
 import type { CalendarEvent } from '../types';
 import { getCalendarEventColor } from '../data/eventColors';
@@ -54,7 +53,6 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   onSelectEvent,
   selectedDate = new Date(),
 }) => {
-  const { darkMode } = useApp();
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
   // Actualizador en tiempo real de la hora actual de Apple
@@ -103,7 +101,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     flexShrink: 0,
     fontSize: 11,
     fontWeight: 500,
-    color: darkMode ? '#8e8e93' : '#8e8e93',
+    color: 'var(--macos-text-secondary, #8e8e93)',
     textAlign: 'center',
     transform: 'translateY(-7px)',
     fontVariantNumeric: 'tabular-nums',
@@ -113,7 +111,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     flex: 1,
     height: '100%',
     position: 'relative',
-    borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.06)',
+    borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
   };
 
   return (
@@ -126,8 +124,8 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           bottom: 0,
           left: 0,
           width: HOUR_COLUMN_WIDTH,
-          backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.015)',
-          borderRight: darkMode ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid rgba(0, 0, 0, 0.06)',
+          backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.015))',
+          borderRight: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
           pointerEvents: 'none',
           zIndex: 1,
         }}
@@ -202,7 +200,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               cursor: 'pointer',
               border: 'none',
               borderLeft: '4px solid #ff3b30',
-              backgroundColor: darkMode ? 'rgba(255, 59, 48, 0.18)' : 'rgba(255, 59, 48, 0.1)',
+              backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.12))',
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
               textAlign: 'left',
               fontFamily: 'inherit',
@@ -224,7 +222,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
                 style={{
                   fontSize: 13,
                   fontWeight: 650,
-                  color: darkMode ? '#ffffff' : '#1c1c1e',
+                  color: 'var(--macos-text, #1c1c1e)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
@@ -254,7 +252,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
                 alignItems: 'center',
                 gap: 12,
                 fontSize: 11.5,
-                color: darkMode ? '#d1d1d6' : '#555558',
+                color: 'var(--macos-text-muted, #555558)',
                 marginTop: 4,
               }}
             >
@@ -305,9 +303,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               cursor: 'pointer',
               border: 'none',
               borderLeft: `4px solid ${color.accent}`,
-              backgroundColor: darkMode
-                ? color.background.replace('0.12', '0.22')
-                : color.background,
+              backgroundColor: color.background.replace('0.12', '0.16'),
               boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
               textAlign: 'left',
               fontFamily: 'inherit',
@@ -328,7 +324,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               style={{
                 fontSize: 13,
                 fontWeight: 650,
-                color: darkMode ? '#ffffff' : '#1c1c1e',
+                color: 'var(--macos-text, #1c1c1e)',
                 lineHeight: 1.3,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -342,7 +338,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               style={{
                 fontSize: 11.5,
                 fontWeight: 500,
-                color: darkMode ? '#c7c7cc' : color.textColor,
+                color: 'var(--macos-text-muted, #636366)',
                 marginTop: 2,
                 display: 'flex',
                 alignItems: 'center',
