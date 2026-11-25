@@ -20,6 +20,11 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
 }) => {
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const monthPadded = String(monthIndex + 1).padStart(2, '0');
+  const rows = [
+    { start: 1, end: 8, indent: 0 },
+    { start: 9, end: 18, indent: 10 },
+    { start: 19, end: daysInMonth, indent: 20 },
+  ];
 
   const headerStyle: CSSProperties = {
     padding: '10px 18px',
@@ -35,7 +40,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
 
   return (
     <div style={headerStyle}>
-      {/* ── Izquierda: Puntos por cada día del mes seleccionado ── */}
+      {/* ── Izquierda: Puntos en tres filas tipo escalera por cada día del mes ── */}
       <div
         className="cal-step-anim"
         key={`${year}-${monthIndex}`}
@@ -43,53 +48,64 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
         aria-label="Días del mes"
         style={{
           display: 'flex',
-          alignItems: 'center',
-          flexWrap: 'wrap',
+          flexDirection: 'column',
           gap: 5,
           minWidth: 0,
         }}
       >
-        {Array.from({ length: daysInMonth }, (_, idx) => {
-          const dayNum = idx + 1;
-          const dateKey = `${year}-${monthPadded}-${String(dayNum).padStart(2, '0')}`;
-          const hasEvent = eventDates.has(dateKey);
-          const isFilled = dayNum <= selectedDay;
-          const isCurrentDay = dayNum === selectedDay;
+        {rows.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              paddingLeft: row.indent,
+            }}
+          >
+            {Array.from({ length: Math.max(0, row.end - row.start + 1) }, (_, idx) => {
+              const dayNum = row.start + idx;
+              const dateKey = `${year}-${monthPadded}-${String(dayNum).padStart(2, '0')}`;
+              const hasEvent = eventDates.has(dateKey);
+              const isFilled = dayNum <= selectedDay;
+              const isCurrentDay = dayNum === selectedDay;
 
-          const dotColor = hasEvent
-            ? '#ff3b30'
-            : isFilled
-            ? 'var(--macos-text, #ececef)'
-            : 'rgba(255, 255, 255, 0.16)';
+              const dotColor = hasEvent
+                ? '#ff3b30'
+                : isFilled
+                ? 'var(--macos-text, #ececef)'
+                : 'rgba(255, 255, 255, 0.16)';
 
-          return (
-            <button
-              key={dayNum}
-              type="button"
-              onClick={() => onSelectDay?.(dayNum)}
-              title={`Día ${dayNum}${hasEvent ? ' • Con eventos' : ''}`}
-              aria-label={`Día ${dayNum}${hasEvent ? ', tiene eventos' : ''}`}
-              aria-pressed={isCurrentDay}
-              style={{
-                width: isCurrentDay ? 8 : 6,
-                height: isCurrentDay ? 8 : 6,
-                padding: 0,
-                border: 'none',
-                borderRadius: '50%',
-                backgroundColor: dotColor,
-                opacity: hasEvent ? (isFilled ? 1 : 0.72) : isFilled ? (isCurrentDay ? 1 : 0.78) : 1,
-                boxShadow: hasEvent
-                  ? '0 0 6px rgba(255, 59, 48, 0.5)'
-                  : isCurrentDay
-                  ? '0 0 0 2px rgba(255, 255, 255, 0.2)'
-                  : 'none',
-                cursor: onSelectDay ? 'pointer' : 'default',
-                transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
-                flexShrink: 0,
-              }}
-            />
-          );
-        })}
+              return (
+                <button
+                  key={dayNum}
+                  type="button"
+                  onClick={() => onSelectDay?.(dayNum)}
+                  title={`Día ${dayNum}${hasEvent ? ' • Con eventos' : ''}`}
+                  aria-label={`Día ${dayNum}${hasEvent ? ', tiene eventos' : ''}`}
+                  aria-pressed={isCurrentDay}
+                  style={{
+                    width: isCurrentDay ? 8 : 6,
+                    height: isCurrentDay ? 8 : 6,
+                    padding: 0,
+                    border: 'none',
+                    borderRadius: '50%',
+                    backgroundColor: dotColor,
+                    opacity: hasEvent ? (isFilled ? 1 : 0.72) : isFilled ? (isCurrentDay ? 1 : 0.78) : 1,
+                    boxShadow: hasEvent
+                      ? '0 0 6px rgba(255, 59, 48, 0.5)'
+                      : isCurrentDay
+                      ? '0 0 0 2px rgba(255, 255, 255, 0.2)'
+                      : 'none',
+                    cursor: onSelectDay ? 'pointer' : 'default',
+                    transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
+                    flexShrink: 0,
+                  }}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
 
       {/* ── Derecha: Icono + grande para añadir evento ── */}
