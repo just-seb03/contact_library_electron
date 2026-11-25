@@ -7,21 +7,10 @@ import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
 import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
-import { AgendaWeekView } from '../components/AgendaWeekView';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
 import { CreateEventPopup } from '../components/CreateEventPopup';
 import type { CalendarEvent } from '../types';
-
-const MONTH_NAMES_FULL = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-];
-
-const MONTH_NAMES_SHORT = [
-  'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN',
-  'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC',
-];
 
 function to24HourTime(time: string): string | null {
   const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -43,9 +32,11 @@ const calendarCardStyle: CSSProperties = {
   WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   display: 'flex',
   flexDirection: 'column',
-  height: 'calc(100vh - 58px)',
+  width: '100%',
+  maxWidth: 980,
+  height: 'calc(100vh - 118px)',
   minHeight: 320,
-  margin: 0,
+  margin: '0 auto',
   border: '1px solid rgba(255, 255, 255, 0.08)',
   boxShadow: '0 12px 32px rgba(0, 0, 0, 0.24)',
   overflow: 'hidden',
@@ -113,7 +104,6 @@ export default function Calendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
-  const [isWeekView, setIsWeekView] = useState(false);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -167,21 +157,6 @@ export default function Calendar() {
     ]),
     [calendarEvents, hearings]
   );
-
-  const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
-  const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
-  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekEnd.getDate() + 6);
-  const weekDateLabel = `Semana del ${weekStart.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-  })} al ${weekEnd.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })}`;
-  const monthShort = MONTH_NAMES_SHORT[currentMonthIndex];
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 900px)');
@@ -314,32 +289,13 @@ export default function Calendar() {
         style={{
           width: '100%',
           minWidth: 0,
-          padding: '0 24px',
+          padding: '12px 32px 0 32px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}
       >
         <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '60ms' }}>
           <AgendaHeader
-            day={currentDay}
-            monthShort={monthShort}
-            fullDateLabel={isWeekView ? weekDateLabel : fullDateLabel}
-            isWeekView={isWeekView}
-            onToday={() => handleSelectDate(new Date())}
-            onPreviousDay={() => handleSelectDate(new Date(
-              currentYear,
-              currentMonthIndex,
-              currentDay - (isWeekView ? 7 : 1)
-            ))}
-            onToggleWeekView={() => {
-              setIsWeekView((previous) => !previous);
-              setSelectedEvent(null);
-            }}
-            onNextDay={() => handleSelectDate(new Date(
-              currentYear,
-              currentMonthIndex,
-              currentDay + (isWeekView ? 7 : 1)
-            ))}
             onAddEvent={() => {
               setEditingEvent(null);
               setIsCreateEventOpen(true);
@@ -354,40 +310,25 @@ export default function Calendar() {
             }}
           >
             <div
-              key={isWeekView ? 'week-view' : 'day-view'}
-              className="cal-switch-anim"
               style={{
                 ...timelinePanelStyle,
                 height: compactLayout ? '50vh' : '100%',
                 flex: compactLayout ? '0 0 auto' : 1,
               }}
             >
-              {isWeekView ? (
-                <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
-                  <div key={weekStart.getTime()} className="cal-step-anim" style={{ height: '100%' }}>
-                    <AgendaWeekView
-                      selectedDate={selectedDate}
-                      calendarEvents={calendarEvents}
-                      hearings={hearings}
-                      onSelectEvent={setSelectedEvent}
-                    />
-                  </div>
-                </CardContent>
-              ) : (
-                <CardContent style={timelineScrollStyle}>
-                  <div
-                    key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
-                    className="cal-step-anim"
-                  >
-                    <AgendaTimeline
-                      todayHearings={todayHearings}
-                      calendarEvents={selectedDayEvents}
-                      onSelectEvent={setSelectedEvent}
-                      selectedDate={selectedDate}
-                    />
-                  </div>
-                </CardContent>
-              )}
+              <CardContent style={timelineScrollStyle}>
+                <div
+                  key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
+                  className="cal-step-anim"
+                >
+                  <AgendaTimeline
+                    todayHearings={todayHearings}
+                    calendarEvents={selectedDayEvents}
+                    onSelectEvent={setSelectedEvent}
+                    selectedDate={selectedDate}
+                  />
+                </div>
+              </CardContent>
             </div>
 
             <div style={{
