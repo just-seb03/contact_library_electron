@@ -53,7 +53,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [navigationFocus]);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('contact_library_dark_mode') === 'true';
+    const stored = localStorage.getItem('contact_library_dark_mode');
+    return stored === null ? true : stored === 'true';
   });
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
