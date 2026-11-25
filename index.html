@@ -106,17 +106,11 @@
         background: transparent;
       }
       ::-webkit-scrollbar-thumb {
-        background: rgba(0, 0, 0, 0.16);
+        background: var(--macos-scrollbar-thumb, rgba(0, 0, 0, 0.16));
         border-radius: 6px;
       }
-      .dark ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.18);
-      }
       ::-webkit-scrollbar-thumb:hover {
-        background: rgba(0, 0, 0, 0.28);
-      }
-      .dark ::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.32);
+        background: var(--macos-scrollbar-thumb-hover, rgba(0, 0, 0, 0.28));
       }
 
       /* Soporte global de Modo Oscuro nativo de macOS */
@@ -143,8 +137,8 @@
         --macos-danger-border: rgba(255, 59, 48, 0.32);
         --f7-page-bg-color: #1e1e20;
         --f7-card-bg-color: rgba(38, 38, 42, 0.85);
-        background-color: #1e1e20;
-        color: #ffffff;
+        background-color: var(--macos-canvas-bg);
+        color: var(--macos-text);
         color-scheme: dark;
       }
       .dark #root,
@@ -153,13 +147,13 @@
       .dark #content-view,
       .dark .page,
       .dark .page-content {
-        background-color: #1e1e20 !important;
-        color: #ffffff;
+        background-color: var(--macos-canvas-bg) !important;
+        color: var(--macos-text);
       }
       .dark .card {
-        background-color: rgba(38, 38, 42, 0.85) !important;
-        color: #ffffff !important;
-        border-color: rgba(255, 255, 255, 0.08) !important;
+        background-color: var(--macos-card-bg) !important;
+        color: var(--macos-text) !important;
+        border-color: var(--macos-card-border) !important;
       }
       .dark input,
       .dark select,
@@ -167,27 +161,27 @@
         color-scheme: dark;
       }
       .dark select option {
-        background-color: #242426;
-        color: #ffffff;
+        background-color: var(--macos-modal-bg);
+        color: var(--macos-text);
       }
       .dark .popover,
       .dark .popover-inner,
       .dark .calendar,
       .dark .calendar-modal {
-        background-color: #242426 !important;
-        color: #ffffff !important;
+        background-color: var(--macos-modal-bg) !important;
+        color: var(--macos-text) !important;
       }
       .dark .calendar-month-selector,
       .dark .calendar-year-selector,
       .dark .calendar-day {
-        color: #ffffff !important;
+        color: var(--macos-text) !important;
       }
       .dark .calendar-day.calendar-day-next,
       .dark .calendar-day.calendar-day-prev {
-        color: rgba(255, 255, 255, 0.3) !important;
+        color: var(--macos-text-muted) !important;
       }
       .dark .calendar-week-header {
-        color: #8e8e93 !important;
+        color: var(--macos-text-secondary) !important;
       }
     </style>
   </head>
