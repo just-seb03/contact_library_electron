@@ -296,6 +296,11 @@ export default function Calendar() {
       >
         <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '60ms' }}>
           <AgendaHeader
+            year={currentYear}
+            monthIndex={currentMonthIndex}
+            selectedDay={currentDay}
+            eventDates={eventDates}
+            onSelectDay={(day) => handleSelectDate(new Date(currentYear, currentMonthIndex, day))}
             onAddEvent={() => {
               setEditingEvent(null);
               setIsCreateEventOpen(true);
