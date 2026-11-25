@@ -11,9 +11,8 @@ interface NavItemConfig {
   id: AppTab;
   title: string;
   icon: string;
-  iconColor: string;
+  activeIcon: string;
   badge?: number | null;
-  badgeColor?: string;
   shortcut?: string;
 }
 
@@ -61,38 +60,35 @@ export const LeftBar = () => {
     {
       id: 'inicio',
       title: 'Inicio',
-      icon: 'house_fill',
-      iconColor: 'var(--macos-accent-color, #007aff)',
+      icon: 'house',
+      activeIcon: 'house_fill',
     },
     {
       id: 'calendar',
       title: 'Agenda',
       icon: 'calendar',
-      iconColor: '#ff3b30',
+      activeIcon: 'calendar_today',
       badge: hearings.length > 0 ? hearings.length : null,
-      badgeColor: '#ff3b30',
     },
     {
       id: 'cliente',
       title: 'Clientes',
-      icon: 'person_2_fill',
-      iconColor: '#5856d6',
+      icon: 'person_2',
+      activeIcon: 'person_2_fill',
       badge: clients.length > 0 ? clients.length : null,
-      badgeColor: '#5856d6',
     },
     {
       id: 'pagos',
       title: 'Pagos',
-      icon: 'creditcard_fill',
-      iconColor: '#34c759',
+      icon: 'creditcard',
+      activeIcon: 'creditcard_fill',
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
-      badgeColor: '#ff9500',
     },
     {
       id: 'config',
       title: 'Ajustes',
-      icon: 'gear_alt_fill',
-      iconColor: '#8e8e93',
+      icon: 'gear_alt',
+      activeIcon: 'gear_alt_fill',
       shortcut: '⌘,',
     },
   ];
@@ -113,9 +109,11 @@ export const LeftBar = () => {
   };
 
   const renderNavItems = (items: NavItemConfig[]) => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 6 }}>
       {items.map((item) => {
         const isActive = activeTab === item.id;
+        const inactiveColor = 'var(--macos-text-secondary, rgba(60, 60, 67, 0.55))';
+        const activeColor = 'var(--macos-text, #1c1c1e)';
         return (
           <button
             key={item.id}
@@ -124,90 +122,70 @@ export const LeftBar = () => {
             title={item.shortcut ? `${item.title} (${item.shortcut})` : item.title}
             aria-label={item.title}
             style={{
+              position: 'relative',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              width: 48,
-              height: 44,
+              width: 32,
+              height: 32,
               padding: 0,
-              borderRadius: 10,
               border: 'none',
               outline: 'none',
               cursor: 'pointer',
-              backgroundColor: isActive
-                ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
-                : 'transparent',
-              color: isActive
-                ? 'var(--macos-accent-color, #007aff)'
-                : 'var(--macos-text, #1c1c1e)',
-              transition: 'background-color 0.12s ease, transform 0.08s ease',
+              backgroundColor: 'transparent',
+              color: isActive ? activeColor : inactiveColor,
+              transition: 'color 0.12s ease, transform 0.08s ease',
               boxSizing: 'border-box',
+              flexShrink: 0,
             }}
             onMouseEnter={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
+                e.currentTarget.style.color = activeColor;
               }
             }}
             onMouseLeave={(e) => {
               if (!isActive) {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = inactiveColor;
               }
             }}
           >
-            {/* Contenedor del icono con la esfera de notificación integrada */}
-            <div
+            <Icon
+              f7={isActive ? item.activeIcon : item.icon}
+              size="19px"
               style={{
-                position: 'relative',
-                width: 30,
-                height: 30,
-                borderRadius: 8,
-                backgroundColor: isActive
-                  ? 'var(--macos-accent-color, #007aff)'
-                  : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                transition: 'all 0.12s ease',
+                color: 'currentColor',
+                transition: 'color 0.12s ease',
               }}
-            >
-              <Icon
-                f7={item.icon}
-                size="16px"
-                style={{
-                  color: isActive ? '#ffffff' : item.iconColor,
-                }}
-              />
+            />
 
-              {/* Esfera de notificación estilo macOS/iOS sobre el icono */}
-              {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: -5,
-                    right: -6,
-                    minWidth: 16,
-                    height: 16,
-                    padding: '0 4px',
-                    borderRadius: 8,
-                    backgroundColor: item.badgeColor || '#ff3b30',
-                    color: '#ffffff',
-                    fontSize: 9.5,
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 0 0 2px var(--macos-canvas-bg, #f5f5f7), 0 1px 3px rgba(0,0,0,0.25)',
-                    lineHeight: 1,
-                    pointerEvents: 'none',
-                    zIndex: 2,
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  {item.badge > 99 ? '99+' : item.badge}
-                </span>
-              )}
-            </div>
+            {/* Indicador numérico monocromo sobre el icono */}
+            {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: -2,
+                  minWidth: 15,
+                  height: 15,
+                  padding: '0 4px',
+                  borderRadius: 8,
+                  backgroundColor: 'var(--macos-text, #1c1c1e)',
+                  color: 'var(--macos-canvas-bg, #ffffff)',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 0 1.5px var(--macos-sidebar-glass, #f6f6f8)',
+                  lineHeight: 1,
+                  pointerEvents: 'none',
+                  zIndex: 2,
+                  boxSizing: 'border-box',
+                }}
+              >
+                {item.badge > 99 ? '99+' : item.badge}
+              </span>
+            )}
           </button>
         );
       })}
@@ -216,27 +194,15 @@ export const LeftBar = () => {
 
   return (
     <nav style={containerStyle} aria-label="Navegación principal">
-      <style>{`
-        .sidebar-nav-scroll::-webkit-scrollbar {
-          width: 0px !important;
-          height: 0px !important;
-          display: none !important;
-        }
-        .sidebar-nav-scroll {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-
       {/* ── Cabecera de la barra lateral (Traffic Lights + Arrastre) ── */}
       <div
         style={{
           height: 52,
           minHeight: 52,
-          padding: '0 8px',
+          padding: '0 14px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'flex-start',
           WebkitAppRegion: 'drag',
           borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
         } as CSSProperties}
@@ -246,14 +212,16 @@ export const LeftBar = () => {
         </div>
       </div>
 
-      {/* ── Elementos de navegación agrupados sin encabezados de sección ── */}
+      {/* ── Espacio flexible para anclar la navegación abajo a la izquierda ── */}
+      <div style={{ flex: 1 }} />
+
+      {/* ── Fila horizontal de iconos monocromos en esquina inferior izquierda ── */}
       <div
-        className="sidebar-nav-scroll"
         style={{
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          padding: '12px 0',
+          padding: '12px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
         }}
       >
         {renderNavItems(navItems)}
