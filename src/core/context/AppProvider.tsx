@@ -100,9 +100,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       root.style.setProperty('--macos-card-bg', 'rgba(38, 38, 42, 0.85)');
       root.style.setProperty('--macos-modal-bg', '#242426');
       root.style.setProperty('--macos-input-bg', 'rgba(255, 255, 255, 0.08)');
+      root.style.setProperty('--macos-sidebar-glass', 'rgba(28, 28, 30, 0.82)');
+      root.style.setProperty('--macos-toolbar-glass', 'rgba(30, 30, 34, 0.82)');
+      root.style.setProperty('--macos-hover-bg', 'rgba(255, 255, 255, 0.06)');
+      root.style.setProperty('--macos-active-bg', 'rgba(255, 255, 255, 0.10)');
+      root.style.setProperty('--macos-subtle-bg', 'rgba(255, 255, 255, 0.04)');
       root.style.setProperty('--macos-text', '#ffffff');
       root.style.setProperty('--macos-text-secondary', '#8e8e93');
+      root.style.setProperty('--macos-text-muted', 'rgba(235, 235, 245, 0.55)');
       root.style.setProperty('--macos-card-border', 'rgba(255, 255, 255, 0.08)');
+      root.style.setProperty('--macos-hairline-border', 'rgba(255, 255, 255, 0.08)');
+      root.style.setProperty('--macos-divider', 'rgba(255, 255, 255, 0.08)');
+      root.style.setProperty('--macos-scrollbar-thumb', 'rgba(255, 255, 255, 0.18)');
+      root.style.setProperty('--macos-scrollbar-thumb-hover', 'rgba(255, 255, 255, 0.32)');
+      root.style.setProperty('--macos-danger-surface', 'rgba(255, 59, 48, 0.15)');
+      root.style.setProperty('--macos-danger-border', 'rgba(255, 59, 48, 0.32)');
       root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
@@ -113,9 +125,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       root.style.setProperty('--macos-card-bg', '#ffffff');
       root.style.setProperty('--macos-modal-bg', '#ffffff');
       root.style.setProperty('--macos-input-bg', '#ffffff');
+      root.style.setProperty('--macos-sidebar-glass', 'rgba(246, 246, 248, 0.82)');
+      root.style.setProperty('--macos-toolbar-glass', 'rgba(255, 255, 255, 0.82)');
+      root.style.setProperty('--macos-hover-bg', 'rgba(0, 0, 0, 0.04)');
+      root.style.setProperty('--macos-active-bg', 'rgba(0, 0, 0, 0.07)');
+      root.style.setProperty('--macos-subtle-bg', 'rgba(0, 0, 0, 0.03)');
       root.style.setProperty('--macos-text', '#1c1c1e');
       root.style.setProperty('--macos-text-secondary', '#8e8e93');
+      root.style.setProperty('--macos-text-muted', 'rgba(60, 60, 67, 0.6)');
       root.style.setProperty('--macos-card-border', 'rgba(0, 0, 0, 0.08)');
+      root.style.setProperty('--macos-hairline-border', 'rgba(0, 0, 0, 0.08)');
+      root.style.setProperty('--macos-divider', 'rgba(0, 0, 0, 0.06)');
+      root.style.setProperty('--macos-scrollbar-thumb', 'rgba(0, 0, 0, 0.16)');
+      root.style.setProperty('--macos-scrollbar-thumb-hover', 'rgba(0, 0, 0, 0.28)');
+      root.style.setProperty('--macos-danger-surface', 'rgba(255, 59, 48, 0.10)');
+      root.style.setProperty('--macos-danger-border', 'rgba(255, 59, 48, 0.25)');
       root.style.colorScheme = 'light';
     }
   }, [darkMode]);
