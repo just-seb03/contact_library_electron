@@ -102,7 +102,6 @@ export const LeftBar = () => {
     backdropFilter: MACOS_THEME.backdropBlur,
     WebkitBackdropFilter: MACOS_THEME.backdropBlur,
     color: 'var(--macos-text, #1c1c1e)',
-    borderRight: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     userSelect: 'none',
     boxSizing: 'border-box',
     overflow: 'hidden',

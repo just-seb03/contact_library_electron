@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Page, Panel, View, f7, f7ready } from 'framework7-react';
+import { useState, useEffect } from 'react';
+import { Page, Panel, View, f7ready } from 'framework7-react';
 import routes from '../navigation/routes';
 import { LeftBar } from '../navigation/LeftBar';
 import { UnifiedToolbar } from './components/UnifiedToolbar';
@@ -11,32 +11,17 @@ import { useApp } from './context/AppContext';
 
 export function AppShell() {
   const { setActiveTab } = useApp();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
-
-  const handleToggleSidebar = useCallback(() => {
-    f7ready(() => {
-      try {
-        f7.panel.toggle('left');
-        setIsSidebarOpen((prev) => !prev);
-      } catch {
-        setIsSidebarOpen((prev) => !prev);
-      }
-    });
-  }, []);
 
   // Navegación disparada por el sistema operativo (Cmd+, en macOS, clic en notificaciones...)
   useSystemNavigation();
 
-  // Atajos de teclado estilo macOS (⌘K para Spotlight, ⌘B para barra lateral, ⌘, para Ajustes)
+  // Atajos de teclado estilo macOS (⌘K para Spotlight, ⌘, para Ajustes)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSpotlightOpen((prev) => !prev);
-      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'b') {
-        e.preventDefault();
-        handleToggleSidebar();
       } else if ((e.metaKey || e.ctrlKey) && e.key === ',') {
         e.preventDefault();
         setActiveTab('config');
@@ -52,7 +37,7 @@ export function AppShell() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleToggleSidebar, setActiveTab]);
+  }, [setActiveTab]);
 
   return (
     <>
@@ -89,10 +74,7 @@ export function AppShell() {
         left
         visibleBreakpoint={0}
         backdrop={false}
-        style={{
-          ...SIDEBAR_SURFACE_STYLE,
-          display: isSidebarOpen ? 'block' : 'none',
-        }}
+        style={SIDEBAR_SURFACE_STYLE}
       >
         <View style={SIDEBAR_SURFACE_STYLE}>
           <Page
@@ -112,18 +94,13 @@ export function AppShell() {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
-          marginLeft: isSidebarOpen ? `${APP_SPACING.sidebarWidth}px` : '0px',
-          width: isSidebarOpen ? `calc(100% - ${APP_SPACING.sidebarWidth}px)` : '100%',
+          marginLeft: `${APP_SPACING.sidebarWidth}px`,
+          width: `calc(100% - ${APP_SPACING.sidebarWidth}px)`,
           overflow: 'hidden',
           boxSizing: 'border-box',
-          transition: 'margin-left 0.2s cubic-bezier(0.16, 1, 0.3, 1), width 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
-        <UnifiedToolbar
-          isSidebarOpen={isSidebarOpen}
-          onToggleSidebar={handleToggleSidebar}
-          onOpenSpotlight={() => setIsSpotlightOpen(true)}
-        />
+        <UnifiedToolbar onOpenSpotlight={() => setIsSpotlightOpen(true)} />
 
         <View
           id="content-view"
