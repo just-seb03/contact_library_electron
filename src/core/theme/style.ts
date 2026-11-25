@@ -78,7 +78,7 @@ export const APP_SPACING = {
   glassRadius: 14,
   sectionPadding: 24,
   controlHeight: 36,
-  sidebarWidth: 240,
+  sidebarWidth: 80,
   toolbarHeight: 52,
   pageMaxWidth: 1200,
   pageTopPadding: 24,

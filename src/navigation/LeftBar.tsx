@@ -113,135 +113,105 @@ export const LeftBar = () => {
   };
 
   const renderNavItems = (items: NavItemConfig[]) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {items.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => handleSelect(item.id)}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+      {items.map((item) => {
+        const isActive = activeTab === item.id;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => handleSelect(item.id)}
+            title={item.shortcut ? `${item.title} (${item.shortcut})` : item.title}
+            aria-label={item.title}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+              height: 44,
+              padding: 0,
+              borderRadius: 10,
+              border: 'none',
+              outline: 'none',
+              cursor: 'pointer',
+              backgroundColor: isActive
+                ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
+                : 'transparent',
+              color: isActive
+                ? 'var(--macos-accent-color, #007aff)'
+                : 'var(--macos-text, #1c1c1e)',
+              transition: 'background-color 0.12s ease, transform 0.08s ease',
+              boxSizing: 'border-box',
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
+          >
+            {/* Contenedor del icono con la esfera de notificación integrada */}
+            <div
               style={{
+                position: 'relative',
+                width: 30,
+                height: 30,
+                borderRadius: 8,
+                backgroundColor: isActive
+                  ? 'var(--macos-accent-color, #007aff)'
+                  : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
                 display: 'flex',
                 alignItems: 'center',
-                margin: '1px 8px',
-                padding: '7px 10px',
-                borderRadius: 8,
-                border: 'none',
-                outline: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                backgroundColor: isActive
-                  ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
-                  : 'transparent',
-                color: isActive
-                  ? 'var(--macos-accent-color, #007aff)'
-                  : 'var(--macos-text, #1c1c1e)',
-                fontWeight: isActive ? 600 : 450,
-                fontSize: 13,
-                transition: 'background-color 0.12s ease, transform 0.08s ease',
-                width: 'calc(100% - 16px)',
-                boxSizing: 'border-box',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
+                justifyContent: 'center',
+                flexShrink: 0,
+                transition: 'all 0.12s ease',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, width: '100%' }}>
-                {/* Contenedor del icono con la esfera de notificación integrada */}
-                <div
+              <Icon
+                f7={item.icon}
+                size="16px"
+                style={{
+                  color: isActive ? '#ffffff' : item.iconColor,
+                }}
+              />
+
+              {/* Esfera de notificación estilo macOS/iOS sobre el icono */}
+              {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
+                <span
                   style={{
-                    position: 'relative',
-                    width: 24,
-                    height: 24,
-                    borderRadius: 6,
-                    backgroundColor: isActive
-                      ? 'var(--macos-accent-color, #007aff)'
-                      : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
+                    position: 'absolute',
+                    top: -5,
+                    right: -6,
+                    minWidth: 16,
+                    height: 16,
+                    padding: '0 4px',
+                    borderRadius: 8,
+                    backgroundColor: item.badgeColor || '#ff3b30',
+                    color: '#ffffff',
+                    fontSize: 9.5,
+                    fontWeight: 700,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'all 0.12s ease',
+                    boxShadow: '0 0 0 2px var(--macos-canvas-bg, #f5f5f7), 0 1px 3px rgba(0,0,0,0.25)',
+                    lineHeight: 1,
+                    pointerEvents: 'none',
+                    zIndex: 2,
+                    boxSizing: 'border-box',
                   }}
                 >
-                  <Icon
-                    f7={item.icon}
-                    size="14px"
-                    style={{
-                      color: isActive ? '#ffffff' : item.iconColor,
-                    }}
-                  />
-
-                  {/* Esfera de notificación estilo macOS/iOS sobre el icono */}
-                  {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: -5,
-                        right: -6,
-                        minWidth: 16,
-                        height: 16,
-                        padding: '0 4px',
-                        borderRadius: 8,
-                        backgroundColor: item.badgeColor || '#ff3b30',
-                        color: '#ffffff',
-                        fontSize: 9.5,
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 0 0 2px var(--macos-canvas-bg, #f5f5f7), 0 1px 3px rgba(0,0,0,0.25)',
-                        lineHeight: 1,
-                        pointerEvents: 'none',
-                        zIndex: 2,
-                        boxSizing: 'border-box',
-                      }}
-                    >
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </span>
-                  )}
-                </div>
-
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1,
-                  }}
-                >
-                  {item.title}
+                  {item.badge > 99 ? '99+' : item.badge}
                 </span>
-
-                {item.shortcut && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 500,
-                      color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
-                      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
-                      padding: '1px 4px',
-                      borderRadius: 4,
-                      backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
-                      border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-                    }}
-                  >
-                    {item.shortcut}
-                  </span>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+              )}
+            </div>
+          </button>
+        );
+      })}
+    </div>
   );
 
   return (
@@ -263,10 +233,10 @@ export const LeftBar = () => {
         style={{
           height: 52,
           minHeight: 52,
-          padding: '0 14px',
+          padding: '0 8px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
           WebkitAppRegion: 'drag',
           borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
         } as CSSProperties}
