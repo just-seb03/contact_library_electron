@@ -68,7 +68,7 @@ export const LeftBar = () => {
     });
   }, [activeTab, setActiveTab]);
 
-  const mainNavItems: NavItemConfig[] = [
+  const navItems: NavItemConfig[] = [
     {
       id: 'inicio',
       title: 'Inicio',
@@ -83,9 +83,6 @@ export const LeftBar = () => {
       badge: hearings.length > 0 ? hearings.length : null,
       badgeColor: '#ff3b30',
     },
-  ];
-
-  const libraryNavItems: NavItemConfig[] = [
     {
       id: 'cliente',
       title: 'Clientes',
@@ -102,9 +99,6 @@ export const LeftBar = () => {
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
       badgeColor: '#ff9500',
     },
-  ];
-
-  const systemNavItems: NavItemConfig[] = [
     {
       id: 'config',
       title: 'Ajustes',
@@ -129,22 +123,8 @@ export const LeftBar = () => {
     overflow: 'hidden',
   };
 
-  const renderNavGroup = (title: string, items: NavItemConfig[]) => (
-    <div style={{ marginBottom: 16 }}>
-      <div
-        style={{
-          padding: '6px 14px 4px 14px',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.05em',
-          textTransform: 'uppercase',
-          color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
-        }}
-      >
-        {title}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+  const renderNavItems = (items: NavItemConfig[]) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {items.map((item) => {
           const isActive = activeTab === item.id;
           return (
@@ -273,7 +253,6 @@ export const LeftBar = () => {
           );
         })}
       </div>
-    </div>
   );
 
   return (
@@ -308,7 +287,7 @@ export const LeftBar = () => {
         </div>
       </div>
 
-      {/* ── Grupos de navegación estilo Source List (sin barra de slide horizontal) ── */}
+      {/* ── Elementos de navegación agrupados sin encabezados de sección ── */}
       <div
         className="sidebar-nav-scroll"
         style={{
@@ -318,9 +297,7 @@ export const LeftBar = () => {
           padding: '12px 0',
         }}
       >
-        {renderNavGroup('Principal', mainNavItems)}
-        {renderNavGroup('Biblioteca', libraryNavItems)}
-        {renderNavGroup('Sistema', systemNavItems)}
+        {renderNavItems(navItems)}
       </div>
 
       {/* ── Pie de la barra lateral (Perfil del Usuario reflejado desde Ajustes) ── */}
