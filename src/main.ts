@@ -4,6 +4,11 @@ import path from 'node:path'
 import { initDatabase, closeDatabase } from './core/database/connection'
 import { setupAppMenu } from './core/menu/appMenu'
 import {
+  createNotificationAdapter,
+  disposeNotificationService,
+  initNotificationService,
+} from './core/notifications'
+import {
   APP_DISPLAY_NAME,
   APP_ID,
   createMainWindow,
@@ -13,6 +18,7 @@ import {
   isTrayActive,
   loadSystemPreferences,
   markQuitting,
+  navigateMainWindow,
   notifyRunningInBackground,
   registerWindowController,
   showMainWindow,
@@ -46,6 +52,15 @@ function openMainWindow() {
     canHideToBackground: () => process.platform === 'darwin' || isTrayActive(),
     onHiddenToBackground: notifyRunningInBackground,
   })
+}
+
+/** Muestra la ventana principal, o la crea si se cerró del todo. */
+function revealMainWindow() {
+  if (getMainWindow()) {
+    showMainWindow()
+  } else {
+    openMainWindow()
+  }
 }
 
 /** Cierre real de la app (menú de la bandeja, Cmd+Q, apagado del sistema). */
@@ -84,6 +99,7 @@ function bootstrap() {
   })
 
   app.on('will-quit', () => {
+    disposeNotificationService()
     destroyTray()
     closeDatabase()
   })
@@ -111,8 +127,16 @@ function bootstrap() {
     openMainWindow()
     createTray({
       publicDir: process.env.VITE_PUBLIC,
-      onOpen: () => (getMainWindow() ? showMainWindow() : openMainWindow()),
+      onOpen: revealMainWindow,
       onQuit: quitApp,
+    })
+
+    // Notificaciones nativas. Las preferencias reales se conectan en el paso 7;
+    // mientras tanto el servicio usa DEFAULT_NOTIFICATION_PREFERENCES.
+    initNotificationService({
+      adapter: createNotificationAdapter({ iconPath: path.join(process.env.VITE_PUBLIC, 'icon.png') }),
+      onOpen: revealMainWindow,
+      navigate: navigateMainWindow,
     })
 
     // macOS/Linux: apagado o reinicio del sistema con la app en segundo plano.

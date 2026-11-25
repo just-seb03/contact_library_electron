@@ -8,6 +8,7 @@ import { BrowserWindow, ipcMain } from 'electron'
 import path from 'node:path'
 import { APP_COLORS } from '../theme/style'
 import { IPC_CHANNELS, createIpcSuccess } from '../../shared/types/ipc'
+import type { NavigationRequest } from '../../shared/types/navigation'
 import { attachContextMenu } from '../menu/contextMenu'
 import { getSystemPreferences } from './preferences'
 
@@ -47,6 +48,22 @@ export function showMainWindow(): void {
   if (target.isMinimized()) target.restore()
   if (!target.isVisible()) target.show()
   target.focus()
+}
+
+/**
+ * Navega el renderer a una sección y, opcionalmente, abre un elemento concreto
+ * (canal `app:navigate`, escuchado en AppShell).
+ * Si la ventana aún está cargando (p. ej. recién creada), espera a que termine.
+ */
+export function navigateMainWindow(request: NavigationRequest): void {
+  const target = getMainWindow()
+  if (!target) return
+  const send = () => target.webContents.send(IPC_CHANNELS.APP_NAVIGATE, request)
+  if (target.webContents.isLoading()) {
+    target.webContents.once('did-finish-load', send)
+  } else {
+    send()
+  }
 }
 
 export function createMainWindow(options: MainWindowOptions): BrowserWindow {

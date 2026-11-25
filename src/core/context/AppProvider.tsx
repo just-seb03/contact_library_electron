@@ -24,6 +24,10 @@ import {
   type AppSettings,
 } from '../../features/settings/data/settingsData';
 import { databaseService } from '../database/databaseService';
+import type { NavigationTarget } from '../../shared/types/navigation';
+
+/** Si ninguna página consume el foco en este tiempo (elemento borrado, etc.), se descarta. */
+const NAVIGATION_FOCUS_TTL_MS = 5000;
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(loadClients);
@@ -32,6 +36,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+  const [navigationFocus, setNavigationFocus] = useState<NavigationTarget | null>(null);
+
+  useEffect(() => {
+    if (!navigationFocus) return;
+    const timer = setTimeout(() => setNavigationFocus(null), NAVIGATION_FOCUS_TTL_MS);
+    return () => clearTimeout(timer);
+  }, [navigationFocus]);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     return localStorage.getItem('contact_library_dark_mode') === 'true';
@@ -373,6 +384,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     activeTab,
     setActiveTab,
     setSelectedClientId,
+    navigationFocus,
+    setNavigationFocus,
     updateClient,
     updatePaymentStatus,
     updateClientPayment,

@@ -11,6 +11,7 @@ import {
   type IpcResponse,
   type ElectronAPIContract,
 } from './shared/types/ipc'
+import { toNavigationRequest, type NavigationRequest } from './shared/types/navigation'
 import type { Client, Payment, CalendarEvent, ClientDocument } from './core/context/types'
 
 /**
@@ -32,11 +33,15 @@ const electronAPI: ElectronAPIContract = {
     const res: IpcResponse<string> = await ipcRenderer.invoke(IPC_CHANNELS.APP_GET_PLATFORM)
     return res.data ?? process.platform
   },
-  onNavigate: (callback: (route: string) => void): (() => void) => {
-    const handler = (_event: Electron.IpcRendererEvent, route: string) => callback(route)
-    ipcRenderer.on('app:navigate', handler)
+  onNavigate: (callback: (request: NavigationRequest) => void): (() => void) => {
+    // Acepta tanto la ruta como texto (menú de macOS) como un NavigationRequest con destino.
+    const handler = (_event: Electron.IpcRendererEvent, payload: unknown) => {
+      const request = toNavigationRequest(payload)
+      if (request) callback(request)
+    }
+    ipcRenderer.on(IPC_CHANNELS.APP_NAVIGATE, handler)
     return () => {
-      ipcRenderer.removeListener('app:navigate', handler)
+      ipcRenderer.removeListener(IPC_CHANNELS.APP_NAVIGATE, handler)
     }
   },
 

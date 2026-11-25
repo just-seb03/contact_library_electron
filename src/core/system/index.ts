@@ -15,6 +15,7 @@ export {
   createMainWindow,
   getMainWindow,
   markQuitting,
+  navigateMainWindow,
   registerWindowController,
   showMainWindow,
 } from './windowManager'

@@ -10,15 +10,20 @@
  *   (calendario, audiencias, cobros)                                     (Windows / macOS)
  */
 
+import type { NavigationRequest, NavigationTarget } from '../../shared/types/navigation'
+
 // ─── Notificación ─────────────────────────────────────────────────────────────
 
 /** Origen de la notificación. Determina la preferencia que la habilita y la ruta por defecto. */
 export type NotificationKind = 'calendar' | 'hearing' | 'payment' | 'system'
 
-/** Rutas del renderer a las que se navega al hacer clic (deben existir en `navigation/`). */
+/**
+ * Sección por defecto de cada tipo, usada cuando la notificación no trae `target`
+ * (p. ej. el resumen diario de cobros). Deben existir en `navigation/`.
+ */
 export const NOTIFICATION_ROUTES = {
   calendar: '/calendar/',
-  hearing: '/cliente/',
+  hearing: '/calendar/',
   payment: '/pagos/',
   system: '/',
 } as const satisfies Record<NotificationKind, string>
@@ -36,7 +41,12 @@ export interface AppNotification {
   kind: NotificationKind
   title: string
   body: string
-  /** Ruta a abrir al hacer clic. Si se omite, se usa `NOTIFICATION_ROUTES[kind]`. */
+  /**
+   * Elemento concreto que se abre al hacer clic (evento, audiencia, cliente o pago).
+   * Determina también la sección, salvo que se indique `route`.
+   */
+  target?: NavigationTarget
+  /** Sección a abrir. Por defecto: la del `target`, o `NOTIFICATION_ROUTES[kind]`. */
   route?: NotificationRoute
   /** No desaparece sola (p. ej. audiencias). Cada adaptador lo traduce a su plataforma. */
   urgent?: boolean
@@ -114,6 +124,8 @@ export interface NotificationAdapter {
 }
 
 // ─── Estado (expuesto a la UI de Ajustes por IPC) ─────────────────────────────
+
+export type { NavigationRequest, NavigationTarget }
 
 export interface NotificationStatus {
   supported: boolean

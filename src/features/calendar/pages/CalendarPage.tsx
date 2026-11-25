@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import { Button, f7, Page, Block, Card, CardContent } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import type { HearingEvent } from '../../../core/context/types';
+import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
 import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
@@ -117,6 +118,25 @@ export default function Calendar() {
   const [isWeekView, setIsWeekView] = useState(false);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Apertura desde fuera de la página (clic en una notificación): ir al día y mostrar el detalle.
+  useNavigationFocus('calendarEvent', ({ id }) => {
+    const event = calendarEvents.find((item) => item.id === id);
+    if (!event) return false;
+    const [year, month, day] = event.date.split('-').map(Number);
+    setSelectedDate(new Date(year, month - 1, day));
+    setSelectedEvent(event);
+    return true;
+  });
+
+  useNavigationFocus('hearing', ({ clientId }) => {
+    const hearing = hearings.find((item) => item.clientId === clientId);
+    if (!hearing) return false;
+    setSelectedDate(new Date(hearing.year, hearing.monthIndex, hearing.day));
+    setSelectedEvent(hearing);
+    return true;
+  });
+
   const currentDay = selectedDate.getDate();
   const currentMonthIndex = selectedDate.getMonth();
   const currentYear = selectedDate.getFullYear();
