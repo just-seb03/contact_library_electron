@@ -41,22 +41,22 @@ export default function Dashboard() {
           minHeight: 'calc(100vh - 52px)',
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(300px, 0.85fr)',
-          alignItems: 'center',
-          gap: 28,
-          padding: '24px 48px 64px 48px',
+          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(360px, 0.95fr)',
+          alignItems: 'start',
+          gap: 32,
+          padding: '18vh 48px 48px 48px',
           boxSizing: 'border-box',
         }}
       >
         {/* ── Mitad izquierda: Tipografía principal ── */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
           <h1
             style={{
               margin: 0,
               fontFamily: "'Brother Signature', Georgia, serif",
-              fontSize: 'clamp(52px, 6vw, 84px)',
+              fontSize: 'clamp(64px, 7.2vw, 108px)',
               fontWeight: 400,
-              lineHeight: 1.05,
+              lineHeight: 1.02,
               letterSpacing: '0.03em',
               color: 'var(--macos-text, #ececef)',
             }}
@@ -84,9 +84,8 @@ export default function Dashboard() {
             flexDirection: 'column',
             gap: 10,
             width: '100%',
-            maxWidth: 420,
+            maxWidth: 480,
             justifySelf: 'end',
-            paddingTop: 150,
           }}
         >
           {/* Cuadro grueso principal: estado de reuniones */}
