@@ -41,9 +41,9 @@ export default function Dashboard() {
           minHeight: 'calc(100vh - 52px)',
           width: '100%',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 0.95fr) minmax(360px, 1.05fr)',
+          gridTemplateColumns: 'minmax(0, 1.15fr) minmax(300px, 0.85fr)',
           alignItems: 'center',
-          gap: 40,
+          gap: 28,
           padding: '24px 48px 64px 48px',
           boxSizing: 'border-box',
         }}
@@ -53,49 +53,25 @@ export default function Dashboard() {
           <h1
             style={{
               margin: 0,
-              fontFamily: "var(--apple-font, 'Courier New', Courier, monospace)",
-              fontSize: 'clamp(42px, 5.2vw, 68px)',
+              fontFamily: "'Brother Signature', Georgia, serif",
+              fontSize: 'clamp(52px, 6vw, 84px)',
               fontWeight: 400,
-              lineHeight: 1.22,
-              letterSpacing: '0.06em',
+              lineHeight: 1.05,
+              letterSpacing: '0.03em',
               color: 'var(--macos-text, #ececef)',
             }}
           >
             {!hasPending ? (
               <>
-                Hoy es un día
+                <span style={{ whiteSpace: 'nowrap' }}>Hoy es un día</span>
                 <br />
-                <span
-                  style={{
-                    fontFamily: "'Brother Signature', Georgia, serif",
-                    fontWeight: 400,
-                    fontSize: '1.38em',
-                    letterSpacing: '0.04em',
-                    opacity: 0.95,
-                    display: 'inline-block',
-                    marginTop: 6,
-                  }}
-                >
-                  tranquilo
-                </span>
+                <span>tranquilo</span>
               </>
             ) : (
               <>
-                Agenda del
+                <span style={{ whiteSpace: 'nowrap' }}>Agenda del</span>
                 <br />
-                <span
-                  style={{
-                    fontFamily: "'Brother Signature', Georgia, serif",
-                    fontWeight: 400,
-                    fontSize: '1.38em',
-                    letterSpacing: '0.04em',
-                    opacity: 0.95,
-                    display: 'inline-block',
-                    marginTop: 6,
-                  }}
-                >
-                  día
-                </span>
+                <span>día</span>
               </>
             )}
           </h1>
@@ -108,7 +84,7 @@ export default function Dashboard() {
             flexDirection: 'column',
             gap: 10,
             width: '100%',
-            maxWidth: 520,
+            maxWidth: 420,
             justifySelf: 'end',
             paddingTop: 150,
           }}
