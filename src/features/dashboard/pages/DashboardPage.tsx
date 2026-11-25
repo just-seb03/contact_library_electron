@@ -42,22 +42,22 @@ export default function Dashboard() {
           width: '100%',
           display: 'grid',
           gridTemplateColumns: 'minmax(0, 1.05fr) minmax(360px, 0.95fr)',
-          alignItems: 'start',
+          alignItems: 'center',
           gap: 32,
-          padding: '18vh 48px 48px 48px',
+          padding: '24px 48px 56px 48px',
           boxSizing: 'border-box',
         }}
       >
-        {/* ── Mitad izquierda: Tipografía principal ── */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' }}>
+        {/* ── Mitad izquierda: Courier arriba + Brother Signature abajo ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
           <h1
             style={{
               margin: 0,
-              fontFamily: "'Brother Signature', Georgia, serif",
-              fontSize: 'clamp(64px, 7.2vw, 108px)',
+              fontFamily: "var(--apple-font, 'Courier New', Courier, monospace)",
+              fontSize: 'clamp(42px, 4.8vw, 66px)',
               fontWeight: 400,
-              lineHeight: 1.02,
-              letterSpacing: '0.03em',
+              lineHeight: 1.08,
+              letterSpacing: '0.06em',
               color: 'var(--macos-text, #ececef)',
             }}
           >
@@ -65,21 +65,46 @@ export default function Dashboard() {
               <>
                 <span style={{ whiteSpace: 'nowrap' }}>Hoy es un día</span>
                 <br />
-                <span>tranquilo</span>
+                <span
+                  style={{
+                    fontFamily: "'Brother Signature', Georgia, serif",
+                    fontWeight: 400,
+                    fontSize: '1.68em',
+                    lineHeight: 0.95,
+                    letterSpacing: '0.03em',
+                    display: 'inline-block',
+                    marginTop: 8,
+                  }}
+                >
+                  tranquilo
+                </span>
               </>
             ) : (
               <>
                 <span style={{ whiteSpace: 'nowrap' }}>Agenda del</span>
                 <br />
-                <span>día</span>
+                <span
+                  style={{
+                    fontFamily: "'Brother Signature', Georgia, serif",
+                    fontWeight: 400,
+                    fontSize: '1.68em',
+                    lineHeight: 0.95,
+                    letterSpacing: '0.03em',
+                    display: 'inline-block',
+                    marginTop: 8,
+                  }}
+                >
+                  día
+                </span>
               </>
             )}
           </h1>
         </div>
 
-        {/* ── Mitad derecha: Pila de cuadros glass tipo Apple alineada con el texto ── */}
+        {/* ── Mitad derecha: Cuadros principales centrados + fantasmas hacia abajo ── */}
         <div
           style={{
+            position: 'relative',
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
@@ -163,20 +188,32 @@ export default function Dashboard() {
           </div>
 
           {/* Cuadros inferiores a la mitad de grosor, difuminados y desvaneciéndose */}
-          {GHOST_OPACITIES.map((opacity, index) => (
-            <div
-              key={index}
-              aria-hidden="true"
-              style={{
-                ...glassCardBase,
-                height: 40,
-                borderRadius: 14,
-                opacity,
-                filter: `blur(${0.6 + index * 0.45}px)`,
-                pointerEvents: 'none',
-              }}
-            />
-          ))}
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 10px)',
+              left: 0,
+              right: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              pointerEvents: 'none',
+            }}
+          >
+            {GHOST_OPACITIES.map((opacity, index) => (
+              <div
+                key={index}
+                style={{
+                  ...glassCardBase,
+                  height: 40,
+                  borderRadius: 14,
+                  opacity,
+                  filter: `blur(${0.6 + index * 0.45}px)`,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </Page>
