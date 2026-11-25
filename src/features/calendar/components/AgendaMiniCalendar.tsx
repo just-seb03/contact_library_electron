@@ -108,10 +108,10 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   const navButtonStyle: CSSProperties = {
     width: 26,
     height: 26,
-    borderRadius: 6,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
-    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
-    color: 'var(--macos-text, #1c1c1e)',
+    borderRadius: 8,
+    border: '1px solid rgba(255, 255, 255, 0.09)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    color: 'var(--macos-text, #ececef)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -236,8 +236,9 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                       : selectedMatch
                       ? 'var(--macos-canvas-bg, #ffffff)'
                       : cell.isCurrentMonth
-                      ? 'var(--macos-text, #1c1c1e)'
-                      : 'var(--macos-text-muted, rgba(0, 0, 0, 0.25))',
+                      ? 'var(--macos-text, #ececef)'
+                      : 'var(--macos-text-muted, #888890)',
+                    opacity: cell.isCurrentMonth || selectedMatch || todayMatch ? 1 : 0.35,
                     fontWeight: todayMatch || selectedMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
                     boxShadow: todayMatch ? '0 2px 5px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.4))' : 'none',
                   }}

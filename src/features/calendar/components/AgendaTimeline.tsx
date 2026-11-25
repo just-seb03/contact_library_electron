@@ -15,6 +15,7 @@ const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
 const HOUR_HEIGHT = 68;
 const HOUR_COLUMN_WIDTH = 74;
 const EVENT_LEFT = HOUR_COLUMN_WIDTH + 14;
+const TIMELINE_TOP_PADDING = 12;
 
 function formatMinutesOfDay(minutes: number, formatter: Intl.DateTimeFormat): string {
   const time = new Date(2000, 0, 1);
@@ -91,12 +92,12 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     selectedDate.getFullYear() === currentTime.getFullYear();
 
   const currentHourDecimal = currentTime.getHours() + currentTime.getMinutes() / 60;
-  const nowLineTop = currentHourDecimal * HOUR_HEIGHT;
+  const nowLineTop = TIMELINE_TOP_PADDING + currentHourDecimal * HOUR_HEIGHT - 5;
 
   const containerStyle: CSSProperties = {
     position: 'relative',
     minHeight: HOURS.length * HOUR_HEIGHT,
-    paddingTop: 12,
+    paddingTop: TIMELINE_TOP_PADDING,
     userSelect: 'none',
   };
 
@@ -211,7 +212,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               position: 'absolute',
               left: EVENT_LEFT,
               right: 16,
-              top: hourDecimal * HOUR_HEIGHT,
+              top: TIMELINE_TOP_PADDING + hourDecimal * HOUR_HEIGHT,
               height: eventHeight,
               borderRadius: 8,
               padding: '8px 12px',
@@ -314,7 +315,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
               position: 'absolute',
               left: EVENT_LEFT,
               right: 16,
-              top: hourDecimal * HOUR_HEIGHT,
+              top: TIMELINE_TOP_PADDING + hourDecimal * HOUR_HEIGHT,
               height: eventHeight,
               borderRadius: 8,
               padding: '6px 12px',

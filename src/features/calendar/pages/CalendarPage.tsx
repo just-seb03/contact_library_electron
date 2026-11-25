@@ -319,13 +319,14 @@ export default function Calendar() {
           <div
             style={{
               ...layoutStyle,
-              gridTemplateColumns: compactLayout ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) 300px',
+              flexDirection: compactLayout ? 'column' : 'row',
               overflowY: compactLayout ? 'auto' : 'hidden',
             }}
           >
             <div style={{
               ...timelinePanelStyle,
               height: compactLayout ? '50vh' : '100%',
+              flex: compactLayout ? '0 0 auto' : 1,
             }}>
               {isWeekView ? (
                 <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
@@ -352,8 +353,8 @@ export default function Calendar() {
               ...sidebarPanelStyle,
               width: compactLayout ? '100%' : 300,
               minWidth: compactLayout ? 0 : 300,
-              borderLeft: compactLayout ? 'none' : '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
-              borderTop: compactLayout ? '1px solid var(--macos-card-border, rgba(0,0,0,0.08))' : 'none',
+              borderLeft: compactLayout ? 'none' : '1px solid rgba(255, 255, 255, 0.07)',
+              borderTop: compactLayout ? '1px solid rgba(255, 255, 255, 0.07)' : 'none',
             }}>
               <AgendaMiniCalendar
                 selectedDate={selectedDate}
