@@ -112,6 +112,8 @@ export default function Configuration() {
           <SettingsAppearanceSelector
             darkMode={darkMode}
             onToggleDarkMode={toggleDarkMode}
+            themeId={settings.themeId ?? 'default'}
+            onChangeTheme={(themeId) => updateSetting('themeId', themeId)}
             accentColor={settings.accentColor}
             onChangeAccentColor={handleAccentColorChange}
           />
