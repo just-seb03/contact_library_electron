@@ -38,9 +38,9 @@ export const APP_COLORS = {
   secondaryText: '#8e8e93',
   border: '#d1d1d6',
   borderSubtle: '#e5e5ea',
-  borderDanger: '#ffccc7',
-  selection: '#e5e5ea',
-  dangerSurface: '#fff1f0',
+  borderDanger: 'var(--macos-danger-border, rgba(255, 59, 48, 0.25))',
+  selection: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))',
+  dangerSurface: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.10))',
   iconMuted: '#c7c7cc',
 
   // Overlays y bordes translúcidos
@@ -252,24 +252,24 @@ const FRAMEWORK_PAGE_VARIABLES = {
 const SIDEBAR_VARIABLES = {
   '--f7-panel-width': `${APP_SPACING.sidebarWidth}px`,
   '--f7-panel-left-width': `${APP_SPACING.sidebarWidth}px`,
-  '--f7-panel-bg-color': APP_COLORS.background,
-  '--f7-page-bg-color': APP_COLORS.background,
-  '--f7-list-strong-bg-color': APP_COLORS.background,
-  '--f7-list-bg-color': APP_COLORS.background,
+  '--f7-panel-bg-color': 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
+  '--f7-page-bg-color': 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
+  '--f7-list-strong-bg-color': 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
+  '--f7-list-bg-color': 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
 } as const satisfies ThemeStyle;
 
 const SIDEBAR_MENU_VARIABLES = {
   '--f7-menu-list-item-selected-bg-color': APP_COLORS.selection,
   '--f7-menu-list-item-selected-text-color': APP_COLORS.primary,
-  '--f7-menu-list-item-text-color': APP_COLORS.sidebarText,
-  '--f7-list-item-title-text-color': APP_COLORS.sidebarText,
-  '--f7-list-item-text-text-color': APP_COLORS.sidebarText,
-  '--f7-text-color': APP_COLORS.sidebarText,
+  '--f7-menu-list-item-text-color': 'var(--macos-text, #1c1c1e)',
+  '--f7-list-item-title-text-color': 'var(--macos-text, #1c1c1e)',
+  '--f7-list-item-text-text-color': 'var(--macos-text, #1c1c1e)',
+  '--f7-text-color': 'var(--macos-text, #1c1c1e)',
 } as const satisfies ThemeStyle;
 
 export const SIDEBAR_SURFACE_STYLE = {
   ...SIDEBAR_DIMENSIONS,
-  backgroundColor: APP_COLORS.background,
+  backgroundColor: 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
   ...SIDEBAR_VARIABLES,
 } as const satisfies ThemeStyle;
 
@@ -283,13 +283,13 @@ export const CONTENT_VIEW_STYLE = {
 
 export const SIDEBAR_CONTAINER_STYLE = {
   ...SIDEBAR_DIMENSIONS,
-  backgroundColor: APP_COLORS.background,
-  color: APP_COLORS.black,
+  backgroundColor: 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
+  color: 'var(--macos-text, #1c1c1e)',
   ...SIDEBAR_MENU_VARIABLES,
 } as const satisfies ThemeStyle;
 
 export const SIDEBAR_ICON = {
-  color: APP_COLORS.sidebarText,
+  color: 'var(--macos-text, #1c1c1e)',
   selectedColor: APP_COLORS.primary,
 } as const;
 
