@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { Button, f7, Page, Block, Card, CardContent } from 'framework7-react';
+import { Button, f7, Page, Block, Card, CardContent, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import type { HearingEvent } from '../../../core/context/types';
 import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
 import { AgendaTimeline } from '../components/AgendaTimeline';
+import { AgendaWeekView } from '../components/AgendaWeekView';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
+import { CalendarViewSwitcher } from '../components/CalendarViewSwitcher';
 import { CreateEventPopup } from '../components/CreateEventPopup';
 import type { CalendarEvent } from '../types';
 
@@ -102,6 +104,7 @@ export default function Calendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
+  const [isWeekView, setIsWeekView] = useState(false);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -155,6 +158,9 @@ export default function Calendar() {
     ]),
     [calendarEvents, hearings]
   );
+
+  const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 900px)');
@@ -301,25 +307,40 @@ export default function Calendar() {
             }}
           >
             <div
+              key={isWeekView ? 'week-view' : 'day-view'}
+              className="cal-switch-anim"
               style={{
                 ...timelinePanelStyle,
                 height: compactLayout ? '50vh' : '100%',
                 flex: compactLayout ? '0 0 auto' : 1,
               }}
             >
-              <CardContent style={timelineScrollStyle}>
-                <div
-                  key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
-                  className="cal-step-anim"
-                >
-                  <AgendaTimeline
-                    todayHearings={todayHearings}
-                    calendarEvents={selectedDayEvents}
-                    onSelectEvent={setSelectedEvent}
-                    selectedDate={selectedDate}
-                  />
-                </div>
-              </CardContent>
+              {isWeekView ? (
+                <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
+                  <div key={weekStart.getTime()} className="cal-step-anim" style={{ height: '100%' }}>
+                    <AgendaWeekView
+                      selectedDate={selectedDate}
+                      calendarEvents={calendarEvents}
+                      hearings={hearings}
+                      onSelectEvent={setSelectedEvent}
+                    />
+                  </div>
+                </CardContent>
+              ) : (
+                <CardContent style={timelineScrollStyle}>
+                  <div
+                    key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
+                    className="cal-step-anim"
+                  >
+                    <AgendaTimeline
+                      todayHearings={todayHearings}
+                      calendarEvents={selectedDayEvents}
+                      onSelectEvent={setSelectedEvent}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
+                </CardContent>
+              )}
             </div>
 
             <div style={{
@@ -334,6 +355,56 @@ export default function Calendar() {
                 eventDates={eventDates}
                 onSelectDate={handleSelectDate}
               />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '6px 14px 12px 14px',
+                }}
+              >
+                <CalendarViewSwitcher
+                  isWeekView={isWeekView}
+                  onToggleWeekView={(isWeek) => {
+                    setIsWeekView(isWeek);
+                    setSelectedEvent(null);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingEvent(null);
+                    setIsCreateEventOpen(true);
+                  }}
+                  aria-label="Añadir evento"
+                  title="Añadir evento"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 32,
+                    height: 32,
+                    padding: 0,
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'var(--macos-text, #ececef)',
+                    opacity: 0.85,
+                    cursor: 'pointer',
+                    transition: 'opacity 0.14s ease, transform 0.14s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0.85';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <Icon f7="plus" size="22px" />
+                </button>
+              </div>
               <AgendaEventDetail
                 event={selectedEvent}
                 clientName={selectedEventClient}
