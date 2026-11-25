@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties, FC } from 'react';
-import { useApp } from '../../../core/context/AppContext';
 import type { HearingEvent } from '../../../core/context/types';
 import type { CalendarEvent } from '../types';
 import { getCalendarEventColor } from '../data/eventColors';
@@ -64,7 +63,6 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   hearings,
   onSelectEvent,
 }) => {
-  const { darkMode } = useApp();
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
@@ -94,7 +92,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   const currentHourDecimal = currentTime.getHours() + currentTime.getMinutes() / 60;
   const todayKey = toDateKey(currentTime);
 
-  const borderColor = darkMode ? 'rgba(255, 255, 255, 0.07)' : 'rgba(0, 0, 0, 0.07)';
+  const borderColor = 'var(--macos-divider, rgba(0, 0, 0, 0.07))';
 
   const containerStyle: CSSProperties = {
     minWidth: 0,
@@ -121,7 +119,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
-    backgroundColor: darkMode ? '#202023' : '#ffffff',
+    backgroundColor: 'var(--macos-card-bg, #ffffff)',
     borderBottom: `1px solid ${borderColor}`,
     borderRight: `1px solid ${borderColor}`,
     backdropFilter: 'blur(20px)',
@@ -133,10 +131,10 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     padding: '2px 8px 0 0',
     textAlign: 'right',
     fontSize: 11,
-    color: darkMode ? '#8e8e93' : '#8e8e93',
+    color: 'var(--macos-text-secondary, #8e8e93)',
     fontVariantNumeric: 'tabular-nums',
     borderRight: `1px solid ${borderColor}`,
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.015)' : 'rgba(0, 0, 0, 0.01)',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.01))',
   };
 
   const dayCellStyle: CSSProperties = {
@@ -166,9 +164,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   fontWeight: 700,
                   color: isToday
                     ? 'var(--macos-accent-color, #007aff)'
-                    : darkMode
-                    ? '#8e8e93'
-                    : '#8e8e93',
+                    : 'var(--macos-text-secondary, #8e8e93)',
                   letterSpacing: '0.04em',
                 }}
               >
@@ -187,19 +183,11 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   fontWeight: isToday || isSelected ? 700 : 500,
                   color: isToday
                     ? '#ffffff'
-                    : isSelected
-                    ? darkMode
-                      ? '#ffffff'
-                      : '#1c1c1e'
-                    : darkMode
-                    ? '#e5e5ea'
-                    : '#1c1c1e',
+                    : 'var(--macos-text, #1c1c1e)',
                   backgroundColor: isToday
                     ? 'var(--macos-accent-color, #007aff)'
                     : isSelected
-                    ? darkMode
-                      ? 'rgba(255, 255, 255, 0.15)'
-                      : 'rgba(0, 0, 0, 0.08)'
+                    ? 'var(--macos-active-bg, rgba(0, 0, 0, 0.08))'
                     : 'transparent',
                   boxShadow: isToday ? '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))' : 'none',
                 }}
@@ -282,10 +270,8 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                                 border: 'none',
                                 borderLeft: '3.5px solid #ff3b30',
                                 borderRadius: 6,
-                                backgroundColor: darkMode
-                                  ? 'rgba(255, 59, 48, 0.22)'
-                                  : 'rgba(255, 59, 48, 0.12)',
-                                color: darkMode ? '#ffffff' : '#1c1c1e',
+                                backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.12))',
+                                color: 'var(--macos-text, #1c1c1e)',
                                 padding: '4px 6px',
                                 fontFamily: 'inherit',
                                 fontSize: 11,
@@ -352,10 +338,8 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                                 border: 'none',
                                 borderLeft: `3.5px solid ${color.accent}`,
                                 borderRadius: 6,
-                                backgroundColor: darkMode
-                                  ? color.background.replace('0.12', '0.22')
-                                  : color.background,
-                                color: darkMode ? '#ffffff' : '#1c1c1e',
+                                backgroundColor: color.background.replace('0.12', '0.16'),
+                                color: 'var(--macos-text, #1c1c1e)',
                                 padding: '4px 6px',
                                 fontFamily: 'inherit',
                                 fontSize: 11,
@@ -382,7 +366,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                               <div
                                 style={{
                                   fontSize: 10,
-                                  color: darkMode ? '#c7c7cc' : color.textColor,
+                                  color: 'var(--macos-text-muted, #636366)',
                                   fontWeight: 500,
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',

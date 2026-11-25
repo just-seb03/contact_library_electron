@@ -1,6 +1,5 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
-import { useApp } from '../../../core/context/AppContext';
 import { CalendarViewSwitcher } from './CalendarViewSwitcher';
 
 interface AgendaHeaderProps {
@@ -26,12 +25,10 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   onAddEvent,
   onToday,
 }) => {
-  const { darkMode } = useApp();
-
   const headerStyle: CSSProperties = {
     padding: '14px 20px',
-    borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.07)',
-    backgroundColor: darkMode ? 'rgba(34, 34, 38, 0.6)' : 'rgba(255, 255, 255, 0.8)',
+    borderBottom: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.07))',
+    backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.8))',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     display: 'flex',
@@ -49,8 +46,8 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: darkMode ? '#2c2c2e' : '#ffffff',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.1)',
+    backgroundColor: 'var(--macos-card-bg, #ffffff)',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
     boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
     flexShrink: 0,
     overflow: 'hidden',
@@ -69,7 +66,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
   const badgeDayStyle: CSSProperties = {
     fontSize: 18,
     fontWeight: 700,
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    color: 'var(--macos-text, #1c1c1e)',
     lineHeight: 1.1,
   };
 
@@ -77,9 +74,9 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
     width: 28,
     height: 28,
     borderRadius: 6,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.9)',
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
+    color: 'var(--macos-text, #1c1c1e)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -92,9 +89,9 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
     height: 28,
     padding: '0 10px',
     borderRadius: 6,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.9)',
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: 12,
     fontWeight: 500,
     cursor: 'pointer',
@@ -133,7 +130,7 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
             style={{
               fontSize: 17,
               fontWeight: 650,
-              color: darkMode ? '#ffffff' : '#1c1c1e',
+              color: 'var(--macos-text, #1c1c1e)',
               lineHeight: 1.3,
               letterSpacing: '-0.01em',
             }}
