@@ -18,6 +18,7 @@
               red: '#ff3b30',
               orange: '#ff9500',
               green: '#34c759',
+              coffee: '#6D4C41',
               graphite: '#8e8e93'
             };
             var hex = map[parsed.accentColor] || '#007aff';
@@ -38,6 +39,18 @@
             root.style.setProperty('--f7-theme-color-rgb', rgb);
             root.style.setProperty('--f7-theme-color-shade', hex);
             root.style.setProperty('--f7-toggle-active-color', hex);
+
+            var isDark = localStorage.getItem('contact_library_dark_mode') === 'true';
+            if (isDark) root.classList.add('dark');
+            if (parsed.themeId === 'coffee') {
+              var canvas = isDark ? '#1F1916' : '#FCF9F5';
+              var card = isDark ? '#2E2420' : '#F7F2EB';
+              var text = isDark ? '#E6D3C8' : '#3C2A21';
+              root.style.setProperty('--macos-canvas-bg', canvas);
+              root.style.setProperty('--macos-card-bg', card);
+              root.style.setProperty('--macos-text', text);
+              root.style.setProperty('--f7-page-bg-color', canvas);
+            }
           }
         } catch (e) {}
       })();

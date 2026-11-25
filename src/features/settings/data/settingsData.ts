@@ -1,3 +1,5 @@
+import type { AppThemeId } from '../../../core/theme/themes';
+
 export type AppleAccentColor =
   | 'blue'
   | 'purple'
@@ -5,6 +7,7 @@ export type AppleAccentColor =
   | 'red'
   | 'orange'
   | 'green'
+  | 'coffee'
   | 'graphite';
 
 export interface AccentColorOption {
@@ -20,6 +23,7 @@ export const MAC_ACCENT_COLORS: AccentColorOption[] = [
   { id: 'red', label: 'Rojo', hex: '#ff3b30' },
   { id: 'orange', label: 'Naranja', hex: '#ff9500' },
   { id: 'green', label: 'Verde', hex: '#34c759' },
+  { id: 'coffee', label: 'Café', hex: '#6D4C41' },
   { id: 'graphite', label: 'Grafito', hex: '#8e8e93' },
 ];
 
@@ -27,6 +31,7 @@ export interface AppSettings {
   hearingAlerts: boolean;
   paymentReminders: boolean;
   soundEffects: boolean;
+  themeId: AppThemeId;
   accentColor: AppleAccentColor;
   lawyerName: string;
   lawyerEmail: string;
@@ -37,6 +42,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hearingAlerts: true,
   paymentReminders: true,
   soundEffects: true,
+  themeId: 'default',
   accentColor: 'blue',
   lawyerName: 'Sebastián Contreras',
   lawyerEmail: 's.contreras@estudiojuridico.cl',
