@@ -8,6 +8,7 @@ import {
   type OpenDocumentDTO,
   type UpsertCaseDTO,
   type SaveSettingsDTO,
+  type SetThemeDTO,
   type IpcResponse,
   type ElectronAPIContract,
 } from './shared/types/ipc'
@@ -31,6 +32,9 @@ const electronAPI: ElectronAPIContract = {
   getPlatform: async (): Promise<string> => {
     const res: IpcResponse<string> = await ipcRenderer.invoke(IPC_CHANNELS.APP_GET_PLATFORM)
     return res.data ?? process.platform
+  },
+  setTheme: (dto: SetThemeDTO): void => {
+    ipcRenderer.send(IPC_CHANNELS.APP_SET_THEME, dto)
   },
   onNavigate: (callback: (route: string) => void): (() => void) => {
     const handler = (_event: Electron.IpcRendererEvent, route: string) => callback(route)

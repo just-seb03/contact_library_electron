@@ -52,6 +52,7 @@ export const IPC_CHANNELS = {
   WINDOW_MAXIMIZE: 'window:maximize',
   WINDOW_CLOSE: 'window:close',
   APP_GET_PLATFORM: 'app:getPlatform',
+  APP_SET_THEME: 'app:setTheme',
 } as const
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
@@ -103,6 +104,11 @@ export type SavePaymentsDTO = Payment[]
 export type SaveCalendarEventsDTO = CalendarEvent[]
 export type SaveSettingsDTO = Partial<AppSettings> | Record<string, unknown>
 
+export interface SetThemeDTO {
+  isDark: boolean
+  backgroundColor?: string
+}
+
 /**
  * Contrato riguroso de la API expuesta por Preload en window.electronAPI
  */
@@ -111,6 +117,7 @@ export interface ElectronAPIContract {
   maximize: () => void
   close: () => void
   getPlatform: () => Promise<string>
+  setTheme?: (dto: SetThemeDTO) => void
   onNavigate?: (callback: (route: string) => void) => () => void
   window: {
     minimize: () => void

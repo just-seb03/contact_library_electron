@@ -106,6 +106,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       root.style.setProperty(key, value);
     }
     root.style.colorScheme = darkMode ? 'dark' : 'light';
+    window.electronAPI?.setTheme?.({
+      isDark: darkMode,
+      backgroundColor: tokens.canvasBg,
+    });
   }, [darkMode, settings.themeId]);
 
   // Carga inicial sincronizada desde SQLite al iniciar en Electron

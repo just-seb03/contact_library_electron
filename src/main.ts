@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, BrowserWindow, ipcMain, Menu, nativeTheme } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import { APP_COLORS } from './core/theme/style'
@@ -47,6 +47,12 @@ ipcMain.on(IPC_CHANNELS.WINDOW_MINIMIZE, handleMinimize)
 ipcMain.on(IPC_CHANNELS.WINDOW_MAXIMIZE, handleMaximize)
 ipcMain.on(IPC_CHANNELS.WINDOW_CLOSE, handleClose)
 ipcMain.handle(IPC_CHANNELS.APP_GET_PLATFORM, () => createIpcSuccess(process.platform))
+ipcMain.on(IPC_CHANNELS.APP_SET_THEME, (_event, payload?: { isDark?: boolean; backgroundColor?: string }) => {
+  nativeTheme.themeSource = payload?.isDark ? 'dark' : 'light'
+  if (win && !win.isDestroyed() && payload?.backgroundColor && /^#[0-9a-fA-F]{6}$/.test(payload.backgroundColor)) {
+    win.setBackgroundColor(payload.backgroundColor)
+  }
+})
 
 // Compatibilidad con llamadas heredadas
 ipcMain.on('window-minimize', handleMinimize)
