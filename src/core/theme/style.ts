@@ -86,7 +86,7 @@ export const APP_SPACING = {
 } as const;
 
 export const MACOS_THEME = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: "'Courier New', Courier, monospace",
   sidebarGlass: 'rgba(246, 246, 248, 0.82)',
   sidebarGlassDark: 'rgba(28, 28, 30, 0.82)',
   toolbarGlass: 'rgba(255, 255, 255, 0.82)',

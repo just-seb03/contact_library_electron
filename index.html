@@ -90,7 +90,8 @@
     </script>
     <style>
       :root {
-        --apple-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        --apple-font: 'Courier New', Courier, monospace;
+        --f7-font-family: var(--apple-font);
         --macos-accent-color: #0056b8;
         --macos-accent-color-rgb: 0, 86, 184;
         --macos-on-accent: #ffffff;
@@ -145,6 +146,9 @@
         font-family: var(--apple-font);
         user-select: none;
         -webkit-user-select: none;
+      }
+      button, input, select, textarea, kbd {
+        font-family: var(--apple-font);
       }
       /* Scrollbars estilo macOS discretas */
       ::-webkit-scrollbar {

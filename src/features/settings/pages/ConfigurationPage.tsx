@@ -62,7 +62,7 @@ export default function Configuration() {
     backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.05))',
     padding: '4px 8px',
     borderRadius: 6,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
+    fontFamily: 'inherit',
   };
 
   const environmentBadgeStyle: CSSProperties = {
