@@ -93,10 +93,14 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     }
   }, [weekStartTime]);
 
-  const currentHourDecimal = currentTime.getHours() + currentTime.getMinutes() / 60;
+  const currentHour = currentTime.getHours();
   const todayKey = toDateKey(currentTime);
+  const monthLabel = new Intl.DateTimeFormat(locale, { month: 'short' })
+    .format(selectedDate)
+    .replace('.', '')
+    .toUpperCase();
 
-  const borderColor = 'var(--macos-divider, rgba(0, 0, 0, 0.07))';
+  const borderColor = 'rgba(255, 255, 255, 0.07)';
 
   const containerStyle: CSSProperties = {
     minWidth: 0,
@@ -123,7 +127,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 2,
-    backgroundColor: 'var(--macos-card-bg, #ffffff)',
+    backgroundColor: 'rgba(24, 24, 26, 0.72)',
     borderBottom: `1px solid ${borderColor}`,
     borderRight: `1px solid ${borderColor}`,
     backdropFilter: 'blur(20px)',
@@ -152,8 +156,21 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   return (
     <div ref={containerRef} style={containerStyle}>
       <div style={gridStyle}>
-        {/* Celda de esquina superior izquierda fija */}
-        <div style={{ ...headerCellStyle, left: 0, zIndex: 7, position: 'sticky' }} />
+        {/* Celda de esquina superior izquierda con mes */}
+        <div
+          style={{
+            ...headerCellStyle,
+            left: 0,
+            zIndex: 7,
+            position: 'sticky',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.06em',
+            color: 'var(--macos-text-secondary, #a4a4ab)',
+          }}
+        >
+          {monthLabel}
+        </div>
 
         {/* Encabezados de días de la semana (LUN, MAR... + número con insignia Apple) */}
         {days.map((day, index) => {
@@ -213,33 +230,20 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
 
               return (
                 <div key={`${hour}-${currentDayKey}`} style={dayCellStyle}>
-                  {/* Línea roja de hora actual en la columna de Hoy */}
-                  {isTodayColumn && hour === Math.floor(currentHourDecimal) && (
+                  {/* Contorno claro en el bloque horario actual de Hoy */}
+                  {isTodayColumn && hour === currentHour && (
                     <div
+                      aria-hidden="true"
                       style={{
                         position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        top: (currentHourDecimal - hour) * HOUR_HEIGHT,
-                        height: 2,
-                        backgroundColor: '#ff3b30',
-                        zIndex: 4,
+                        inset: '2px 4px',
+                        borderRadius: 8,
+                        border: '1.5px solid rgba(236, 236, 239, 0.42)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.03)',
+                        zIndex: 3,
                         pointerEvents: 'none',
                       }}
-                    >
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: -4,
-                          top: -3,
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          backgroundColor: '#ff3b30',
-                          boxShadow: '0 0 4px rgba(255, 59, 48, 0.6)',
-                        }}
-                      />
-                    </div>
+                    />
                   )}
 
                   {/* Renderizado de eventos en la primera fila horaria (con top absoluto) */}

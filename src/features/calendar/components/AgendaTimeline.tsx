@@ -91,8 +91,8 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     selectedDate.getMonth() === currentTime.getMonth() &&
     selectedDate.getFullYear() === currentTime.getFullYear();
 
-  const currentHourDecimal = currentTime.getHours() + currentTime.getMinutes() / 60;
-  const nowLineTop = TIMELINE_TOP_PADDING + currentHourDecimal * HOUR_HEIGHT - 5;
+  const currentHour = currentTime.getHours();
+  const currentHourTop = TIMELINE_TOP_PADDING + currentHour * HOUR_HEIGHT;
 
   const containerStyle: CSSProperties = {
     position: 'relative',
@@ -161,41 +161,24 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
         </div>
       ))}
 
-      {/* ── Indicador de Hora Actual estilo Apple Calendar (Apple Red) ── */}
+      {/* ── Contorno claro en el bloque horario actual ── */}
       {isToday && (
         <div
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            left: HOUR_COLUMN_WIDTH - 5,
-            right: 12,
-            top: nowLineTop,
-            zIndex: 10,
+            left: HOUR_COLUMN_WIDTH + 6,
+            right: 10,
+            top: currentHourTop + 2,
+            height: HOUR_HEIGHT - 4,
+            borderRadius: 10,
+            border: '1.5px solid rgba(236, 236, 239, 0.42)',
+            backgroundColor: 'rgba(255, 255, 255, 0.03)',
+            boxSizing: 'border-box',
+            zIndex: 2,
             pointerEvents: 'none',
-            display: 'flex',
-            alignItems: 'center',
           }}
-        >
-          {/* Círculo indicador */}
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              borderRadius: '50%',
-              backgroundColor: '#ff3b30',
-              boxShadow: '0 0 6px rgba(255, 59, 48, 0.5)',
-              flexShrink: 0,
-            }}
-          />
-          {/* Línea horizontal continua */}
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: '#ff3b30',
-              borderRadius: 1,
-            }}
-          />
-        </div>
+        />
       )}
 
       {/* ── Chips de Audiencias (Judiciales) ── */}
