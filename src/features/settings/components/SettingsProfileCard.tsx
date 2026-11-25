@@ -13,7 +13,6 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
   name,
   firm,
   email,
-  darkMode,
   onEdit,
 }) => {
   const cardStyle: CSSProperties = {
@@ -22,9 +21,9 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
     justifyContent: 'space-between',
     padding: '16px 20px',
     borderRadius: 14,
-    backgroundColor: darkMode ? 'rgba(38, 38, 42, 0.8)' : 'rgba(255, 255, 255, 0.85)',
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.07)',
-    boxShadow: darkMode ? '0 2px 8px rgba(0, 0, 0, 0.3)' : '0 2px 8px rgba(0, 0, 0, 0.04)',
+    backgroundColor: 'var(--macos-card-bg, rgba(255, 255, 255, 0.85))',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.07))',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     marginBottom: 24,
@@ -58,7 +57,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             fontWeight: 700,
             flexShrink: 0,
             boxShadow: '0 4px 12px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
-            border: darkMode ? '2px solid rgba(255, 255, 255, 0.15)' : '2px solid #ffffff',
+            border: '2px solid var(--macos-card-bg, #ffffff)',
           }}
         >
           {getInitials(name) || 'CL'}
@@ -70,7 +69,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
               style={{
                 fontSize: 16,
                 fontWeight: 650,
-                color: darkMode ? '#ffffff' : '#1c1c1e',
+                color: 'var(--macos-text, #1c1c1e)',
                 letterSpacing: '-0.01em',
               }}
             >
@@ -82,7 +81,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
           <div
             style={{
               fontSize: 12.5,
-              color: darkMode ? '#a1a1aa' : '#636366',
+              color: 'var(--macos-text-muted, #636366)',
               marginTop: 2,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -95,7 +94,7 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
           <div
             style={{
               fontSize: 11.5,
-              color: darkMode ? '#71717a' : '#8e8e93',
+              color: 'var(--macos-text-secondary, #8e8e93)',
               marginTop: 1,
             }}
           >
@@ -121,9 +120,9 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             height: 28,
             padding: '0 12px',
             borderRadius: 6,
-            border: darkMode ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 0, 0, 0.15)',
-            backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#ffffff',
-            color: darkMode ? '#ffffff' : '#1c1c1e',
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.15))',
+            backgroundColor: 'var(--macos-input-bg, #ffffff)',
+            color: 'var(--macos-text, #1c1c1e)',
             fontSize: 12,
             fontWeight: 500,
             cursor: 'pointer',
@@ -133,10 +132,10 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             transition: 'background-color 0.12s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255, 255, 255, 0.14)' : '#f2f2f7';
+            e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, #f2f2f7)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255, 255, 255, 0.08)' : '#ffffff';
+            e.currentTarget.style.backgroundColor = 'var(--macos-input-bg, #ffffff)';
           }}
         >
           <Icon f7="pencil" size="11px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />

@@ -37,9 +37,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
     borderRadius: 8,
     border: selected
       ? '2px solid var(--macos-accent-color, #007aff)'
-      : darkMode
-      ? '1px solid rgba(255, 255, 255, 0.12)'
-      : '1px solid rgba(0, 0, 0, 0.12)',
+      : '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
     backgroundColor: isDarkPreview ? '#1e1e20' : '#f5f5f7',
     display: 'flex',
     overflow: 'hidden',
@@ -57,7 +55,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
           style={{
             fontSize: 12.5,
             fontWeight: 600,
-            color: darkMode ? '#ffffff' : '#1c1c1e',
+            color: 'var(--macos-text, #1c1c1e)',
             marginBottom: 10,
           }}
         >
@@ -103,7 +101,9 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
               style={{
                 fontSize: 12,
                 fontWeight: !darkMode ? 600 : 450,
-                color: !darkMode ? 'var(--macos-accent-color, #007aff)' : darkMode ? '#a1a1aa' : '#636366',
+                color: !darkMode
+                  ? 'var(--macos-accent-color, #007aff)'
+                  : 'var(--macos-text-muted, #636366)',
               }}
             >
               Claro {!darkMode && '✓'}
@@ -148,7 +148,9 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
               style={{
                 fontSize: 12,
                 fontWeight: darkMode ? 600 : 450,
-                color: darkMode ? 'var(--macos-accent-color, #007aff)' : '#636366',
+                color: darkMode
+                  ? 'var(--macos-accent-color, #007aff)'
+                  : 'var(--macos-text-muted, #636366)',
               }}
             >
               Oscuro {darkMode && '✓'}
@@ -158,12 +160,12 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
       </div>
 
       {/* ── Selector de Color de Acento de macOS ── */}
-      <div style={{ borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.06)', paddingTop: 14 }}>
+      <div style={{ borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))', paddingTop: 14 }}>
         <div
           style={{
             fontSize: 12.5,
             fontWeight: 600,
-            color: darkMode ? '#ffffff' : '#1c1c1e',
+            color: 'var(--macos-text, #1c1c1e)',
             marginBottom: 10,
           }}
         >
@@ -191,7 +193,7 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                   position: 'relative',
                   outline: 'none',
                   boxShadow: isSelected
-                    ? `0 0 0 2px ${darkMode ? '#1c1c1e' : '#ffffff'}, 0 0 0 4px ${item.hex}`
+                    ? `0 0 0 2px var(--macos-card-bg, #ffffff), 0 0 0 4px ${item.hex}`
                     : 'none',
                   transform: isSelected ? 'scale(1.1)' : 'scale(1)',
                   transition: 'all 0.15s ease',

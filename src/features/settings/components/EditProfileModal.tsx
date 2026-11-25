@@ -20,7 +20,6 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
   onClose,
   initialData,
   onSave,
-  darkMode,
 }) => {
   const [formData, setFormData] = useState<ProfileFormData>(initialData);
 
@@ -58,9 +57,9 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
   const modalStyle: CSSProperties = {
     width: '100%',
     maxWidth: 460,
-    backgroundColor: darkMode ? '#1e1e20' : '#ffffff',
+    backgroundColor: 'var(--macos-modal-bg, #ffffff)',
     borderRadius: 14,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
     boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
     overflow: 'hidden',
     display: 'flex',
@@ -73,7 +72,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '14px 18px',
-    borderBottom: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
+    borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
   };
 
   const inputGroupStyle: CSSProperties = {
@@ -86,16 +85,16 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
   const labelStyle: CSSProperties = {
     fontSize: 12,
     fontWeight: 600,
-    color: darkMode ? '#d1d1d6' : '#3c3c43',
+    color: 'var(--macos-text-muted, #3c3c43)',
   };
 
   const inputStyle: CSSProperties = {
     height: 34,
     padding: '0 10px',
     borderRadius: 7,
-    border: darkMode ? '1px solid rgba(255, 255, 255, 0.14)' : '1px solid rgba(0, 0, 0, 0.15)',
-    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.06)' : '#f5f5f7',
-    color: darkMode ? '#ffffff' : '#1c1c1e',
+    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.15))',
+    backgroundColor: 'var(--macos-input-bg, #f5f5f7)',
+    color: 'var(--macos-text, #1c1c1e)',
     fontSize: 13,
     outline: 'none',
     boxSizing: 'border-box',
@@ -108,8 +107,8 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
     justifyContent: 'flex-end',
     gap: 10,
     padding: '12px 18px',
-    borderTop: darkMode ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(0, 0, 0, 0.08)',
-    backgroundColor: darkMode ? 'rgba(0, 0, 0, 0.2)' : '#fbfbfd',
+    borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
+    backgroundColor: 'var(--macos-subtle-bg, #fbfbfd)',
   };
 
   return (
@@ -131,7 +130,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
             >
               <Icon f7="person_crop_circle" size="14px" />
             </div>
-            <span style={{ fontSize: 14, fontWeight: 650, color: darkMode ? '#ffffff' : '#1c1c1e' }}>
+            <span style={{ fontSize: 14, fontWeight: 650, color: 'var(--macos-text, #1c1c1e)' }}>
               Editar Perfil del Despacho
             </span>
           </div>
@@ -144,7 +143,7 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              color: darkMode ? '#8e8e93' : '#8e8e93',
+              color: 'var(--macos-text-secondary, #8e8e93)',
               padding: 4,
             }}
           >
@@ -197,9 +196,9 @@ export const EditProfileModal: FC<EditProfileModalProps> = ({
                 height: 30,
                 padding: '0 14px',
                 borderRadius: 6,
-                border: darkMode ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.12)',
-                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.08)' : '#ffffff',
-                color: darkMode ? '#e5e5ea' : '#3c3c43',
+                border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+                backgroundColor: 'var(--macos-input-bg, #ffffff)',
+                color: 'var(--macos-text, #3c3c43)',
                 fontSize: 12.5,
                 fontWeight: 500,
                 cursor: 'pointer',

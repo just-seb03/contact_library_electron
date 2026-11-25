@@ -16,10 +16,9 @@ export const IosSwitch: React.FC<IosSwitchProps> = ({
   disabled = false,
   activeColor = 'var(--macos-accent-color, #007aff)',
   inactiveColor,
-  darkMode = false,
   ariaLabel = 'Interruptor',
 }) => {
-  const defaultInactive = darkMode ? '#39393D' : '#E9E9EA';
+  const defaultInactive = 'var(--macos-active-bg, #E9E9EA)';
   const currentBgColor = checked ? activeColor : (inactiveColor ?? defaultInactive);
 
   const trackStyle: CSSProperties = {
