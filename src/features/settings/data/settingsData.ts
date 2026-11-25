@@ -24,6 +24,8 @@ export const MAC_ACCENT_COLORS: AccentColorOption[] = [
 ];
 
 export interface AppSettings {
+  /** Aviso previo de eventos del calendario (según "Aviso previo" de cada evento). */
+  calendarAlerts: boolean;
   hearingAlerts: boolean;
   paymentReminders: boolean;
   soundEffects: boolean;
@@ -36,6 +38,7 @@ export interface AppSettings {
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
+  calendarAlerts: true,
   hearingAlerts: true,
   paymentReminders: true,
   soundEffects: true,

@@ -31,6 +31,7 @@ INSERT OR IGNORE INTO calendar_events (id, title, date, start_time, end_time, co
 
 -- 5. Configuración inicial (Settings)
 INSERT OR IGNORE INTO settings (key, value) VALUES
+('calendarAlerts', 'true'),
 ('hearingAlerts', 'true'),
 ('paymentReminders', 'true'),
 ('soundEffects', 'true'),

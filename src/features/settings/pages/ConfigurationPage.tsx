@@ -119,7 +119,7 @@ export default function Configuration() {
             icon="speaker_wave_2_fill"
             iconBgColor="#af52de"
             title="Efectos de sonido de la interfaz"
-            subtitle="Reproduce sutiles tonos al completar cobros, crear clientes o guardar audiencias"
+            subtitle="Reproduce sutiles tonos en la app y el sonido de las notificaciones"
             control={
               <IosSwitch
                 checked={settings.soundEffects}
@@ -140,6 +140,22 @@ export default function Configuration() {
           darkMode={darkMode}
         >
           <SettingsRow
+            icon="bell_fill"
+            iconBgColor="#007aff"
+            title="Avisos de eventos del calendario"
+            subtitle="Notifica antes de cada evento según el «Aviso previo» que elijas al crearlo"
+            control={
+              <IosSwitch
+                checked={settings.calendarAlerts}
+                onChange={(val) => updateSetting('calendarAlerts', val)}
+                darkMode={darkMode}
+                ariaLabel="Avisos de eventos del calendario"
+              />
+            }
+            isLast={false}
+            darkMode={darkMode}
+          />
+          <SettingsRow
             icon="calendar"
             iconBgColor="#ff3b30"
             title="Alertas de audiencias judiciales"
@@ -159,7 +175,7 @@ export default function Configuration() {
             icon="creditcard_fill"
             iconBgColor="#ff9500"
             title="Recordatorios de cobros y vencimientos"
-            subtitle="Destaca en color ámbar las cuotas pendientes o con fecha límite próxima"
+            subtitle="Resumen diario a las 9:00 de cobros vencidos y de los que vencen esta semana"
             control={
               <IosSwitch
                 checked={settings.paymentReminders}

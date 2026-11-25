@@ -119,6 +119,7 @@ INSERT OR IGNORE INTO calendar_events (id, title, date, start_time, end_time, co
 ('cal-seed-4', 'Audiencia: Carlos Mendoza', '2026-10-22', '14:00', '15:00', 'lavender', 15, 6, '3° Juzgado Civil de Santiago - EXP-2026-155');
 
 INSERT OR IGNORE INTO settings (key, value) VALUES
+('calendarAlerts', 'true'),
 ('hearingAlerts', 'true'),
 ('paymentReminders', 'true'),
 ('soundEffects', 'true'),

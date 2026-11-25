@@ -11,6 +11,7 @@ import {
   registerNotificationProvider,
   startNotificationScheduler,
   stopNotificationScheduler,
+  type NotificationPreferences,
 } from './core/notifications'
 import {
   APP_DISPLAY_NAME,
@@ -20,6 +21,7 @@ import {
   destroyTray,
   getMainWindow,
   isTrayActive,
+  getSystemPreferences,
   loadSystemPreferences,
   markQuitting,
   migrateLegacyUserData,
@@ -71,6 +73,17 @@ function revealMainWindow() {
     showMainWindow()
   } else {
     openMainWindow()
+  }
+}
+
+/** Traduce los ajustes del usuario al contrato del sistema de notificaciones. */
+function getNotificationPreferencesFromSettings(): NotificationPreferences {
+  const settings = getSystemPreferences()
+  return {
+    calendarAlerts: settings.calendarAlerts,
+    hearingAlerts: settings.hearingAlerts,
+    paymentReminders: settings.paymentReminders,
+    sound: settings.soundEffects,
   }
 }
 
@@ -158,10 +171,11 @@ function bootstrap() {
       onQuit: quitApp,
     })
 
-    // Notificaciones nativas. Las preferencias reales se conectan en el paso 7;
-    // mientras tanto el servicio usa DEFAULT_NOTIFICATION_PREFERENCES.
+    // Notificaciones nativas. Las preferencias se leen de la caché de ajustes en cada aviso,
+    // así que un cambio en Ajustes se aplica de inmediato.
     initNotificationService({
       adapter: createNotificationAdapter({ iconPath: path.join(process.env.VITE_PUBLIC, 'icon.png') }),
+      getPreferences: getNotificationPreferencesFromSettings,
       onOpen: revealMainWindow,
       navigate: navigateMainWindow,
     })
