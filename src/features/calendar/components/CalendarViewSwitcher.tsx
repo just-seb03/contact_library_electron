@@ -13,28 +13,28 @@ export const CalendarViewSwitcher: FC<CalendarViewSwitcherProps> = ({
     display: 'inline-flex',
     alignItems: 'center',
     padding: 3,
-    borderRadius: 8,
-    backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
-    boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.08)',
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     userSelect: 'none',
   };
 
   const buttonStyle = (active: boolean): CSSProperties => ({
     padding: '4px 14px',
-    borderRadius: 6,
+    borderRadius: 999,
     border: 'none',
     outline: 'none',
     fontSize: 12.5,
     fontWeight: active ? 600 : 500,
     cursor: 'pointer',
     backgroundColor: active
-      ? 'var(--macos-card-bg, #ffffff)'
+      ? 'rgba(255, 255, 255, 0.14)'
       : 'transparent',
     color: active
-      ? 'var(--macos-text, #1c1c1e)'
-      : 'var(--macos-text-muted, #636366)',
+      ? 'var(--macos-text, #ececef)'
+      : 'var(--macos-text-muted, #888890)',
     boxShadow: active
-      ? '0 1px 3px rgba(0, 0, 0, 0.16), 0 0 1px rgba(0, 0, 0, 0.08)'
+      ? '0 1px 4px rgba(0, 0, 0, 0.2)'
       : 'none',
     transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
   });

@@ -37,22 +37,26 @@ function to24HourTime(time: string): string | null {
 
 const sectionTitleStyle: CSSProperties = {
   margin: '0 0 14px',
-  fontSize: 22,
-  fontWeight: 700,
+  fontSize: 24,
+  fontWeight: 400,
+  letterSpacing: '0.04em',
   lineHeight: 1.2,
-  color: 'var(--macos-text, #1c1c1e)',
+  color: 'var(--macos-text, #ececef)',
 };
 
 const calendarCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: 'var(--macos-card-bg, #ffffff)',
-  ['--f7-card-border-radius' as string]: '16px',
+  ['--f7-card-bg-color' as string]: 'rgba(255, 255, 255, 0.038)',
+  ['--f7-card-border-radius' as string]: '18px',
+  backgroundColor: 'rgba(255, 255, 255, 0.038)',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   display: 'flex',
   flexDirection: 'column',
-  height: 'calc(100vh - 150px)',
+  height: 'calc(100vh - 156px)',
   minHeight: 320,
   margin: 0,
-  border: '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.24)',
   overflow: 'hidden',
 };
 
@@ -257,18 +261,44 @@ export default function Calendar() {
 
   return (
     <Page noNavbar noToolbar style={{ overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes calEnter {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .cal-anim {
+          opacity: 0;
+          animation: calEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cal-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
       <Block
-        className="no-margin-top padding-top-half"
+        className="no-margin-top"
         style={{
           width: '100%',
           minWidth: 0,
-          paddingTop: '20px',
+          padding: '16px 32px 64px 32px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}
       >
-        <h1 style={sectionTitleStyle}>Calendario</h1>
-        <Card style={calendarCardStyle}>
+        <h1 className="cal-anim" style={{ ...sectionTitleStyle, animationDelay: '40ms' }}>
+          Calendario
+        </h1>
+        <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '100ms' }}>
           <AgendaHeader
             day={currentDay}
             monthShort={monthShort}
