@@ -126,9 +126,8 @@
         background: var(--macos-scrollbar-thumb-hover, rgba(0, 0, 0, 0.28));
       }
 
-      /* Soporte global de Modo Oscuro nativo de macOS */
-      html.dark,
-      body.dark {
+      /* Respaldo inicial de Modo Oscuro en html (los estilos inline de AppProvider en :root tienen prioridad) */
+      html.dark {
         --macos-canvas-bg: #1e1e20;
         --macos-card-bg: rgba(38, 38, 42, 0.85);
         --macos-modal-bg: #242426;
@@ -150,6 +149,9 @@
         --macos-danger-border: rgba(255, 59, 48, 0.32);
         --f7-page-bg-color: #1e1e20;
         --f7-card-bg-color: rgba(38, 38, 42, 0.85);
+      }
+      html.dark,
+      body.dark {
         background-color: var(--macos-canvas-bg);
         color: var(--macos-text);
         color-scheme: dark;
