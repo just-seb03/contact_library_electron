@@ -277,6 +277,8 @@ export const SIDEBAR_SURFACE_STYLE = {
 export const CONTENT_VIEW_STYLE = {
   ...SURFACE_STYLE,
   ...FRAMEWORK_PAGE_VARIABLES,
+  backgroundColor: 'transparent',
+  '--f7-page-bg-color': 'transparent',
   '--f7-page-navbar-offset': '0px',
   '--f7-page-toolbar-top-offset': '0px',
   '--f7-page-content-extra-padding-top': '0px',

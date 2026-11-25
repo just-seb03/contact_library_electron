@@ -196,13 +196,26 @@
         color: var(--macos-text);
         color-scheme: dark;
       }
+      html, body {
+        background-color: var(--macos-canvas-bg);
+        color: var(--macos-text);
+      }
+      .view-main,
+      #content-view,
+      .page,
+      .page-content {
+        background-color: transparent !important;
+      }
       .dark #root,
-      .dark #app,
+      .dark #app {
+        background-color: transparent !important;
+        color: var(--macos-text);
+      }
       .dark .view-main,
       .dark #content-view,
       .dark .page,
       .dark .page-content {
-        background-color: var(--macos-canvas-bg) !important;
+        background-color: transparent !important;
         color: var(--macos-text);
       }
       .dark .card {

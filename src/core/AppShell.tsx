@@ -4,6 +4,7 @@ import routes from '../navigation/routes';
 import { LeftBar } from '../navigation/LeftBar';
 import { UnifiedToolbar } from './components/UnifiedToolbar';
 import { SpotlightModal } from './components/SpotlightModal';
+import { XmbWaveBackground } from './background';
 import { CONTENT_VIEW_STYLE } from './theme/style';
 import { navigateToTab } from '../navigation/navigation';
 import { useSystemNavigation } from '../navigation/useSystemNavigation';
@@ -69,9 +70,14 @@ export function AppShell() {
         }
       `}</style>
 
+      {/* ── Fondo animado tipo XMB (PS3) en paleta grafito mate ── */}
+      <XmbWaveBackground />
+
       {/* ── Área Principal de Contenido a ancho completo con Unified Toolbar ── */}
       <div
         style={{
+          position: 'relative',
+          zIndex: 1,
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
