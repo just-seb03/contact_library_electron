@@ -226,17 +226,18 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
       ) : (
         <div
           style={{
-            padding: '28px 12px',
+            minHeight: 112,
+            padding: '20px 12px',
             textAlign: 'center',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            gap: 8,
+            justifyContent: 'center',
             color: 'var(--macos-text-secondary, #8e8e93)',
           }}
         >
-          <Icon f7="calendar_badge_clock" size="32px" style={{ opacity: 0.5 }} />
-          <span style={{ fontSize: 13 }}>Selecciona una audiencia o evento para ver sus detalles</span>
+          <span style={{ fontSize: 13, lineHeight: 1.45 }}>
+            Selecciona una audiencia o evento para ver sus detalles
+          </span>
         </div>
       )}
     </div>

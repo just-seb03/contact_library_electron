@@ -35,15 +35,6 @@ function to24HourTime(time: string): string | null {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-const sectionTitleStyle: CSSProperties = {
-  margin: '0 0 14px',
-  fontSize: 24,
-  fontWeight: 400,
-  letterSpacing: '0.04em',
-  lineHeight: 1.2,
-  color: 'var(--macos-text, #ececef)',
-};
-
 const calendarCardStyle: CSSProperties = {
   ['--f7-card-bg-color' as string]: 'rgba(255, 255, 255, 0.038)',
   ['--f7-card-border-radius' as string]: '18px',
@@ -52,12 +43,14 @@ const calendarCardStyle: CSSProperties = {
   WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   display: 'flex',
   flexDirection: 'column',
-  height: 'calc(100vh - 156px)',
+  height: 'calc(100vh - 58px)',
   minHeight: 320,
   margin: 0,
   border: '1px solid rgba(255, 255, 255, 0.08)',
   boxShadow: '0 12px 32px rgba(0, 0, 0, 0.24)',
   overflow: 'hidden',
+  maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
 };
 
 const layoutStyle: CSSProperties = {
@@ -78,6 +71,7 @@ const sidebarPanelStyle: CSSProperties = {
   minHeight: 0,
   flexShrink: 0,
   borderLeft: '1px solid rgba(0,0,0,0.08)',
+  paddingBottom: 68,
   overflowY: 'auto',
   overscrollBehaviorY: 'contain',
 };
@@ -97,7 +91,7 @@ const undoBannerStyle: CSSProperties = {
 const timelineScrollStyle: CSSProperties = {
   height: '100%',
   boxSizing: 'border-box',
-  padding: '8px 0',
+  padding: '8px 0 68px 0',
   minHeight: 0,
   overflowX: 'hidden',
   overflowY: 'auto',
@@ -290,15 +284,12 @@ export default function Calendar() {
         style={{
           width: '100%',
           minWidth: 0,
-          padding: '16px 32px 64px 32px',
+          padding: '0 24px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}
       >
-        <h1 className="cal-anim" style={{ ...sectionTitleStyle, animationDelay: '40ms' }}>
-          Calendario
-        </h1>
-        <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '100ms' }}>
+        <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '60ms' }}>
           <AgendaHeader
             day={currentDay}
             monthShort={monthShort}
