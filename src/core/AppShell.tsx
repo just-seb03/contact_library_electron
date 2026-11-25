@@ -80,7 +80,7 @@ export function AppShell() {
           boxSizing: 'border-box',
         }}
       >
-        <UnifiedToolbar onOpenSpotlight={() => setIsSpotlightOpen(true)} />
+        <UnifiedToolbar />
 
         <View
           id="content-view"
@@ -96,7 +96,7 @@ export function AppShell() {
       </div>
 
       {/* ── Navegación flotante monocroma en esquina inferior izquierda ── */}
-      <LeftBar />
+      <LeftBar onOpenSpotlight={() => setIsSpotlightOpen(true)} />
 
       {/* ── Buscador Rápido Spotlight (⌘K) ── */}
       <SpotlightModal

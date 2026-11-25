@@ -3,13 +3,7 @@ import { Icon } from 'framework7-react';
 import { useApp } from '../context/AppContext';
 import { TrafficLights } from '../windowControls/TrafficLights';
 
-interface UnifiedToolbarProps {
-  onOpenSpotlight: () => void;
-}
-
-export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
-  onOpenSpotlight,
-}) => {
+export const UnifiedToolbar: FC = () => {
   const { activeTab, hearings, clients } = useApp();
 
   const toolbarStyle: CSSProperties = {
@@ -36,54 +30,9 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
 
   return (
     <header style={toolbarStyle}>
-      {/* ── Izquierda: Controles de ventana + Buscador estilo Spotlight al lado ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0, ...noDragStyle }}>
+      {/* ── Izquierda: Controles de ventana (cerrar, minimizar, maximizar) ── */}
+      <div style={{ display: 'flex', alignItems: 'center', ...noDragStyle }}>
         <TrafficLights />
-
-        <div
-          style={{
-            width: 'min(340px, 100%)',
-            display: 'flex',
-          }}
-        >
-        <button
-          type="button"
-          onClick={onOpenSpotlight}
-          style={{
-            width: '100%',
-            height: 30,
-            padding: '0 12px',
-            borderRadius: 8,
-            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.09))',
-            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
-            color: 'var(--macos-text-secondary, #8e8e93)',
-            fontSize: 12.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            transition: 'border-color 0.15s ease, background-color 0.15s ease',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Icon f7="search" size="14px" style={{ opacity: 0.8 }} />
-            <span>Buscar clientes, causas o citas...</span>
-          </div>
-          <kbd
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              padding: '2px 5px',
-              borderRadius: 4,
-              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
-              color: 'var(--macos-text-muted, #636366)',
-              border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
-            }}
-          >
-            ⌘K
-          </kbd>
-        </button>
-        </div>
       </div>
 
       {/* ── Derecha: Contadores contextuales ── */}

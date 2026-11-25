@@ -15,7 +15,11 @@ interface NavItemConfig {
   shortcut?: string;
 }
 
-export const LeftBar = () => {
+interface LeftBarProps {
+  onOpenSpotlight?: () => void;
+}
+
+export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
   const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
 
   const handleSelect = (tab: AppTab) => {
@@ -99,6 +103,7 @@ export const LeftBar = () => {
     zIndex: 9000,
     display: 'flex',
     alignItems: 'center',
+    gap: 10,
     userSelect: 'none',
     pointerEvents: 'auto',
   };
@@ -190,6 +195,53 @@ export const LeftBar = () => {
   const navElement = (
     <nav style={containerStyle} aria-label="Navegación principal">
       {renderNavItems(navItems)}
+
+      {onOpenSpotlight && (
+        <button
+          type="button"
+          onClick={onOpenSpotlight}
+          title="Buscar clientes, causas o citas (⌘K)"
+          aria-label="Buscar"
+          style={{
+            height: 32,
+            padding: '0 10px',
+            borderRadius: 999,
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.10))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: 'var(--macos-text-secondary, #5c5c5e)',
+            fontSize: 12,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            transition: 'border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--macos-text, #1c1c1e)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--macos-text-secondary, #5c5c5e)';
+          }}
+        >
+          <Icon f7="search" size="14px" />
+          <span>Buscar...</span>
+          <kbd
+            style={{
+              fontSize: 10,
+              fontWeight: 600,
+              padding: '1px 5px',
+              borderRadius: 4,
+              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
+              color: 'var(--macos-text-muted, #636366)',
+              border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
+            }}
+          >
+            ⌘K
+          </kbd>
+        </button>
+      )}
     </nav>
   );
 
