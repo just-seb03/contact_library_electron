@@ -15,7 +15,8 @@ export interface DatabaseWrapper {
   exec(sql: string): Promise<void>
   pragma(sql: string): Promise<void>
   transaction<T>(fn: () => Promise<T>): Promise<T>
-  close(): void
+  /** Cierra la conexión tras esperar las transacciones en curso. */
+  close(): Promise<void>
 }
 
 let dbInstance: DatabaseWrapper | null = null
@@ -169,11 +170,16 @@ function createWrapper(rawDb: sqlite3.Database): DatabaseWrapper {
         releaseTransaction()
       }
     },
-    close(): void {
-      rawDb.close((error) => {
-        if (error) {
-          console.error('[SQLite] Error cerrando la base de datos:', error)
-        }
+    async close(): Promise<void> {
+      // Espera a que terminen las transacciones en curso (p. ej. un saveAll) antes de cerrar.
+      await transactionTail
+      await new Promise<void>((resolve) => {
+        rawDb.close((error) => {
+          if (error) {
+            console.error('[SQLite] Error cerrando la base de datos:', error)
+          }
+          resolve()
+        })
       })
     },
   }
@@ -193,7 +199,7 @@ export async function initDatabase(dbPath?: string): Promise<DatabaseWrapper> {
     await wrapper.pragma('foreign_keys = ON')
     await runDatabaseMigrations(wrapper)
   } catch (error) {
-    wrapper.close()
+    await wrapper.close()
     throw error
   }
 
@@ -209,9 +215,13 @@ export function getDatabase(): DatabaseWrapper {
   return dbInstance
 }
 
-export function closeDatabase(): void {
-  if (dbInstance) {
-    dbInstance.close()
-    dbInstance = null
-  }
+/**
+ * Cierra la conexión y espera a que SQLite termine. Llamarlo al salir de la app y esperar
+ * la promesa antes de terminar el proceso (ver `will-quit` en main.ts).
+ */
+export async function closeDatabase(): Promise<void> {
+  if (!dbInstance) return
+  const instance = dbInstance
+  dbInstance = null
+  await instance.close()
 }

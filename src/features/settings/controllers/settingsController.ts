@@ -6,6 +6,7 @@
 
 import { ipcMain } from 'electron'
 import { getDatabase } from '../../../core/database/connection'
+import { applySystemPreferences } from '../../../core/system/preferences'
 import {
   IPC_CHANNELS,
   createIpcSuccess,
@@ -60,6 +61,8 @@ export function registerSettingsController(): void {
             await statement.run(key, JSON.stringify(value))
           }
         })
+        // Sincroniza la caché del proceso main (p. ej. minimizar a la bandeja al cerrar)
+        applySystemPreferences(settings as Record<string, unknown>)
         return createIpcSuccess(true)
       } catch (error) {
         return createIpcError(error)
@@ -94,6 +97,7 @@ export function registerSettingsController(): void {
         await statement.run(key, JSON.stringify(value))
       }
     })
+    applySystemPreferences(settings as Record<string, unknown>)
     return true
   })
 }

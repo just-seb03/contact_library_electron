@@ -24,6 +24,14 @@ export interface CaseEntity {
   updatedAt: string
 }
 
+export interface ScheduledHearingRow {
+  clientId: number
+  clientName: string
+  expediente: string
+  juzgado: string
+  proximaAudiencia: string
+}
+
 export interface UpsertCaseDTO {
   expediente: string
   juzgado: string
@@ -45,6 +53,30 @@ export class CaseRepository {
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     }
+  }
+
+  /** Casos con audiencia programada, junto al nombre del cliente (para notificaciones). */
+  async getScheduledHearings(): Promise<ScheduledHearingRow[]> {
+    const db = getDatabase()
+    const rows = await db.prepare(`
+      SELECT c.client_id, cl.name AS client_name, c.expediente, c.juzgado, c.proxima_audiencia
+      FROM cases c
+      JOIN clients cl ON cl.id = c.client_id
+      WHERE c.proxima_audiencia IS NOT NULL AND TRIM(c.proxima_audiencia) != ''
+    `).all<{
+      client_id: number
+      client_name: string
+      expediente: string
+      juzgado: string
+      proxima_audiencia: string
+    }>()
+    return rows.map((row) => ({
+      clientId: row.client_id,
+      clientName: row.client_name,
+      expediente: row.expediente,
+      juzgado: row.juzgado,
+      proximaAudiencia: row.proxima_audiencia,
+    }))
   }
 
   async getByClientId(clientId: number): Promise<CaseEntity | null> {

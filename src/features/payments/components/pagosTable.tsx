@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { useEffect, useRef, type FC } from 'react';
 import type { Payment } from '../types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from './PaymentActionsMenu';
@@ -7,6 +7,8 @@ import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface TableProps {
   payments: Payment[];
+  /** Pago a destacar y desplazar a la vista (p. ej. al abrirlo desde una notificación). */
+  highlightedPaymentId?: string | null;
   onEdit: (payment: Payment) => void;
   onDelete: (payment: Payment) => void;
 }
@@ -17,7 +19,15 @@ function formatPaymentDate(value: string): string {
   return new Intl.DateTimeFormat('es-CL').format(date);
 }
 
-export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) => {
+export const PaymentsTable: FC<TableProps> = ({ payments, highlightedPaymentId, onEdit, onDelete }) => {
+  const highlightedRowRef = useRef<HTMLTableRowElement | null>(null);
+
+  useEffect(() => {
+    if (highlightedPaymentId) {
+      highlightedRowRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlightedPaymentId]);
+
   const headerCellStyle = {
     padding: '12px 14px',
     color: 'var(--macos-text-secondary, #6e6e73)',
@@ -64,8 +74,18 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) =>
               </td>
             </tr>
           ) : (
-            payments.map((payment) => (
-              <tr key={payment.id}>
+            payments.map((payment) => {
+              const isHighlighted = payment.id === highlightedPaymentId;
+              return (
+              <tr
+                key={payment.id}
+                ref={isHighlighted ? highlightedRowRef : undefined}
+                aria-current={isHighlighted ? 'true' : undefined}
+                style={{
+                  backgroundColor: isHighlighted ? 'var(--macos-accent-tint-active, rgba(0, 122, 255, 0.26))' : undefined,
+                  transition: 'background-color 0.6s ease',
+                }}
+              >
                 <td style={{ ...cellStyle, fontWeight: 600 }}>{payment.client}</td>
                 <td style={cellStyle}>{payment.concept}</td>
                 <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>{formatPaymentDate(payment.date)}</td>
@@ -82,7 +102,8 @@ export const PaymentsTable: FC<TableProps> = ({ payments, onEdit, onDelete }) =>
                   />
                 </td>
               </tr>
-            ))
+              );
+            })
           )}
         </tbody>
       </table>

@@ -543,7 +543,7 @@ export function CreateEventPopup({
           </div>
 
           <div style={fieldStyle}>
-            <label htmlFor="calendar-event-alarm" style={labelStyle}>Aviso previo (no funcional)</label>
+            <label htmlFor="calendar-event-alarm" style={labelStyle}>Aviso previo</label>
             <select
               id="calendar-event-alarm"
               value={alarmMinutes}

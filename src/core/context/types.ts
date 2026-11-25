@@ -1,3 +1,5 @@
+import type { NavigationTarget } from '../../shared/types/navigation';
+
 export type ClientStatus = 'activo' | 'en_proceso' | 'completado';
 
 export interface ClientCase {
@@ -92,6 +94,12 @@ export interface AppContextType {
   activeTab: AppTab;
   setActiveTab: (tab: AppTab) => void;
   setSelectedClientId: (id: number | null) => void;
+  /**
+   * Elemento pendiente de abrir tras una navegación del sistema (p. ej. clic en una notificación).
+   * La página correspondiente lo consume con `useNavigationFocus` y lo limpia.
+   */
+  navigationFocus: NavigationTarget | null;
+  setNavigationFocus: (target: NavigationTarget | null) => void;
   updateClient: (id: number, data: Partial<Client>) => void;
   updatePaymentStatus: (clientIdOrPaymentId: string | number, status: 'completed' | 'pending' | 'overdue') => void;
   updatePayment: (payment: Payment, data: Omit<Payment, 'id' | 'client' | 'clientId'>) => void;

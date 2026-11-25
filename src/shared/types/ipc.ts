@@ -1,5 +1,6 @@
 import type { Client, Payment, CalendarEvent, ClientDocument } from '../../core/context/types'
 import type { AppSettings } from '../../features/settings/data/settingsData'
+import type { NavigationRequest } from './navigation'
 
 /**
  * Estándar de respuesta estricta para todos los canales IPC.
@@ -53,6 +54,8 @@ export const IPC_CHANNELS = {
   WINDOW_CLOSE: 'window:close',
   APP_GET_PLATFORM: 'app:getPlatform',
   APP_SET_THEME: 'app:setTheme',
+  /** Main → Renderer: abrir una sección o un elemento concreto (payload: NavigationRequest). */
+  APP_NAVIGATE: 'app:navigate',
 } as const
 
 export type IpcChannel = (typeof IPC_CHANNELS)[keyof typeof IPC_CHANNELS]
@@ -118,7 +121,7 @@ export interface ElectronAPIContract {
   close: () => void
   getPlatform: () => Promise<string>
   setTheme?: (dto: SetThemeDTO) => void
-  onNavigate?: (callback: (route: string) => void) => () => void
+  onNavigate?: (callback: (request: NavigationRequest) => void) => () => void
   window: {
     minimize: () => void
     maximize: () => void
