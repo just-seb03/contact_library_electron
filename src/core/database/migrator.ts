@@ -1,5 +1,5 @@
 import type { DatabaseWrapper } from './connection'
-import { TABLES_SQL, SEED_SQL, NOTIFICATION_LOG_SQL } from './schema'
+import { TABLES_SQL, NOTIFICATION_LOG_SQL } from './schema'
 
 interface TableColumnInfo {
   cid: number
@@ -178,12 +178,6 @@ async function migrateToV1(db: DatabaseWrapper): Promise<void> {
     // Si la base de datos es totalmente nueva:
     console.log('[SQLite Migrator] Creando base de datos inicial v1...')
     await db.exec(TABLES_SQL)
-
-    const clientCount = await db.prepare('SELECT count(*) as count FROM clients').get<{ count: number }>()
-    if (!clientCount || clientCount.count === 0) {
-      console.log('[SQLite Migrator] Población inicial con seed data...')
-      await db.exec(SEED_SQL)
-    }
 
     await db.pragma('user_version = 1')
     console.log('[SQLite Migrator] Esquema inicial v1 aplicado con éxito.')
