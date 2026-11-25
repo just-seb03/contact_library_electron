@@ -1,4 +1,5 @@
 export { APP_DISPLAY_NAME, APP_ID } from './appInfo'
+export { migrateLegacyUserData } from './legacyUserData'
 export {
   applySystemPreferences,
   getSystemPreferences,

@@ -18,6 +18,7 @@ import {
   isTrayActive,
   loadSystemPreferences,
   markQuitting,
+  migrateLegacyUserData,
   navigateMainWindow,
   notifyRunningInBackground,
   registerWindowController,
@@ -41,6 +42,9 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 
 // Debe fijarse antes de cualquier uso de rutas de usuario (userData) o del bloqueo de instancia única.
 app.name = APP_DISPLAY_NAME
+
+/** Tiempo máximo de espera para cerrar SQLite al salir. */
+const DATABASE_CLOSE_TIMEOUT_MS = 3000
 
 function openMainWindow() {
   createMainWindow({
@@ -70,6 +74,9 @@ function quitApp() {
 }
 
 function bootstrap() {
+  // Recupera los datos de la carpeta anterior (antes de abrir SQLite y el localStorage).
+  migrateLegacyUserData()
+
   // Windows: agrupa la barra de tareas y habilita notificaciones. En desarrollo se usa el ejecutable.
   if (process.platform === 'win32') {
     app.setAppUserModelId(app.isPackaged ? APP_ID : process.execPath)
@@ -98,10 +105,22 @@ function bootstrap() {
     markQuitting()
   })
 
-  app.on('will-quit', () => {
+  // Salida ordenada: se pausa la salida hasta que SQLite termine de cerrar (con un límite
+  // de tiempo para no quedar colgados) y luego se vuelve a pedir la salida.
+  let isDatabaseClosed = false
+  app.on('will-quit', (event) => {
     disposeNotificationService()
     destroyTray()
-    closeDatabase()
+    if (isDatabaseClosed) return
+
+    event.preventDefault()
+    const timeout = new Promise<void>((resolve) => setTimeout(resolve, DATABASE_CLOSE_TIMEOUT_MS))
+    Promise.race([closeDatabase(), timeout])
+      .catch((error) => console.error('[SQLite] Error al cerrar:', error))
+      .finally(() => {
+        isDatabaseClosed = true
+        app.quit()
+      })
   })
 
   // macOS: clic en el Dock. La ventana oculta sigue existiendo, así que se muestra en vez de crear otra.
