@@ -54,7 +54,8 @@ export class CalendarRepository {
       startTime: row.start_time,
       endTime: row.end_time,
       colorId: (row.color_id as CalendarEventColorId) || 'blue',
-      alarmMinutes: Number(row.alarm_minutes) || 15,
+      // 0 significa "Sin aviso": no debe reemplazarse por el valor por defecto (antes se usaba `|| 15`).
+      alarmMinutes: Number.isFinite(Number(row.alarm_minutes)) ? Number(row.alarm_minutes) : 15,
       clientId: row.client_id,
       details: row.details || '',
     }
@@ -189,6 +190,34 @@ export class CalendarRepository {
     `).all<CalendarEventRow>(targetDate, startTime)
 
     return rows.map((r) => this.toEntity(r))
+  }
+
+  /**
+   * Reemplaza todos los eventos en una sola transacción (sincronización completa desde la UI).
+   * Si cualquier inserción falla, se revierte también el borrado.
+   */
+  async replaceAll(events: CalendarEvent[]): Promise<void> {
+    const db = getDatabase()
+    await db.transaction(async () => {
+      await db.prepare('DELETE FROM calendar_events').run()
+      const statement = db.prepare(`
+        INSERT INTO calendar_events (id, title, date, start_time, end_time, color_id, alarm_minutes, client_id, details)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+      for (const event of events) {
+        await statement.run(
+          event.id,
+          event.title,
+          event.date,
+          event.startTime,
+          event.endTime,
+          event.colorId || 'blue',
+          event.alarmMinutes ?? 15,
+          event.clientId ?? null,
+          event.details || ''
+        )
+      }
+    })
   }
 }
 

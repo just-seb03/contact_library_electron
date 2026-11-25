@@ -225,6 +225,32 @@ export class PaymentRepository {
       overdueCount,
     }
   }
+
+  /**
+   * Reemplaza todos los pagos en una sola transacción (sincronización completa desde la UI).
+   * Si cualquier inserción falla, se revierte también el borrado.
+   */
+  async replaceAll(payments: Payment[]): Promise<void> {
+    const db = getDatabase()
+    await db.transaction(async () => {
+      await db.prepare('DELETE FROM payments').run()
+      const statement = db.prepare(`
+        INSERT INTO payments (id, client_id, client_name, concept, amount, date, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `)
+      for (const payment of payments) {
+        await statement.run(
+          payment.id,
+          payment.clientId ?? null,
+          payment.client,
+          payment.concept,
+          Number(payment.amount),
+          payment.date,
+          payment.status
+        )
+      }
+    })
+  }
 }
 
 export const paymentRepository = new PaymentRepository()

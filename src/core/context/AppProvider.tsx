@@ -37,6 +37,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [navigationFocus, setNavigationFocus] = useState<NavigationTarget | null>(null);
+  /** Tablas de SQLite ya leídas al arrancar; hasta entonces no se escribe en ellas. */
+  const [dbHydrated, setDbHydrated] = useState({
+    clients: false,
+    payments: false,
+    calendar: false,
+    settings: false,
+  });
 
   useEffect(() => {
     if (!navigationFocus) return;
@@ -148,6 +155,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         if (!isMounted) return;
 
+        // Solo se habilita la escritura de las tablas que se pudieron leer (null = error de lectura).
+        // Si SQLite está vacío pero localStorage tiene datos, el siguiente guardado los migra a SQLite.
+        setDbHydrated({
+          clients: dbClients !== null,
+          payments: dbPayments !== null,
+          calendar: dbCalendar !== null,
+          settings: dbSettings !== null,
+        });
+
         if (dbClients && dbClients.length > 0) {
           setClients(dbClients);
         }
@@ -172,24 +188,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     };
   }, []);
 
+  // Los guardados en SQLite esperan a que termine la carga inicial de cada tabla.
+  // Sin esto, el primer render guardaba el estado inicial (localStorage, posiblemente vacío)
+  // y `saveAll` reemplazaba la tabla completa antes de haberla leído.
   useEffect(() => {
     saveCalendarEvents(calendarEvents);
-    databaseService.saveCalendarEvents(calendarEvents);
-  }, [calendarEvents]);
+    if (dbHydrated.calendar) databaseService.saveCalendarEvents(calendarEvents);
+  }, [calendarEvents, dbHydrated.calendar]);
 
   useEffect(() => {
     saveClients(clients);
-    databaseService.saveAllClients(clients);
-  }, [clients]);
+    if (dbHydrated.clients) databaseService.saveAllClients(clients);
+  }, [clients, dbHydrated.clients]);
 
   useEffect(() => {
     saveRegisteredPayments(registeredPayments);
-    databaseService.savePayments(registeredPayments);
-  }, [registeredPayments]);
+    if (dbHydrated.payments) databaseService.savePayments(registeredPayments);
+  }, [registeredPayments, dbHydrated.payments]);
 
   useEffect(() => {
-    databaseService.saveSettings(settings as unknown as Record<string, unknown>);
-  }, [settings]);
+    if (dbHydrated.settings) {
+      databaseService.saveSettings(settings as unknown as Record<string, unknown>);
+    }
+  }, [settings, dbHydrated.settings]);
 
   const toggleDarkMode = () => setDarkMode((prev) => !prev);
 
@@ -199,22 +220,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return clients.find((c) => c.id === selectedClientId) ?? null;
   }, [clients, selectedClientId]);
 
-  // Lista de pagos sincronizada de forma reactiva a partir de la fuente de clientes
+  // Lista de pagos: pagos registrados + el pago asociado a cada cliente (`client.pago`).
+  // Con SQLite, `client.pago` es el último pago de la tabla `payments`, es decir, uno que ya
+  // está en `registeredPayments`: se omite para no mostrarlo duplicado.
   const payments: Payment[] = useMemo(
-    () => [
-      ...clients
-        .filter((client) => client.pago !== undefined)
-        .map((client) => ({
-          id: String(client.id),
-          client: client.name,
-          clientId: client.id,
-          concept: client.pago!.concepto,
-          amount: client.pago!.monto,
-          date: client.pago!.fecha,
-          status: client.pago!.estado,
-        })),
-      ...registeredPayments,
-    ],
+    () => {
+      const isRegistered = (clientId: number, pago: ClientPaymentInfo) =>
+        registeredPayments.some((payment) => (
+          payment.clientId === clientId &&
+          payment.concept === pago.concepto &&
+          payment.amount === pago.monto &&
+          payment.date === pago.fecha
+        ));
+
+      return [
+        ...clients
+          .filter((client) => client.pago !== undefined && !isRegistered(client.id, client.pago))
+          .map((client) => ({
+            id: String(client.id),
+            client: client.name,
+            clientId: client.id,
+            concept: client.pago!.concepto,
+            amount: client.pago!.monto,
+            date: client.pago!.fecha,
+            status: client.pago!.estado,
+          })),
+        ...registeredPayments,
+      ];
+    },
     [clients, registeredPayments]
   );
 
