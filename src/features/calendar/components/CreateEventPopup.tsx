@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
-import { Button, f7, Icon, Input, Popup } from 'framework7-react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
+import { f7, Icon } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import { APP_COLORS } from '../../../core/theme/style';
 import { CALENDAR_EVENT_COLORS } from '../data/eventColors';
 import type { CalendarEvent, CalendarEventColorId } from '../types';
 import type { HearingEvent } from '../../../core/context/types';
+import { EventDatePicker, EventTimePicker } from './EventDateTimePickers';
 
 interface CreateEventPopupProps {
   opened: boolean;
@@ -18,41 +20,23 @@ interface CreateEventPopupProps {
   onUpdate: (event: CalendarEvent) => void;
 }
 
-const popupStyle: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  top: 0,
-  left: 0,
-  position: 'fixed',
-  backgroundColor: 'rgba(0, 0, 0, 0.45)',
-  backdropFilter: 'blur(8px)',
-  WebkitBackdropFilter: 'blur(8px)',
-  overflow: 'hidden',
-  zIndex: 10500,
-};
-
-const popupCenterStyle: CSSProperties = {
-  width: '100%',
-  height: '100%',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '16px',
-  boxSizing: 'border-box',
-};
+const CLOSE_ANIMATION_MS = 190;
 
 const contentStyle: CSSProperties = {
   position: 'relative',
   width: '100%',
-  maxWidth: 540,
-  maxHeight: 'min(640px, calc(100vh - 40px))',
+  maxWidth: 520,
+  maxHeight: 'min(660px, calc(100vh - 40px))',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-  borderRadius: 14,
-  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
-  color: 'var(--macos-text, #1c1c1e)',
-  boxShadow: '0 20px 48px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--macos-card-border, rgba(0, 0, 0, 0.08))',
+  borderRadius: 18,
+  backgroundColor: 'var(--macos-modal-bg, #242428)',
+  backdropFilter: 'blur(28px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(28px) saturate(160%)',
+  color: 'var(--macos-text, #ececef)',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+  boxShadow: '0 24px 60px rgba(0, 0, 0, 0.45)',
   boxSizing: 'border-box',
 };
 
@@ -60,7 +44,7 @@ const formStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  maxHeight: 'min(640px, calc(100vh - 40px))',
+  maxHeight: 'min(660px, calc(100vh - 40px))',
   minHeight: 0,
   boxSizing: 'border-box',
   overflow: 'hidden',
@@ -72,49 +56,52 @@ const headerStyle: CSSProperties = {
   justifyContent: 'space-between',
   gap: 12,
   flexShrink: 0,
-  padding: '16px 24px 12px',
+  padding: '18px 24px 12px',
+  borderBottom: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.12))',
 };
 
 const titleStyle: CSSProperties = {
   margin: 0,
-  fontSize: 21,
-  fontWeight: 700,
-  color: 'var(--macos-text, #1c1c1e)',
-  flexShrink: 0,
-  whiteSpace: 'nowrap',
+  fontSize: 18,
+  fontWeight: 600,
+  letterSpacing: '0.02em',
+  color: 'var(--macos-text, #ececef)',
 };
 
 const formBodyStyle: CSSProperties = {
   flex: 1,
   minHeight: 0,
   overflowY: 'auto',
-  padding: '8px 24px 12px',
+  padding: '14px 24px 12px',
 };
 
 const fieldStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 7,
-  marginBottom: 16,
+  gap: 6,
+  marginBottom: 14,
 };
 
 const labelStyle: CSSProperties = {
-  fontSize: 13,
+  fontSize: 11.5,
   fontWeight: 600,
-  color: 'var(--macos-text, #1c1c1e)',
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  color: 'var(--macos-text-secondary, #a4a4ab)',
 };
 
 const controlStyle: CSSProperties = {
   width: '100%',
   boxSizing: 'border-box',
   minHeight: 40,
-  padding: '9px 11px',
-  border: '1px solid var(--macos-card-border, #d1d1d6)',
-  borderRadius: 8,
-  backgroundColor: 'var(--macos-input-bg, #ffffff)',
-  color: 'var(--macos-text, #1c1c1e)',
-  fontSize: 14,
+  padding: '9px 12px',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+  borderRadius: 10,
+  backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.08))',
+  color: 'var(--macos-text, #ececef)',
+  fontSize: 13.5,
   fontFamily: 'inherit',
+  outline: 'none',
 };
 
 const timeFieldsStyle: CSSProperties = {
@@ -126,7 +113,7 @@ const timeFieldsStyle: CSSProperties = {
 const colorOptionsStyle: CSSProperties = {
   display: 'grid',
   gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
-  gap: 10,
+  gap: 8,
 };
 
 const actionsStyle: CSSProperties = {
@@ -136,130 +123,15 @@ const actionsStyle: CSSProperties = {
   gap: 10,
   flexShrink: 0,
   padding: '14px 24px',
-  borderTop: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
-  backgroundColor: 'var(--macos-modal-bg, #ffffff)',
-  position: 'sticky',
-  bottom: 0,
-  zIndex: 10,
+  borderTop: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.12))',
+  backgroundColor: 'var(--macos-modal-bg, #242428)',
 };
-
-interface TimePickerFieldProps {
-  id: string;
-  value: string;
-  onChange: (value: string) => void;
-}
-
-function getTimePickerValues(value: string, uses12HourClock: boolean): string[] {
-  const [hours, minutes] = value.split(':').map(Number);
-  if (!uses12HourClock) return [String(hours), String(minutes).padStart(2, '0')];
-
-  const period = hours < 12 ? 'AM' : 'PM';
-  return [String(hours % 12 || 12), String(minutes).padStart(2, '0'), period];
-}
-
-function getTimeFromPickerValues(values: unknown, uses12HourClock: boolean): string | null {
-  if (!Array.isArray(values) || values.length < 2) return null;
-
-  let hours = Number(values[0]);
-  const minutes = Number(values[1]);
-  if (!Number.isInteger(hours) || !Number.isInteger(minutes) || minutes < 0 || minutes > 59) {
-    return null;
-  }
-
-  if (uses12HourClock) {
-    const period = values[2];
-    if (hours < 1 || hours > 12 || (period !== 'AM' && period !== 'PM')) return null;
-    hours %= 12;
-    if (period === 'PM') hours += 12;
-  } else if (hours < 0 || hours > 23) {
-    return null;
-  }
-
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-}
-
-function formatTimeForDisplay(value: string, locale: string | undefined): string {
-  const [hours, minutes] = value.split(':').map(Number);
-  const time = new Date(2000, 0, 1, hours, minutes);
-  return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(time);
-}
-
-function TimePickerField({ id, value, onChange }: TimePickerFieldProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const pickerRef = useRef<ReturnType<typeof f7.picker.create> | null>(null);
-  const onChangeRef = useRef(onChange);
-  const valueRef = useRef(value);
-  onChangeRef.current = onChange;
-  valueRef.current = value;
-
-  const locale = document.documentElement.lang || undefined;
-  const uses12HourClock = new Intl.DateTimeFormat(locale, { hour: 'numeric' })
-    .resolvedOptions().hour12 ?? false;
-
-  useEffect(() => {
-    if (!inputRef.current) return;
-
-    const hours = uses12HourClock
-      ? Array.from({ length: 12 }, (_, index) => String(index + 1))
-      : Array.from({ length: 24 }, (_, hour) => String(hour));
-    const minutes = Array.from({ length: 60 }, (_, minute) => String(minute).padStart(2, '0'));
-    const cols = [
-      { values: hours },
-      { divider: true, content: ':' },
-      { values: minutes },
-      ...(uses12HourClock ? [{ values: ['AM', 'PM'] }] : []),
-    ];
-
-    const picker = f7.picker.create({
-      inputEl: inputRef.current,
-      openIn: 'popover',
-      toolbar: true,
-      toolbarCloseText: 'Seleccionar hora',
-      value: getTimePickerValues(valueRef.current, uses12HourClock),
-      cols,
-      on: {
-        change: (_picker, values) => {
-          const time = getTimeFromPickerValues(values, uses12HourClock);
-          if (time) onChangeRef.current(time);
-        },
-      },
-    });
-    pickerRef.current = picker;
-
-    return () => {
-      picker.destroy();
-      pickerRef.current = null;
-    };
-  }, [uses12HourClock]);
-
-  useEffect(() => {
-    pickerRef.current?.setValue(getTimePickerValues(value, uses12HourClock));
-  }, [value, uses12HourClock]);
-
-  return (
-    <input
-      ref={inputRef}
-      id={id}
-      type="text"
-      readOnly
-      required
-      value={formatTimeForDisplay(value, locale)}
-      aria-haspopup="dialog"
-      style={controlStyle}
-    />
-  );
-}
 
 function toDateInputValue(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-
-function fromDateInputValue(value: string): Date {
-  const [year, month, day] = value.split('-').map(Number);
-  return new Date(year, month - 1, day);
 }
 
 function hearingTimeToMinutes(value: string): number | null {
@@ -290,15 +162,37 @@ export function CreateEventPopup({
   const [clientId, setClientId] = useState('');
   const [details, setDetails] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isVisible, setIsVisible] = useState(opened);
+  const [isClosing, setIsClosing] = useState(false);
+
   const initialValues = useRef('');
-  const [contentMounted, setContentMounted] = useState(opened);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedTime = selectedDate.getTime();
 
   useEffect(() => {
-    if (opened) setContentMounted(true);
-  }, [opened]);
+    if (opened) {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      setIsClosing(false);
+      setIsVisible(true);
+    } else if (isVisible && !isClosing) {
+      setIsClosing(true);
+      closeTimerRef.current = setTimeout(() => {
+        setIsVisible(false);
+        setIsClosing(false);
+      }, CLOSE_ANIMATION_MS);
+    }
+  }, [opened, isVisible, isClosing]);
 
-  const getFormValues = () => ({
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  const getFormValues = useCallback(() => ({
     title,
     date,
     startTime,
@@ -307,7 +201,7 @@ export function CreateEventPopup({
     alarmMinutes,
     clientId,
     details,
-  });
+  }), [title, date, startTime, endTime, colorId, alarmMinutes, clientId, details]);
 
   useEffect(() => {
     if (!opened) return;
@@ -344,17 +238,39 @@ export function CreateEventPopup({
     initialValues.current = JSON.stringify(values);
   }, [opened, selectedTime, editingEvent, selectedDate]);
 
-  const requestClose = () => {
-    if (JSON.stringify(getFormValues()) === initialValues.current) {
+  const animateAndClose = useCallback(() => {
+    if (isClosing) return;
+    setIsClosing(true);
+    closeTimerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setIsClosing(false);
       onClose();
+    }, CLOSE_ANIMATION_MS);
+  }, [isClosing, onClose]);
+
+  const requestClose = useCallback(() => {
+    if (JSON.stringify(getFormValues()) === initialValues.current) {
+      animateAndClose();
       return;
     }
     f7.dialog.confirm(
       'Se perderán los cambios que no hayas guardado.',
       '¿Descartar cambios?',
-      onClose
+      animateAndClose
     );
-  };
+  }, [animateAndClose, getFormValues]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        requestClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible, requestClose]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -408,231 +324,299 @@ export function CreateEventPopup({
     } else {
       onCreate(updatedFields);
     }
-    onClose();
+    animateAndClose();
   };
 
-  return (
-    <Popup
-      opened={opened}
-      className="popup-tablet-fullscreen"
-      style={popupStyle}
-      closeByBackdropClick={false}
-      closeOnEscape={false}
-      onPopupClosed={() => setContentMounted(false)}
+  if (!isVisible) return null;
+
+  const modalNode = (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="event-modal-title"
+      className={isClosing ? 'event-backdrop-out' : 'event-backdrop-in'}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) requestClose();
+      }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 10500,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+        backgroundColor: 'rgba(0, 0, 0, 0.48)',
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        boxSizing: 'border-box',
+      }}
     >
-      {contentMounted && (
-      <div style={popupCenterStyle}>
-      <div style={contentStyle}>
+      <style>{`
+        @keyframes eventBackdropIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes eventBackdropOut {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        @keyframes eventCardIn {
+          from { opacity: 0; transform: translateY(16px) scale(0.96); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes eventCardOut {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(10px) scale(0.97); }
+        }
+        @keyframes pickerReveal {
+          from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .event-backdrop-in {
+          animation: eventBackdropIn 0.22s ease forwards;
+        }
+        .event-backdrop-out {
+          animation: eventBackdropOut ${CLOSE_ANIMATION_MS}ms ease forwards;
+        }
+        .event-card-in {
+          animation: eventCardIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .event-card-out {
+          animation: eventCardOut ${CLOSE_ANIMATION_MS}ms cubic-bezier(0.4, 0, 1, 1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .event-backdrop-in,
+          .event-backdrop-out,
+          .event-card-in,
+          .event-card-out {
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
+
+      <div
+        style={contentStyle}
+        className={isClosing ? 'event-card-out' : 'event-card-in'}
+      >
         <form onSubmit={handleSubmit} style={formStyle}>
           <div style={headerStyle}>
-            <h2 style={titleStyle}>{editingEvent ? 'Editar evento' : 'Nuevo evento'}</h2>
-            <Button
+            <h2 id="event-modal-title" style={titleStyle}>
+              {editingEvent ? 'Editar evento' : 'Nuevo evento'}
+            </h2>
+            <button
               type="button"
               aria-label="Cerrar"
               onClick={requestClose}
               style={{
-                color: APP_COLORS.neutral,
-                width: 36,
-                height: 36,
-                minWidth: 36,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 30,
+                height: 30,
                 padding: 0,
-                margin: 0,
+                border: 'none',
+                borderRadius: 8,
                 backgroundColor: 'transparent',
-                boxShadow: 'none',
+                color: 'var(--macos-text-secondary, #a4a4ab)',
+                cursor: 'pointer',
               }}
             >
-              <Icon f7="xmark" />
-            </Button>
+              <Icon f7="xmark" size="16px" />
+            </button>
           </div>
 
           <div style={formBodyStyle}>
-          <div style={fieldStyle}>
-            <label htmlFor="calendar-event-title" style={labelStyle}>Título</label>
-            <input
-              id="calendar-event-title"
-              required
-              maxLength={80}
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Ej.: Reunión con cliente"
-              style={controlStyle}
-            />
-          </div>
+            <div style={fieldStyle}>
+              <label htmlFor="calendar-event-title" style={labelStyle}>Título</label>
+              <input
+                id="calendar-event-title"
+                required
+                maxLength={80}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="Ej.: Reunión con cliente"
+                style={controlStyle}
+              />
+            </div>
 
-          <div style={fieldStyle}>
-            <span style={labelStyle}>Color del evento</span>
-            <div style={colorOptionsStyle} role="radiogroup" aria-label="Color del evento">
-              {CALENDAR_EVENT_COLORS.map((color) => (
-                <button
-                  key={color.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={colorId === color.id}
-                  aria-label={color.label}
-                  title={color.label}
-                  onClick={() => setColorId(color.id)}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 4,
-                    width: '100%',
-                    minWidth: 0,
-                    minHeight: 52,
-                    padding: 5,
-                    borderRadius: 9,
-                    backgroundColor: color.background,
-                    border: colorId === color.id ? `2px solid ${color.border}` : '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
-                    cursor: 'pointer',
-                    boxSizing: 'border-box',
-                  }}
-                >
-                  <span
-                    aria-hidden="true"
+            <div style={fieldStyle}>
+              <span style={labelStyle}>Color del evento</span>
+              <div style={colorOptionsStyle} role="radiogroup" aria-label="Color del evento">
+                {CALENDAR_EVENT_COLORS.map((color) => (
+                  <button
+                    key={color.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={colorId === color.id}
+                    aria-label={color.label}
+                    title={color.label}
+                    onClick={() => setColorId(color.id)}
                     style={{
-                      width: 14,
-                      height: 14,
-                      borderRadius: '50%',
-                      backgroundColor: color.border,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 4,
+                      width: '100%',
+                      minWidth: 0,
+                      minHeight: 50,
+                      padding: 5,
+                      borderRadius: 10,
+                      backgroundColor: color.background,
+                      border: colorId === color.id
+                        ? `2px solid ${color.border}`
+                        : '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+                      cursor: 'pointer',
+                      boxSizing: 'border-box',
                     }}
-                  />
-                  <span style={{ fontSize: 11, color: 'var(--macos-text, #1c1c1e)' }}>{color.label}</span>
-                </button>
-              ))}
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 12,
+                        height: 12,
+                        borderRadius: '50%',
+                        backgroundColor: color.border,
+                      }}
+                    />
+                    <span style={{ fontSize: 11, color: 'var(--macos-text, #ececef)' }}>
+                      {color.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div style={fieldStyle}>
-            <label htmlFor="calendar-event-date" style={labelStyle}>Día</label>
-            <Input
-              inputId="calendar-event-date"
-              type="datepicker"
-              required
-              value={date ? [fromDateInputValue(date)] : []}
-              placeholder="Seleccionar día"
-              calendarParams={{
-                dateFormat: 'dd M, yyyy',
-                locale: 'es-CL',
-                openIn: 'popover',
-              }}
-              onCalendarChange={(value?: Date[]) => {
-                if (value?.[0]) setDate(toDateInputValue(value[0]));
-              }}
-              style={controlStyle}
-            />
-          </div>
-
-          <div style={{ ...fieldStyle, ...timeFieldsStyle }}>
             <div style={fieldStyle}>
-              <label htmlFor="calendar-event-start" style={labelStyle}>Desde</label>
-              <TimePickerField
-                id="calendar-event-start"
-                value={startTime}
-                onChange={setStartTime}
+              <label htmlFor="calendar-event-date" style={labelStyle}>Día</label>
+              <EventDatePicker
+                id="calendar-event-date"
+                value={date}
+                onChange={setDate}
               />
             </div>
+
+            <div style={{ ...fieldStyle, ...timeFieldsStyle }}>
+              <div>
+                <label htmlFor="calendar-event-start" style={{ ...labelStyle, display: 'block', marginBottom: 6 }}>
+                  Desde
+                </label>
+                <EventTimePicker
+                  id="calendar-event-start"
+                  value={startTime}
+                  onChange={setStartTime}
+                />
+              </div>
+              <div>
+                <label htmlFor="calendar-event-end" style={{ ...labelStyle, display: 'block', marginBottom: 6 }}>
+                  Hasta
+                </label>
+                <EventTimePicker
+                  id="calendar-event-end"
+                  value={endTime}
+                  onChange={setEndTime}
+                />
+              </div>
+            </div>
+
             <div style={fieldStyle}>
-              <label htmlFor="calendar-event-end" style={labelStyle}>Hasta</label>
-              <TimePickerField
-                id="calendar-event-end"
-                value={endTime}
-                onChange={setEndTime}
+              <label htmlFor="calendar-event-alarm" style={labelStyle}>Aviso previo</label>
+              <select
+                id="calendar-event-alarm"
+                value={alarmMinutes}
+                onChange={(event) => setAlarmMinutes(Number(event.target.value))}
+                style={controlStyle}
+              >
+                <option value={0}>Sin aviso</option>
+                <option value={5}>5 minutos antes</option>
+                <option value={10}>10 minutos antes</option>
+                <option value={15}>15 minutos antes</option>
+                <option value={30}>30 minutos antes</option>
+                <option value={60}>1 hora antes</option>
+              </select>
+            </div>
+
+            <div style={fieldStyle}>
+              <label htmlFor="calendar-event-client" style={labelStyle}>Cliente (opcional)</label>
+              <select
+                id="calendar-event-client"
+                value={clientId}
+                onChange={(event) => setClientId(event.target.value)}
+                style={controlStyle}
+              >
+                <option value="">Sin cliente asociado</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>{client.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={fieldStyle}>
+              <label htmlFor="calendar-event-details" style={labelStyle}>Detalles (opcional)</label>
+              <textarea
+                id="calendar-event-details"
+                rows={3}
+                maxLength={1000}
+                value={details}
+                onChange={(event) => setDetails(event.target.value)}
+                placeholder="Añade información útil para este evento"
+                style={{ ...controlStyle, resize: 'vertical', minHeight: 76 }}
               />
             </div>
-          </div>
 
-          <div style={fieldStyle}>
-            <label htmlFor="calendar-event-alarm" style={labelStyle}>Aviso previo</label>
-            <select
-              id="calendar-event-alarm"
-              value={alarmMinutes}
-              onChange={(event) => setAlarmMinutes(Number(event.target.value))}
-              style={controlStyle}
-            >
-              <option value={0}>Sin aviso</option>
-              <option value={5}>5 minutos antes</option>
-              <option value={10}>10 minutos antes</option>
-              <option value={15}>15 minutos antes</option>
-              <option value={30}>30 minutos antes</option>
-              <option value={60}>1 hora antes</option>
-            </select>
-          </div>
-
-          <div style={fieldStyle}>
-            <label htmlFor="calendar-event-client" style={labelStyle}>Cliente (opcional)</label>
-            <select
-              id="calendar-event-client"
-              value={clientId}
-              onChange={(event) => setClientId(event.target.value)}
-              style={controlStyle}
-            >
-              <option value="">Sin cliente asociado</option>
-              {clients.map((client) => (
-                <option key={client.id} value={client.id}>{client.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={fieldStyle}>
-            <label htmlFor="calendar-event-details" style={labelStyle}>Detalles (opcional)</label>
-            <textarea
-              id="calendar-event-details"
-              rows={4}
-              maxLength={1000}
-              value={details}
-              onChange={(event) => setDetails(event.target.value)}
-              placeholder="Añade información útil para este evento"
-              style={{ ...controlStyle, resize: 'vertical', minHeight: 88 }}
-            />
-          </div>
-
-          {errorMessage && (
-            <p role="alert" style={{ color: APP_COLORS.danger, fontSize: 13, margin: '0 0 14px' }}>
-              {errorMessage}
-            </p>
-          )}
+            {errorMessage && (
+              <p role="alert" style={{ color: APP_COLORS.danger, fontSize: 12.5, margin: '0 0 8px' }}>
+                {errorMessage}
+              </p>
+            )}
           </div>
 
           <div style={actionsStyle}>
-            <Button
+            <button
               type="button"
               onClick={requestClose}
               style={{
-                borderRadius: 7,
-                border: '1px solid var(--macos-card-border, #d1d1d6)',
-                backgroundColor: 'var(--macos-input-bg, #ffffff)',
-                color: 'var(--macos-text, #1c1c1e)',
-                fontSize: 13,
+                borderRadius: 999,
+                border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+                backgroundColor: 'transparent',
+                color: 'var(--macos-text, #ececef)',
+                fontSize: 12.5,
                 fontWeight: 500,
                 padding: '0 16px',
                 height: 34,
+                cursor: 'pointer',
               }}
             >
               Cancelar
-            </Button>
-            <Button
+            </button>
+            <button
               type="submit"
-              fill
               style={{
-                backgroundColor: 'var(--macos-accent-color, #0056b8)',
-                borderRadius: 7,
-                color: 'var(--macos-on-accent, #ffffff)',
-                fontSize: 13,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                backgroundColor: 'var(--macos-active-bg, #323237)',
+                border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.28))',
+                borderRadius: 999,
+                color: 'var(--macos-text, #ececef)',
+                fontSize: 12.5,
                 fontWeight: 600,
                 padding: '0 18px',
                 height: 34,
-                boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.16)',
               }}
             >
-              <Icon f7="checkmark" size="14px" style={{ marginRight: 6 }} />
-              {editingEvent ? 'Guardar cambios' : 'Guardar evento'}
-            </Button>
+              <Icon f7="checkmark" size="13px" />
+              <span>{editingEvent ? 'Guardar cambios' : 'Guardar evento'}</span>
+            </button>
           </div>
         </form>
       </div>
-      </div>
-      )}
-    </Popup>
+    </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalNode, document.body) : modalNode;
 }
