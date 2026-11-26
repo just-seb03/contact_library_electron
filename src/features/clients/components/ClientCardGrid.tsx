@@ -4,32 +4,21 @@ import type { Client } from '../types';
 import { ClientCard } from './ClientCard';
 import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
-import { APP_COLORS } from '../../../core/theme/style';
-
-function getLocalDateValue(): string {
-  const today = new Date();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${today.getFullYear()}-${month}-${day}`;
-}
 
 interface ClientCardGridProps {
   clients: Client[];
   onSelectClient: (client: Client) => void;
   onAddClient: () => void;
-  payments: Payment[];
-  events: CalendarEvent[];
+  payments?: Payment[];
+  events?: CalendarEvent[];
 }
 
 export const ClientCardGrid: FC<ClientCardGridProps> = ({
   clients,
   onSelectClient,
   onAddClient,
-  payments,
-  events,
 }) => {
   const [filterText, setFilterText] = useState('');
-  const today = getLocalDateValue();
 
   const filteredClients = clients.filter(
     (client) =>
@@ -50,44 +39,51 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '20px 20px 14px 20px',
+    padding: '18px 24px 14px 24px',
     flexShrink: 0,
   };
 
   const titleRowStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'baseline',
-    gap: 8,
+    gap: 10,
   };
 
   const titleStyle: CSSProperties = {
     fontSize: 22,
-    fontWeight: 700,
-    color: 'var(--macos-text, #1c1c1e)',
+    fontWeight: 650,
+    letterSpacing: '-0.02em',
+    color: 'var(--macos-text, #ececef)',
     lineHeight: 1.2,
   };
 
   const counterStyle: CSSProperties = {
-    fontSize: 15,
+    fontSize: 13.5,
     fontWeight: 500,
     color: 'var(--macos-text-secondary, #8e8e93)',
+    fontVariantNumeric: 'tabular-nums',
   };
 
   const addClientButtonStyle: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 36,
-    height: 36,
-    border: 'none',
-    borderRadius: 10,
-    backgroundColor: APP_COLORS.primary,
-    color: APP_COLORS.white,
+    gap: 6,
+    height: 32,
+    padding: '0 14px',
+    border: '1px solid rgba(255, 255, 255, 0.14)',
+    borderRadius: 999,
+    backgroundColor: 'var(--macos-text, #ececef)',
+    color: 'var(--macos-canvas-bg, #18181a)',
+    fontSize: 12.5,
+    fontWeight: 600,
     cursor: 'pointer',
+    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
+    transition: 'transform 0.12s ease',
   };
 
   const searchWrapperStyle: CSSProperties = {
-    padding: '0 20px 16px 20px',
+    padding: '0 24px 16px 24px',
     flexShrink: 0,
   };
 
@@ -99,7 +95,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
 
   const searchIconStyle: CSSProperties = {
     position: 'absolute',
-    left: 12,
+    left: 14,
     color: 'var(--macos-text-secondary, #8e8e93)',
     pointerEvents: 'none',
     zIndex: 1,
@@ -107,44 +103,47 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
 
   const searchInputStyle: CSSProperties = {
     width: '100%',
-    height: 38,
-    paddingLeft: 38,
-    paddingRight: filterText.length > 0 ? 36 : 14,
-    fontSize: 14,
-    color: 'var(--macos-text, #1c1c1e)',
-    backgroundColor: 'var(--macos-input-bg, #ffffff)',
-    border: '1px solid var(--macos-card-border, #e5e5ea)',
-    borderRadius: 10,
+    height: 40,
+    paddingLeft: 40,
+    paddingRight: filterText.length > 0 ? 38 : 14,
+    fontSize: 13.5,
+    color: 'var(--macos-text, #ececef)',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
+    borderRadius: 12,
     outline: 'none',
     boxSizing: 'border-box',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
   };
 
   const clearBtnStyle: CSSProperties = {
     position: 'absolute',
-    right: 8,
+    right: 10,
     top: '50%',
     transform: 'translateY(-50%)',
     background: 'none',
     border: 'none',
-    padding: '4px',
+    padding: 4,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    color: APP_COLORS.secondaryText,
+    color: 'var(--macos-text-secondary, #8e8e93)',
   };
 
-  const gridScrollStyle: CSSProperties = {
+  const listScrollStyle: CSSProperties = {
     flex: 1,
     overflowY: 'auto',
-    padding: '0 20px 20px 20px',
+    padding: '2px 24px 96px 24px',
+    maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
   };
 
-  const gridStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-    gap: 14,
+  const listStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
   };
 
   const emptyStateStyle: CSSProperties = {
@@ -152,19 +151,43 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 48,
+    padding: 56,
     gap: 12,
-    color: APP_COLORS.secondaryText,
+    color: 'var(--macos-text-secondary, #8e8e93)',
     textAlign: 'center',
   };
 
   return (
     <div style={containerStyle}>
+      <style>{`
+        @keyframes clientRowEnter {
+          from {
+            opacity: 0;
+            transform: translateY(10px) scale(0.99);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .client-row-anim {
+          opacity: 0;
+          animation: clientRowEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .client-row-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
+
       {/* Encabezado */}
       <div style={topBarStyle}>
         <div style={titleRowStyle}>
           <span style={titleStyle}>Clientes</span>
-          <span style={counterStyle}>({filteredClients.length})</span>
+          <span style={counterStyle}>{filteredClients.length}</span>
         </div>
         <button
           type="button"
@@ -173,17 +196,18 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
           title="Añadir cliente"
           aria-label="Añadir cliente"
         >
-          <Icon f7="plus" size="18px" />
+          <Icon f7="plus" size="14px" />
+          <span>Nuevo cliente</span>
         </button>
       </div>
 
       {/* Buscador */}
       <div style={searchWrapperStyle}>
         <div style={searchInnerStyle}>
-          <Icon f7="search" size="16px" style={searchIconStyle} />
+          <Icon f7="search" size="15px" style={searchIconStyle} />
           <input
             type="text"
-            placeholder="Buscar por nombre, correo, teléfono o tipo de caso…"
+            placeholder="Buscar por nombre o teléfono…"
             value={filterText}
             onChange={(e) => setFilterText(e.target.value)}
             style={searchInputStyle}
@@ -202,37 +226,27 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
         </div>
       </div>
 
-      {/* Grilla de tarjetas */}
-      <div style={gridScrollStyle}>
+      {/* Lista de rectángulos */}
+      <div style={listScrollStyle}>
         {filteredClients.length > 0 ? (
-          <div style={gridStyle}>
-            {filteredClients.map((client) => (
-              <ClientCard
+          <div style={listStyle}>
+            {filteredClients.map((client, index) => (
+              <div
                 key={client.id}
-                client={client}
-                onSelect={onSelectClient}
-                payment={
-                  payments.filter((payment) => (
-                    payment.clientId === client.id
-                    || (!payment.clientId && payment.client === client.name)
-                  )).slice(-1)[0] ?? null
-                }
-                event={
-                  events
-                    .filter((event) => event.clientId === client.id)
-                    .sort((first, second) => (
-                      `${first.date}T${first.startTime}`.localeCompare(`${second.date}T${second.startTime}`)
-                    ))
-                    .find((event) => event.date >= today)
-                    ?? null
-                }
-              />
+                className="client-row-anim"
+                style={{ animationDelay: `${Math.min(index * 28, 220)}ms` }}
+              >
+                <ClientCard
+                  client={client}
+                  onSelect={onSelectClient}
+                />
+              </div>
             ))}
           </div>
         ) : (
           <div style={emptyStateStyle}>
-            <Icon f7="person_2_slash" size="40px" style={{ color: APP_COLORS.iconMuted }} />
-            <p style={{ margin: 0, fontSize: 14 }}>No se encontraron clientes</p>
+            <Icon f7="person_2" size="36px" style={{ opacity: 0.6 }} />
+            <p style={{ margin: 0, fontSize: 13.5 }}>No se encontraron clientes</p>
           </div>
         )}
       </div>

@@ -1,23 +1,10 @@
 import type { FC, CSSProperties } from 'react';
-import { Badge, Icon } from 'framework7-react';
-import type { Client, ClientStatus } from '../types';
-import { APP_COLORS } from '../../../core/theme/style';
+import { Icon } from 'framework7-react';
+import type { Client } from '../types';
 
 interface ClientBannerProps {
   client: Client;
 }
-
-const statusLabels: Record<ClientStatus, string> = {
-  activo: 'Activo',
-  en_proceso: 'En Proceso',
-  completado: 'Completado',
-};
-
-const statusColors: Record<ClientStatus, string> = {
-  activo: 'green',
-  en_proceso: 'blue',
-  completado: 'gray',
-};
 
 const isInvalidEmail = (email?: string): boolean => {
   if (!email) return true;
@@ -29,10 +16,14 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
   const hasValidEmail = !isInvalidEmail(client.email);
 
   const bannerStyle: CSSProperties = {
-    background: `linear-gradient(135deg, ${APP_COLORS.primaryStrong} 0%, ${APP_COLORS.primaryLight} 100%)`,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
     borderRadius: 16,
     padding: '20px 24px',
-    color: APP_COLORS.white,
+    color: 'var(--macos-text, #ececef)',
   };
 
   const topRowStyle: CSSProperties = {
@@ -61,7 +52,8 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     height: 44,
     minWidth: 44,
     borderRadius: '50%',
-    backgroundColor: APP_COLORS.whiteOverlay,
+    backgroundColor: 'var(--macos-active-bg, rgba(128, 128, 136, 0.2))',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.25))',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -74,7 +66,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     gap: 10,
     fontSize: 20,
     fontWeight: 700,
-    color: APP_COLORS.white,
+    color: 'var(--macos-text, #ececef)',
   };
 
   const contactInfoStyle: CSSProperties = {
@@ -85,7 +77,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     rowGap: 4,
     marginTop: 4,
     fontSize: 13,
-    color: APP_COLORS.whiteTextMuted,
+    color: 'var(--macos-text-secondary, #a4a4ab)',
   };
 
   const contactItemStyle: CSSProperties = {
@@ -121,7 +113,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
   };
   /** Texto sutil sin fondo ni píldora para no confundir con botones (Heurística #4) */
   const idBadgeStyle: CSSProperties = {
-    color: APP_COLORS.white,
+    color: 'var(--macos-text-secondary, #a4a4ab)',
     opacity: 0.85,
     fontSize: 13,
     fontWeight: 500,
@@ -135,33 +127,25 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
       <div style={topRowStyle}>
         <div style={profileAreaStyle}>
           <div style={avatarStyle}>
-            <Icon f7="person_fill" size="24px" style={{ color: APP_COLORS.white }} />
+            <Icon f7="person_fill" size="22px" style={{ color: 'var(--macos-text, #ececef)' }} />
           </div>
           <div style={profileTextStyle}>
             <div style={nameRowStyle}>
               <span>{client.name}</span>
-              {client.status && (
-                <Badge
-                  color={statusColors[client.status] ?? 'blue'}
-                  style={{ fontSize: 11, fontWeight: 600 }}
-                >
-                  {statusLabels[client.status] ?? client.status}
-                </Badge>
-              )}
             </div>
             <div style={contactInfoStyle}>
               <span style={contactItemStyle}>
-                <Icon f7="phone_fill" size="12px" style={{ color: APP_COLORS.whiteTextMuted }} />
+                <Icon f7="phone_fill" size="12px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)' }} />
                 {client.phone}
               </span>
               {hasValidEmail ? (
                 <span style={emailItemStyle}>
-                  <Icon f7="envelope_fill" size="12px" style={{ color: APP_COLORS.whiteTextMuted }} />
+                  <Icon f7="envelope_fill" size="12px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)' }} />
                   {client.email}
                 </span>
               ) : (
                 <span style={noEmailTextStyle}>
-                  <Icon f7="envelope" size="12px" style={{ color: APP_COLORS.whiteTextFaint }} />
+                  <Icon f7="envelope" size="12px" style={{ color: 'var(--macos-text-secondary, #8e8e93)', opacity: 0.7 }} />
                   Sin correo registrado
                 </span>
               )}
