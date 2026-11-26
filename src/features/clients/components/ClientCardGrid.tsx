@@ -73,20 +73,18 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     maxWidth: 'fit-content',
     display: 'inline-flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
+    justifyContent: 'flex-end',
+    gap: 6,
     height: 30,
-    padding: '0 12px',
-    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))',
-    borderRadius: 999,
-    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.06))',
+    padding: '0 4px',
+    border: 'none',
+    backgroundColor: 'transparent',
     color: 'var(--macos-text, #ececef)',
-    fontSize: 12,
-    fontWeight: 550,
+    fontSize: 12.5,
+    fontWeight: 500,
     cursor: 'pointer',
     flexShrink: 0,
     whiteSpace: 'nowrap',
-    transition: 'background-color 0.12s ease',
   };
 
   const searchWrapperStyle: CSSProperties = {
@@ -187,6 +185,34 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
             animation: none !important;
             transform: none !important;
           }
+          .add-client-label {
+            transition: none !important;
+          }
+        }
+        .add-client-label {
+          display: inline-block;
+          overflow: hidden;
+          max-width: 0;
+          opacity: 0;
+          transform: translateX(8px);
+          transition: max-width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+            opacity 0.18s ease,
+            transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+          white-space: nowrap;
+        }
+        .add-client-btn:hover .add-client-label,
+        .add-client-btn:focus-visible .add-client-label {
+          max-width: 120px;
+          opacity: 0.85;
+          transform: translateX(0);
+        }
+        .add-client-btn .add-client-plus {
+          opacity: 0.78;
+          transition: opacity 0.15s ease, transform 0.18s ease;
+        }
+        .add-client-btn:hover .add-client-plus {
+          opacity: 1;
+          transform: rotate(90deg);
         }
       `}</style>
 
@@ -197,13 +223,14 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
         </div>
         <button
           type="button"
+          className="add-client-btn"
           onClick={onAddClient}
           style={addClientButtonStyle}
-          title="Añadir cliente"
-          aria-label="Añadir cliente"
+          title="Nuevo cliente"
+          aria-label="Nuevo cliente"
         >
-          <Icon f7="plus" size="14px" />
-          <span>Nuevo cliente</span>
+          <span className="add-client-label">Nuevo cliente</span>
+          <Icon f7="plus" size="17px" className="add-client-plus" />
         </button>
       </div>
 
