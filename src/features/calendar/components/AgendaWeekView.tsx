@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FC } from 'react';
 import type { HearingEvent } from '../../../core/context/types';
 import type { CalendarEvent } from '../types';
 import { getCalendarEventColor } from '../data/eventColors';
+import { computeDayOverlapLayout } from '../utils/timelineLayout';
 
 interface AgendaWeekViewProps {
   selectedDate: Date;
@@ -12,7 +13,8 @@ interface AgendaWeekViewProps {
   onCreateAtSlot?: (date: Date, startTime: string, endTime: string) => void;
 }
 
-const HOUR_HEIGHT = 68;
+const HOUR_HEIGHT = 72;
+const HALF_HOUR_HEIGHT = HOUR_HEIGHT / 2;
 const HOUR_LABEL_WIDTH = 60;
 const HEADER_HEIGHT = 48;
 const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
@@ -30,20 +32,6 @@ function toDateKey(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
-}
-
-function parseTime(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  return hours + minutes / 60;
-}
-
-function parseHearingTime(time: string): number {
-  const match = time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return 9;
-  let hours = Number(match[1]);
-  if (match[3].toUpperCase() === 'PM' && hours !== 12) hours += 12;
-  if (match[3].toUpperCase() === 'AM' && hours === 12) hours = 0;
-  return hours + Number(match[2]) / 60;
 }
 
 function formatHour(hour: number): string {
@@ -96,7 +84,22 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   }, [weekStartTime]);
 
   const currentHour = currentTime.getHours();
+  const currentDecimalHour = currentHour + currentTime.getMinutes() / 60;
   const todayKey = toDateKey(currentTime);
+
+  const dayLayouts = useMemo(() => {
+    return days.map((day, dayIndex) => {
+      const dayKey = dateKeys[dayIndex];
+      const dayHearings = hearings.filter(
+        (h) =>
+          h.year === day.getFullYear() &&
+          h.monthIndex === day.getMonth() &&
+          h.day === day.getDate()
+      );
+      const dayEvents = calendarEvents.filter((e) => e.date === dayKey);
+      return computeDayOverlapLayout(dayHearings, dayEvents, 0.75);
+    });
+  }, [days, dateKeys, hearings, calendarEvents]);
   const monthLabel = new Intl.DateTimeFormat(locale, { month: 'short' })
     .format(selectedDate)
     .replace('.', '')
@@ -227,7 +230,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
           );
         })}
 
-        {/* Grilla horaria con filas y columnas */}
+        {/* Grilla horaria con filas (cada 30 min) y columnas */}
         {HOURS.map((hour) => (
           <div key={`hour-${hour}`} style={{ display: 'contents' }}>
             <div style={hourCellStyle}>{formatHour(hour)}</div>
@@ -235,24 +238,54 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
             {days.map((day, dayIndex) => {
               const currentDayKey = dateKeys[dayIndex];
               const isTodayColumn = currentDayKey === todayKey;
-              const slotStart = `${String(hour).padStart(2, '0')}:00`;
-              const slotEnd = hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`;
+              const hh = String(hour).padStart(2, '0');
+              const nextHh = String(hour + 1).padStart(2, '0');
+              const halfSlots = [
+                { start: `${hh}:00`, end: `${hh}:30`, isHalf: false },
+                { start: `${hh}:30`, end: hour === 23 ? '23:59' : `${nextHh}:00`, isHalf: true },
+              ];
 
               return (
                 <div
                   key={`${hour}-${currentDayKey}`}
-                  className={onCreateAtSlot ? 'week-hour-slot' : undefined}
-                  onClick={(e) => {
-                    if (e.target === e.currentTarget && onCreateAtSlot) {
-                      onCreateAtSlot(day, slotStart, slotEnd);
-                    }
-                  }}
                   style={{
                     ...dayCellStyle,
-                    cursor: onCreateAtSlot ? 'pointer' : 'default',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
-                  {/* Contorno en el bloque horario actual de Hoy */}
+                  {halfSlots.map((slot) => (
+                    <div
+                      key={slot.start}
+                      role={onCreateAtSlot ? 'button' : undefined}
+                      tabIndex={onCreateAtSlot ? 0 : undefined}
+                      aria-label={onCreateAtSlot ? `Crear evento ${slot.start}` : undefined}
+                      className={onCreateAtSlot ? 'week-hour-slot' : undefined}
+                      onClick={(e) => {
+                        if (e.target === e.currentTarget && onCreateAtSlot) {
+                          onCreateAtSlot(day, slot.start, slot.end);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if ((e.key === 'Enter' || e.key === ' ') && onCreateAtSlot) {
+                          e.preventDefault();
+                          onCreateAtSlot(day, slot.start, slot.end);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        height: HALF_HOUR_HEIGHT,
+                        boxSizing: 'border-box',
+                        borderTop: slot.isHalf
+                          ? '1px dashed var(--macos-divider, rgba(128, 128, 136, 0.11))'
+                          : 'none',
+                        cursor: onCreateAtSlot ? 'pointer' : 'default',
+                        transition: 'background-color 0.12s ease',
+                      }}
+                    />
+                  ))}
+
+                  {/* Contorno tenue en el bloque horario actual de Hoy (detrás de eventos) */}
                   {isTodayColumn && hour === currentHour && (
                     <div
                       aria-hidden="true"
@@ -260,65 +293,61 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                         position: 'absolute',
                         inset: '2px 4px',
                         borderRadius: 8,
-                        border: '1.5px solid var(--macos-text-secondary, rgba(120, 120, 128, 0.55))',
-                        backgroundColor: 'var(--macos-subtle-bg, rgba(120, 120, 128, 0.06))',
-                        zIndex: 3,
+                        border: '1px solid var(--macos-text-secondary, rgba(120, 120, 128, 0.35))',
+                        backgroundColor: 'var(--macos-subtle-bg, rgba(120, 120, 128, 0.045))',
+                        zIndex: 1,
                         pointerEvents: 'none',
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'flex-end',
-                        padding: '4px 6px',
                       }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: 'Georgia, "Times New Roman", serif',
-                          fontStyle: 'italic',
-                          fontSize: 10.5,
-                          color: 'var(--macos-text-secondary, #8e8e93)',
-                          opacity: 0.85,
-                        }}
-                      >
-                        estás aquí
-                      </span>
-                    </div>
+                    />
                   )}
 
-                  {/* Renderizado de eventos en la primera fila horaria (con top absoluto) */}
+                  {/* Renderizado de eventos y línea "estás aquí" en la primera fila horaria */}
                   {hour === 0 && (
-                    <>
-                      {/* Audiencias */}
-                      {hearings
-                        .filter(
-                          (hearing) =>
-                            hearing.year === day.getFullYear() &&
-                            hearing.monthIndex === day.getMonth() &&
-                            hearing.day === day.getDate()
-                        )
-                        .map((hearing) => {
-                          const start = parseHearingTime(hearing.timeStr);
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: HOURS.length * HOUR_HEIGHT,
+                        pointerEvents: 'none',
+                        zIndex: 2,
+                      }}
+                    >
+                      {dayLayouts[dayIndex].map(({ item, startHour, endHour, col, totalCols }) => {
+                        const leftPct = (col / totalCols) * 100;
+                        const widthPct = 100 / totalCols;
+                        const isRightmostCol = col === totalCols - 1;
+                        const overlapsHereBadge =
+                          isTodayColumn &&
+                          isRightmostCol &&
+                          Math.abs(startHour - currentDecimalHour) < 0.45;
+
+                        if (item.kind === 'hearing') {
+                          const { hearing } = item;
                           return (
                             <button
-                              key={hearing.id}
+                              key={item.id}
                               type="button"
                               title={`${hearing.clientName} - ${hearing.materia} (${hearing.timeStr})`}
                               aria-label={hearing.clientName}
                               onClick={() => onSelectEvent(hearing)}
                               style={{
                                 position: 'absolute',
-                                top: start * HOUR_HEIGHT,
-                                left: 3,
-                                right: 3,
-                                height: 42,
+                                top: startHour * HOUR_HEIGHT,
+                                left: `calc(${leftPct}% + 2px)`,
+                                width: `calc(${widthPct}% - 4px)`,
+                                height: 44,
                                 zIndex: 3,
                                 overflow: 'hidden',
                                 textAlign: 'left',
+                                pointerEvents: 'auto',
                                 border: 'none',
                                 borderLeft: '3.5px solid #ff3b30',
                                 borderRadius: 6,
                                 backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.12))',
                                 color: 'var(--macos-text, #1c1c1e)',
-                                padding: '4px 6px',
+                                padding: overlapsHereBadge ? '4px 62px 4px 6px' : '4px 6px',
                                 fontFamily: 'inherit',
                                 fontSize: 11,
                                 cursor: 'pointer',
@@ -355,76 +384,124 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                               </div>
                             </button>
                           );
-                        })}
+                        }
 
-                      {/* Eventos regulares */}
-                      {calendarEvents
-                        .filter((event) => event.date === currentDayKey)
-                        .map((event) => {
-                          const start = parseTime(event.startTime);
-                          const duration = Math.max(parseTime(event.endTime) - start, 0.5);
-                          const color = getCalendarEventColor(event.colorId);
+                        const { event } = item;
+                        const duration = Math.max(endHour - startHour, 0.5);
+                        const color = getCalendarEventColor(event.colorId);
 
-                          return (
-                            <button
-                              key={event.id}
-                              type="button"
-                              title={`${event.title} (${event.startTime} - ${event.endTime})`}
-                              aria-label={event.title}
-                              onClick={() => onSelectEvent(event)}
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            title={`${event.title} (${event.startTime} - ${event.endTime})`}
+                            aria-label={event.title}
+                            onClick={() => onSelectEvent(event)}
+                            style={{
+                              position: 'absolute',
+                              top: startHour * HOUR_HEIGHT,
+                              left: `calc(${leftPct}% + 2px)`,
+                              width: `calc(${widthPct}% - 4px)`,
+                              height: Math.max(duration * HOUR_HEIGHT - 3, 34),
+                              zIndex: 2,
+                              overflow: 'hidden',
+                              textAlign: 'left',
+                              pointerEvents: 'auto',
+                              border: 'none',
+                              borderLeft: `3.5px solid ${color.accent}`,
+                              borderRadius: 6,
+                              backgroundColor: color.background.replace('0.12', '0.16'),
+                              color: 'var(--macos-text, #1c1c1e)',
+                              padding: overlapsHereBadge ? '4px 62px 4px 6px' : '4px 6px',
+                              fontFamily: 'inherit',
+                              fontSize: 11,
+                              cursor: 'pointer',
+                              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+                              backdropFilter: 'blur(8px)',
+                              WebkitBackdropFilter: 'blur(8px)',
+                              transition: 'transform 0.1s ease',
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
+                            onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
+                          >
+                            <div
                               style={{
-                                position: 'absolute',
-                                top: start * HOUR_HEIGHT,
-                                left: 3,
-                                right: 3,
-                                height: Math.max(duration * HOUR_HEIGHT - 3, 34),
-                                zIndex: 2,
+                                fontWeight: 650,
                                 overflow: 'hidden',
-                                textAlign: 'left',
-                                border: 'none',
-                                borderLeft: `3.5px solid ${color.accent}`,
-                                borderRadius: 6,
-                                backgroundColor: color.background.replace('0.12', '0.16'),
-                                color: 'var(--macos-text, #1c1c1e)',
-                                padding: '4px 6px',
-                                fontFamily: 'inherit',
-                                fontSize: 11,
-                                cursor: 'pointer',
-                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-                                backdropFilter: 'blur(8px)',
-                                WebkitBackdropFilter: 'blur(8px)',
-                                transition: 'transform 0.1s ease',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                                fontSize: 11.5,
                               }}
-                              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
-                              onMouseLeave={(e) => (e.currentTarget.style.transform = 'none')}
                             >
-                              <div
-                                style={{
-                                  fontWeight: 650,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                  fontSize: 11.5,
-                                }}
-                              >
-                                {event.title}
-                              </div>
-                              <div
-                                style={{
-                                  fontSize: 10,
-                                  color: 'var(--macos-text-muted, #636366)',
-                                  fontWeight: 500,
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap',
-                                }}
-                              >
-                                {event.startTime} – {event.endTime}
-                              </div>
-                            </button>
-                          );
-                        })}
-                    </>
+                              {event.title}
+                            </div>
+                            <div
+                              style={{
+                                fontSize: 10,
+                                color: 'var(--macos-text-muted, #636366)',
+                                fontWeight: 500,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
+                              }}
+                            >
+                              {event.startTime} – {event.endTime}
+                            </div>
+                          </button>
+                        );
+                      })}
+
+                      {isTodayColumn && (
+                        <div
+                          aria-hidden="true"
+                          style={{
+                            position: 'absolute',
+                            left: 2,
+                            right: 4,
+                            top: currentDecimalHour * HOUR_HEIGHT,
+                            zIndex: 4,
+                            pointerEvents: 'none',
+                            display: 'flex',
+                            alignItems: 'center',
+                            transform: 'translateY(-50%)',
+                          }}
+                        >
+                          <div
+                            style={{
+                              width: 6,
+                              height: 6,
+                              borderRadius: '50%',
+                              backgroundColor: 'var(--macos-text-secondary, #8e8e93)',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <div
+                            style={{
+                              flex: 1,
+                              height: 1.5,
+                              backgroundColor: 'var(--macos-text-secondary, rgba(142, 142, 147, 0.55))',
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontFamily: 'Georgia, "Times New Roman", serif',
+                              fontStyle: 'italic',
+                              fontSize: 10,
+                              color: 'var(--macos-text, #ececef)',
+                              backgroundColor: 'var(--macos-modal-bg, #242428)',
+                              border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.3))',
+                              borderRadius: 999,
+                              padding: '0 6px',
+                              marginLeft: 4,
+                              opacity: 0.92,
+                              whiteSpace: 'nowrap',
+                            }}
+                          >
+                            estás aquí
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               );
