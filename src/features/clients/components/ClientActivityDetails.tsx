@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { CalendarEvent } from '../../calendar/types';
 import type { ClientDocument } from '../types';
@@ -8,13 +8,40 @@ import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
 import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
 import { ClientDocumentsSection } from './ClientDocumentsSection';
-import {
-  APP_COLORS,
-  EMPTY_TEXT_STYLE,
-  MUTED_ITEM_STYLE,
-  SECTION_HEADING_STYLE,
-  SECTION_STYLE,
-} from '../../../core/theme/style';
+
+const glassSectionStyle: CSSProperties = {
+  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
+  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  borderRadius: 16,
+  padding: '18px 20px',
+};
+
+const glassItemStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  padding: '12px 14px',
+  borderRadius: 12,
+  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.035))',
+  border: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+};
+
+const glassHeadingStyle: CSSProperties = {
+  fontSize: 15,
+  fontWeight: 600,
+  color: 'var(--macos-text, #ececef)',
+  margin: '0 0 12px 0',
+};
+
+const glassEmptyStyle: CSSProperties = {
+  margin: 0,
+  fontSize: 13,
+  color: 'var(--macos-text-secondary, #8e8e93)',
+};
 
 interface ClientActivityDetailsProps {
   payments: Payment[];
@@ -74,14 +101,14 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
 
   return (
     <>
-      <section style={SECTION_STYLE} aria-labelledby="client-payments-heading">
-        <h2 id="client-payments-heading" style={SECTION_HEADING_STYLE}>Gestión de pagos</h2>
+      <section style={glassSectionStyle} aria-labelledby="client-payments-heading">
+        <h2 id="client-payments-heading" style={glassHeadingStyle}>Gestión de pagos</h2>
         {payments.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {payments.map((payment) => (
-              <div key={payment.id} style={MUTED_ITEM_STYLE}>
+              <div key={payment.id} style={glassItemStyle}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                  <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
+                  <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
                     {payment.concept} · {formatCLP(payment.amount)}
                   </span>
                   <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>Fecha: {payment.date}</span>
@@ -97,22 +124,22 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
             ))}
           </div>
         ) : (
-          <p style={EMPTY_TEXT_STYLE}>Este cliente aún no tiene pagos registrados.</p>
+          <p style={glassEmptyStyle}>Este cliente aún no tiene pagos registrados.</p>
         )}
       </section>
 
-      <section style={SECTION_STYLE} aria-labelledby="client-events-heading">
-        <h2 id="client-events-heading" style={SECTION_HEADING_STYLE}>Agenda del cliente</h2>
+      <section style={glassSectionStyle} aria-labelledby="client-events-heading">
+        <h2 id="client-events-heading" style={glassHeadingStyle}>Agenda del cliente</h2>
         {nextEvent && (
-          <p style={{ ...EMPTY_TEXT_STYLE, marginBottom: 12, color: APP_COLORS.primary, fontWeight: 600 }}>
+          <p style={{ ...glassEmptyStyle, marginBottom: 12, color: 'var(--macos-text, #ececef)', fontWeight: 550 }}>
             Próxima reunión: {nextEvent.title} · {formatEventDate(nextEvent.date)} · {nextEvent.startTime}
           </p>
         )}
         {showLegacyHearing && legacyHearing && (
-          <div style={{ ...MUTED_ITEM_STYLE, justifyContent: 'flex-start', marginBottom: 8 }}>
-            <Icon f7="calendar" size="18px" style={{ color: APP_COLORS.primary, flexShrink: 0 }} />
+          <div style={{ ...glassItemStyle, justifyContent: 'flex-start', marginBottom: 8 }}>
+            <Icon f7="calendar" size="16px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)', flexShrink: 0 }} />
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-              <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
+              <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
                 Próxima audiencia
               </span>
               <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
@@ -129,11 +156,11 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
         {orderedEvents.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {orderedEvents.map((event) => (
-              <div key={event.id} style={MUTED_ITEM_STYLE}>
+              <div key={event.id} style={glassItemStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                  <Icon f7="calendar" size="18px" style={{ color: APP_COLORS.primary, flexShrink: 0 }} />
+                  <Icon f7="calendar" size="16px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)', flexShrink: 0 }} />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                    <span style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: 14, fontWeight: 600 }}>
+                    <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
                       {event.title}
                     </span>
                     <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
@@ -148,7 +175,7 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
             ))}
           </div>
         ) : (
-          <p style={EMPTY_TEXT_STYLE}>Este cliente aún no tiene eventos asociados.</p>
+          <p style={glassEmptyStyle}>Este cliente aún no tiene eventos asociados.</p>
         )}
       </section>
       <ClientDocumentsSection

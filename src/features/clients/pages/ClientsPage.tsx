@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useState, useRef, useEffect, type CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { ClientCardGrid } from '../components/ClientCardGrid';
@@ -9,10 +9,26 @@ import type { Client } from '../types';
 import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
 import { databaseService } from '../../../core/database/databaseService';
-import {
-  BACK_BUTTON_STYLE,
-  PAGE_SCROLL_CONTENT_STYLE,
-} from '../../../core/theme/style';
+import { PAGE_SCROLL_CONTENT_STYLE } from '../../../core/theme/style';
+
+const clientBackButtonStyle: CSSProperties = {
+  width: 'auto',
+  minWidth: 'auto',
+  maxWidth: 'fit-content',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 6,
+  height: 30,
+  padding: '0 12px',
+  borderRadius: 999,
+  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.12))',
+  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.05))',
+  color: 'var(--macos-text, #ececef)',
+  fontSize: 12.5,
+  fontWeight: 550,
+  cursor: 'pointer',
+  transition: 'background-color 0.12s ease',
+};
 
 const glassClientsContainerStyle: CSSProperties = {
   display: 'flex',
@@ -53,6 +69,14 @@ export default function Cliente() {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [isClosingDetail, setIsClosingDetail] = useState(false);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
 
   const handleUploadDocument = (file: File): Promise<void> => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -97,12 +121,22 @@ export default function Cliente() {
   const showDetail = selectedClient !== null;
 
   const handleSelectClient = (client: Client) => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setIsClosingDetail(false);
     setSelectedClientId(client.id);
   };
 
   const handleBack = () => {
-    // Deseleccionamos volviendo a la grilla
-    setSelectedClientId(null);
+    if (isClosingDetail) return;
+    setIsClosingDetail(true);
+    closeTimerRef.current = setTimeout(() => {
+      setSelectedClientId(null);
+      setIsClosingDetail(false);
+      closeTimerRef.current = null;
+    }, 180);
   };
 
   const handleCloseClientPopup = () => {
@@ -112,23 +146,64 @@ export default function Cliente() {
 
   return (
     <Page noNavbar noToolbar>
+      <style>{`
+        @keyframes clientDetailIn {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes clientDetailOut {
+          from {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(10px) scale(0.985);
+          }
+        }
+        .client-detail-enter {
+          animation: clientDetailIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .client-detail-exit {
+          animation: clientDetailOut 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+          will-change: transform, opacity;
+          pointer-events: none;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .client-detail-enter,
+          .client-detail-exit {
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
       <div style={glassClientsContainerStyle}>
         {showDetail && selectedClient ? (
-          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 24px 0 24px', boxSizing: 'border-box' }}>
+          <div
+            key={selectedClient.id}
+            className={isClosingDetail ? 'client-detail-exit' : 'client-detail-enter'}
+            style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '18px 24px 0 24px', boxSizing: 'border-box', gap: 12 }}
+          >
             {/* Botón volver */}
             <div>
               <button
                 type="button"
-                style={BACK_BUTTON_STYLE}
+                style={clientBackButtonStyle}
                 onClick={handleBack}
                 aria-label="Volver a clientes"
               >
                 <svg
-                  width="8"
-                  height="14"
+                  width="7"
+                  height="12"
                   viewBox="0 0 8 14"
                   fill="none"
-                  style={{ marginRight: 2 }}
                 >
                   <path
                     d="M7 1L1 7L7 13"
@@ -138,12 +213,12 @@ export default function Cliente() {
                     strokeLinejoin="round"
                   />
                 </svg>
-                Clientes
+                <span>Clientes</span>
               </button>
             </div>
 
             {/* Detalle del cliente seleccionado */}
-            <div style={PAGE_SCROLL_CONTENT_STYLE}>
+            <div style={{ ...PAGE_SCROLL_CONTENT_STYLE, paddingBottom: 110 }}>
               <ClientDetails
                 client={selectedClient}
                 payments={payments.filter((payment) => (

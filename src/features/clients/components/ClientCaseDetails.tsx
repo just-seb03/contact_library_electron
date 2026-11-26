@@ -1,7 +1,6 @@
 import { useState, type FC, type CSSProperties } from 'react';
 import { Icon, f7 } from 'framework7-react';
 import type { Client } from '../types';
-import { APP_COLORS, SECTION_STYLE } from '../../../core/theme/style';
 
 interface ClientCaseDetailsProps {
   client: Client;
@@ -13,9 +12,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
   const { caso } = client;
   const [copied, setCopied] = useState(false);
 
-
   const sectionStyle: CSSProperties = {
-    ...SECTION_STYLE,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+    borderRadius: 16,
+    padding: '18px 20px',
   };
 
   const headerRowStyle: CSSProperties = {
@@ -33,16 +37,16 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
   };
 
   const titleStyle: CSSProperties = {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 600,
     lineHeight: 1.25,
-    color: 'var(--macos-text, #1c1c1e)',
+    color: 'var(--macos-text, #ececef)',
     margin: 0,
   };
 
   const subtitleStyle: CSSProperties = {
-    fontSize: 13,
-    color: APP_COLORS.secondaryText,
+    fontSize: 12.5,
+    color: 'var(--macos-text-secondary, #8e8e93)',
     lineHeight: '1.4',
     marginTop: 4,
   };
@@ -57,37 +61,45 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
 
   const editBtnStyle: CSSProperties = {
     width: 'auto',
+    minWidth: 'auto',
+    maxWidth: 'fit-content',
     display: 'inline-flex',
     alignItems: 'center',
     whiteSpace: 'nowrap',
-    backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
-    color: APP_COLORS.primary,
-    border: '1px solid var(--macos-card-border, #d1d1d6)',
-    borderRadius: 8,
-    padding: '6px 12px',
-    fontSize: 13,
-    fontWeight: 500,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.06))',
+    color: 'var(--macos-text, #ececef)',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))',
+    borderRadius: 999,
+    height: 30,
+    padding: '0 14px',
+    fontSize: 12,
+    fontWeight: 550,
     cursor: 'pointer',
   };
 
   const deleteBtnStyle: CSSProperties = {
     width: 'auto',
+    minWidth: 'auto',
+    maxWidth: 'fit-content',
     display: 'inline-flex',
     alignItems: 'center',
+    justifyContent: 'center',
     whiteSpace: 'nowrap',
-    backgroundColor: APP_COLORS.dangerSurface,
-    color: APP_COLORS.danger,
-    border: `1px solid ${APP_COLORS.borderDanger}`,
-    borderRadius: 8,
-    padding: '6px 12px',
-    fontSize: 13,
+    backgroundColor: 'transparent',
+    color: 'var(--macos-text-secondary, #a4a4ab)',
+    border: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.2))',
+    borderRadius: 999,
+    height: 30,
+    padding: '0 12px',
+    fontSize: 12,
     fontWeight: 500,
     cursor: 'pointer',
   };
 
   const fieldCardStyle: CSSProperties = {
-    backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
-    borderRadius: 10,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.035))',
+    border: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+    borderRadius: 12,
     padding: '12px 16px',
     marginBottom: 10,
   };
@@ -95,7 +107,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
   const fieldLabelStyle: CSSProperties = {
     fontSize: 11,
     fontWeight: 600,
-    color: APP_COLORS.secondaryText,
+    color: 'var(--macos-text-secondary, #8e8e93)',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -109,9 +121,9 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
   };
 
   const fieldValueStyle: CSSProperties = {
-    fontSize: 15,
-    fontWeight: 600,
-    color: 'var(--macos-text, #1c1c1e)',
+    fontSize: 14.5,
+    fontWeight: 550,
+    color: 'var(--macos-text, #ececef)',
     overflowWrap: 'anywhere',
   };
 
@@ -125,13 +137,14 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
 
   const copyBtnStyle: CSSProperties = {
     width: 'auto',
+    minWidth: 'auto',
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 3,
-    background: 'var(--macos-card-bg, #ffffff)',
-    border: '1px solid var(--macos-card-border, #d1d1d6)',
-    borderRadius: 5,
-    padding: '2px 6px',
+    gap: 4,
+    background: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.06))',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))',
+    borderRadius: 999,
+    padding: '3px 10px',
     cursor: 'pointer',
     flexShrink: 0,
     whiteSpace: 'nowrap',
@@ -226,13 +239,13 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client, onEdit, 
             <Icon
               f7={copied ? 'checkmark_alt' : 'doc_on_doc'}
               size="11px"
-              style={{ color: copied ? APP_COLORS.success : APP_COLORS.primary }}
+              style={{ color: 'var(--macos-text, #ececef)' }}
             />
             <span
               style={{
                 fontSize: 11,
-                color: copied ? APP_COLORS.success : APP_COLORS.primary,
-                fontWeight: 600,
+                color: 'var(--macos-text, #ececef)',
+                fontWeight: 550,
                 lineHeight: 1,
               }}
             >
