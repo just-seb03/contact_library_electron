@@ -13,12 +13,22 @@ interface ClientCardGridProps {
   events?: CalendarEvent[];
 }
 
+function getLocalDateValue(): string {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${today.getFullYear()}-${month}-${day}`;
+}
+
 export const ClientCardGrid: FC<ClientCardGridProps> = ({
   clients,
   onSelectClient,
   onAddClient,
+  payments = [],
+  events = [],
 }) => {
   const [filterText, setFilterText] = useState('');
+  const today = getLocalDateValue();
 
   const filteredClients = clients.filter(
     (client) =>
@@ -65,21 +75,25 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   };
 
   const addClientButtonStyle: CSSProperties = {
+    width: 'auto',
+    minWidth: 'auto',
+    maxWidth: 'fit-content',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    height: 32,
-    padding: '0 14px',
-    border: '1px solid rgba(255, 255, 255, 0.14)',
+    gap: 5,
+    height: 30,
+    padding: '0 12px',
+    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))',
     borderRadius: 999,
-    backgroundColor: 'var(--macos-text, #ececef)',
-    color: 'var(--macos-canvas-bg, #18181a)',
-    fontSize: 12.5,
-    fontWeight: 600,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.06))',
+    color: 'var(--macos-text, #ececef)',
+    fontSize: 12,
+    fontWeight: 550,
     cursor: 'pointer',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
-    transition: 'transform 0.12s ease',
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    transition: 'background-color 0.12s ease',
   };
 
   const searchWrapperStyle: CSSProperties = {
@@ -230,18 +244,47 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
       <div style={listScrollStyle}>
         {filteredClients.length > 0 ? (
           <div style={listStyle}>
-            {filteredClients.map((client, index) => (
-              <div
-                key={client.id}
-                className="client-row-anim"
-                style={{ animationDelay: `${Math.min(index * 28, 220)}ms` }}
-              >
-                <ClientCard
-                  client={client}
-                  onSelect={onSelectClient}
-                />
-              </div>
-            ))}
+            {filteredClients.map((client, index) => {
+              const pendingPaymentsCount = payments.filter(
+                (p) =>
+                  (p.clientId === client.id || (!p.clientId && p.client === client.name)) &&
+                  (p.status === 'pending' || p.status === 'overdue')
+              ).length;
+              const upcomingEventsCount = events.filter(
+                (e) => e.clientId === client.id && e.date >= today
+              ).length;
+              const hasHearing = Boolean(client.caso?.proximaAudiencia);
+              const totalAgenda = upcomingEventsCount + (hasHearing ? 1 : 0);
+
+              let pendingSummary = 'Sin pendientes';
+              if (pendingPaymentsCount > 0 && totalAgenda > 0) {
+                pendingSummary = 'Pagos y eventos pendientes';
+              } else if (pendingPaymentsCount > 0) {
+                pendingSummary =
+                  pendingPaymentsCount === 1
+                    ? '1 pago pendiente'
+                    : `${pendingPaymentsCount} pagos pendientes`;
+              } else if (totalAgenda > 0) {
+                pendingSummary =
+                  totalAgenda === 1
+                    ? '1 evento próximo'
+                    : `${totalAgenda} eventos próximos`;
+              }
+
+              return (
+                <div
+                  key={client.id}
+                  className="client-row-anim"
+                  style={{ animationDelay: `${Math.min(index * 28, 220)}ms` }}
+                >
+                  <ClientCard
+                    client={client}
+                    pendingSummary={pendingSummary}
+                    onSelect={onSelectClient}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <div style={emptyStateStyle}>
