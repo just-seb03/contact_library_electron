@@ -151,10 +151,16 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
     boxSizing: 'border-box',
     borderTop: `1px solid ${borderColor}`,
     borderRight: `1px solid ${borderColor}`,
+    transition: 'background-color 0.12s ease',
   };
 
   return (
     <div ref={containerRef} style={containerStyle}>
+      <style>{`
+        .week-hour-slot:hover {
+          background-color: var(--macos-hover-bg, rgba(128, 128, 136, 0.08));
+        }
+      `}</style>
       <div style={gridStyle}>
         {/* Celda de esquina superior izquierda con mes */}
         <div
@@ -235,6 +241,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
               return (
                 <div
                   key={`${hour}-${currentDayKey}`}
+                  className={onCreateAtSlot ? 'week-hour-slot' : undefined}
                   onClick={(e) => {
                     if (e.target === e.currentTarget && onCreateAtSlot) {
                       onCreateAtSlot(day, slotStart, slotEnd);
