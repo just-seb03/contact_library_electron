@@ -234,13 +234,13 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                   backgroundColor: selectedMatch
                     ? 'var(--macos-active-bg, #323237)'
                     : todayMatch
-                    ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
-                    : 'transparent',
+                      ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
+                      : 'transparent',
                   border: selectedMatch
                     ? '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.35))'
                     : todayMatch
-                    ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.45))'
-                    : '1px solid transparent',
+                      ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.45))'
+                      : '1px solid transparent',
                   color: cell.isCurrentMonth || selectedMatch || todayMatch
                     ? 'var(--macos-text, #1c1c1e)'
                     : 'var(--macos-text-muted, #8e8e93)',
