@@ -110,8 +110,8 @@ export default function PaymentsPage() {
     gap: 36,
     boxSizing: 'border-box',
     overflow: 'hidden',
-    maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 120px), transparent 100%)',
-    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 120px), transparent 100%)',
+    maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 170px), rgba(0, 0, 0, 0.45) calc(100% - 70px), transparent 100%)',
+    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 170px), rgba(0, 0, 0, 0.45) calc(100% - 70px), transparent 100%)',
   };
 
   const rightColumnStatsStyle: CSSProperties = {

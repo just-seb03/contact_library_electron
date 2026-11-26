@@ -101,10 +101,12 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client, onEdit }) => {
       </div>
 
       <div style={contactInfoStyle}>
-        <span style={contactItemStyle}>
-          <Icon f7="phone" size="12px" style={{ opacity: 0.75 }} />
-          <span>{client.phone}</span>
-        </span>
+        {client.phone.trim() && (
+          <span style={contactItemStyle}>
+            <Icon f7="phone" size="12px" style={{ opacity: 0.75 }} />
+            <span>{client.phone}</span>
+          </span>
+        )}
         {hasValidEmail && (
           <span style={contactItemStyle}>
             <Icon f7="envelope" size="12px" style={{ opacity: 0.75 }} />

@@ -148,18 +148,11 @@ export function AddClientPopup({
     const trimmedPhone = phone.trim();
     const trimmedEmail = email.trim();
     const trimmedCaseType = caseType.trim();
-    const requiresCaseType = !client || Boolean(client.caso);
 
     const nextErrors: Partial<Record<'name' | 'phone' | 'email' | 'caseType', string>> = {};
     if (!trimmedName) nextErrors.name = 'Ingresa el nombre del cliente.';
-    if (!trimmedPhone) nextErrors.phone = 'Ingresa un teléfono de contacto.';
-    if (!trimmedEmail) {
-      nextErrors.email = 'Ingresa un correo electrónico.';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+    if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       nextErrors.email = 'El formato del correo no es válido.';
-    }
-    if (requiresCaseType && !trimmedCaseType) {
-      nextErrors.caseType = 'Indica el tipo de caso o materia.';
     }
 
     if (Object.keys(nextErrors).length > 0) {
@@ -172,7 +165,7 @@ export function AddClientPopup({
       onUpdate(client.id, {
         name: trimmedName,
         phone: trimmedPhone,
-        email: trimmedEmail,
+        email: trimmedEmail || undefined,
         ...(trimmedCaseType
           ? {
               caso: client.caso
@@ -190,14 +183,18 @@ export function AddClientPopup({
       onAdd({
         name: trimmedName,
         phone: trimmedPhone,
-        email: trimmedEmail,
+        ...(trimmedEmail ? { email: trimmedEmail } : {}),
         status: 'activo',
-        caso: {
-          expediente: generateExpediente(clients),
-          juzgado: 'Por asignar',
-          materia: trimmedCaseType,
-          estado: 'Caso registrado',
-        },
+        ...(trimmedCaseType
+          ? {
+              caso: {
+                expediente: generateExpediente(clients),
+                juzgado: 'Por asignar',
+                materia: trimmedCaseType,
+                estado: 'Caso registrado',
+              },
+            }
+          : {}),
       });
     }
     requestClose();

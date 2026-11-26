@@ -93,21 +93,23 @@ export const ClientCard: FC<ClientCardProps> = ({
           flexShrink: 0,
         }}
       >
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13.5,
-            fontWeight: 450,
-            color: 'var(--macos-text-secondary, #a4a4ab)',
-            fontVariantNumeric: 'tabular-nums',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <Icon f7="phone" size="13px" style={{ opacity: 0.7 }} />
-          <span>{client.phone}</span>
-        </span>
+        {client.phone.trim() && (
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: 13.5,
+              fontWeight: 450,
+              color: 'var(--macos-text-secondary, #a4a4ab)',
+              fontVariantNumeric: 'tabular-nums',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Icon f7="phone" size="13px" style={{ opacity: 0.7 }} />
+            <span>{client.phone}</span>
+          </span>
+        )}
 
         <Icon
           f7="chevron_right"
