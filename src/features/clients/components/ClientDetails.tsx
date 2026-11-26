@@ -22,6 +22,7 @@ interface ClientDetailsProps {
   payments: Payment[];
   events: CalendarEvent[];
   legacyHearing: HearingEvent | null;
+  onEditClient: () => void;
   onEditPayment: (payment: Payment) => void;
   onDeletePayment: (payment: Payment) => void;
   onUploadDocument: (file: File) => Promise<void>;
@@ -33,6 +34,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   payments,
   events,
   legacyHearing,
+  onEditClient,
   onEditPayment,
   onDeletePayment,
   onUploadDocument,
@@ -108,7 +110,7 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
         }
       `}</style>
 
-      <ClientBanner client={client} />
+      <ClientBanner client={client} onEdit={onEditClient} />
 
       <div style={tabRowStyle}>
         <div style={tabSwitcherStyle} role="tablist" aria-label="Secciones del cliente">

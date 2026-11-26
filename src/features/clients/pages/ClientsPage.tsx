@@ -12,22 +12,20 @@ import { databaseService } from '../../../core/database/databaseService';
 import { PAGE_SCROLL_CONTENT_STYLE } from '../../../core/theme/style';
 
 const clientBackButtonStyle: CSSProperties = {
-  width: 'auto',
-  minWidth: 'auto',
-  maxWidth: 'fit-content',
+  width: 30,
+  height: 30,
+  minWidth: 30,
   display: 'inline-flex',
   alignItems: 'center',
-  gap: 6,
-  height: 30,
-  padding: '0 12px',
+  justifyContent: 'center',
+  padding: 0,
   borderRadius: 999,
-  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.12))',
-  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.05))',
+  border: 'none',
+  backgroundColor: 'transparent',
   color: 'var(--macos-text, #ececef)',
-  fontSize: 12.5,
-  fontWeight: 550,
   cursor: 'pointer',
-  transition: 'background-color 0.12s ease',
+  opacity: 0.8,
+  transition: 'opacity 0.12s ease, transform 0.12s ease',
 };
 
 const glassClientsContainerStyle: CSSProperties = {
@@ -191,67 +189,65 @@ export default function Cliente() {
             className={isClosingDetail ? 'client-detail-exit' : 'client-detail-enter'}
             style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '18px 24px 0 24px', boxSizing: 'border-box', gap: 14 }}
           >
-            {/* Barra superior: Volver + Editar + Eliminar */}
+            {/* Barra superior: Flecha volver + Eliminar */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <button
                 type="button"
                 style={clientBackButtonStyle}
                 onClick={handleBack}
                 aria-label="Volver a clientes"
+                title="Volver"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'translateX(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '0.8';
+                  e.currentTarget.style.transform = 'none';
+                }}
               >
                 <svg
-                  width="7"
-                  height="12"
+                  width="9"
+                  height="15"
                   viewBox="0 0 8 14"
                   fill="none"
                 >
                   <path
                     d="M7 1L1 7L7 13"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="1.8"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
-                <span>Clientes</span>
               </button>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <button
-                  type="button"
-                  style={clientBackButtonStyle}
-                  onClick={() => setEditingClient(selectedClient)}
-                >
-                  <Icon f7="pencil" size="12px" />
-                  <span>Editar</span>
-                </button>
-                <button
-                  type="button"
-                  aria-label="Eliminar cliente"
-                  title="Eliminar cliente"
-                  onClick={() => {
-                    f7.dialog.confirm(
-                      `Se eliminará a ${selectedClient.name}, sus pagos y se desvinculará de sus eventos. Esta acción no se puede deshacer.`,
-                      'Eliminar cliente',
-                      () => deleteClient(selectedClient.id)
-                    );
-                  }}
-                  style={{
-                    width: 30,
-                    height: 30,
-                    padding: 0,
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--macos-text-secondary, #a4a4ab)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <Icon f7="trash" size="15px" />
-                </button>
-              </div>
+              <button
+                type="button"
+                aria-label="Eliminar cliente"
+                title="Eliminar cliente"
+                onClick={() => {
+                  f7.dialog.confirm(
+                    `Se eliminará a ${selectedClient.name}, sus pagos y se desvinculará de sus eventos. Esta acción no se puede deshacer.`,
+                    'Eliminar cliente',
+                    () => deleteClient(selectedClient.id)
+                  );
+                }}
+                style={{
+                  width: 30,
+                  height: 30,
+                  padding: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--macos-text-secondary, #a4a4ab)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                }}
+              >
+                <Icon f7="trash" size="15px" />
+              </button>
             </div>
 
             {/* Detalle del cliente seleccionado */}
@@ -264,6 +260,7 @@ export default function Cliente() {
                 ))}
                 events={calendarEvents.filter((event) => event.clientId === selectedClient.id)}
                 legacyHearing={hearings.find((hearing) => hearing.clientId === selectedClient.id) ?? null}
+                onEditClient={() => setEditingClient(selectedClient)}
                 onEditPayment={(payment) => setEditingPayment(payment)}
                 onDeletePayment={deletePayment}
                 onUploadDocument={handleUploadDocument}

@@ -4,6 +4,7 @@ import type { Client } from '../types';
 
 interface ClientBannerProps {
   client: Client;
+  onEdit?: () => void;
 }
 
 const isInvalidEmail = (email?: string): boolean => {
@@ -12,10 +13,11 @@ const isInvalidEmail = (email?: string): boolean => {
   return clean === '' || clean === 'sin_registro@consultorio.cl';
 };
 
-export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
+export const ClientBanner: FC<ClientBannerProps> = ({ client, onEdit }) => {
   const hasValidEmail = !isInvalidEmail(client.email);
 
   const bannerStyle: CSSProperties = {
+    position: 'relative',
     backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
     border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
     boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
@@ -26,11 +28,19 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
     color: 'var(--macos-text, #ececef)',
   };
 
+  const headerRowStyle: CSSProperties = {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 12,
+  };
+
   const nameStyle: CSSProperties = {
     fontSize: 22,
     fontWeight: 500,
     letterSpacing: '-0.015em',
     color: 'var(--macos-text, #ececef)',
+    minWidth: 0,
   };
 
   const contactInfoStyle: CSSProperties = {
@@ -53,7 +63,41 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client }) => {
 
   return (
     <div style={bannerStyle}>
-      <div style={nameStyle}>{client.name}</div>
+      <div style={headerRowStyle}>
+        <div style={nameStyle}>{client.name}</div>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label="Editar cliente"
+            title="Editar cliente"
+            style={{
+              width: 28,
+              height: 28,
+              padding: 0,
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--macos-text-secondary, #a4a4ab)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              flexShrink: 0,
+              opacity: 0.78,
+              transition: 'opacity 0.12s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '1';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '0.78';
+            }}
+          >
+            <Icon f7="pencil" size="14px" />
+          </button>
+        )}
+      </div>
+
       <div style={contactInfoStyle}>
         <span style={contactItemStyle}>
           <Icon f7="phone" size="12px" style={{ opacity: 0.75 }} />

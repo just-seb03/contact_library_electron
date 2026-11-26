@@ -4,7 +4,12 @@ import type { Payment } from '../../payments/types';
 import type { HearingEvent } from '../../../core/context/types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
-import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
+
+const PAYMENT_STATUS_LABELS: Record<Payment['status'], string> = {
+  completed: 'Cobrado',
+  pending: 'Pendiente',
+  overdue: 'Vencido',
+};
 
 const sectionStyle: CSSProperties = {
   backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
@@ -109,8 +114,16 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
                       {formatCLP(payment.amount)} · {payment.date}
                     </span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                    <PaymentStatusIndicator status={payment.status} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontStyle: 'italic',
+                        color: 'var(--macos-text-secondary, #a4a4ab)',
+                      }}
+                    >
+                      {PAYMENT_STATUS_LABELS[payment.status] ?? payment.status}
+                    </span>
                     <PaymentActionsMenu
                       onEdit={() => onEditPayment(payment)}
                       onDelete={() => onDeletePayment(payment)}
