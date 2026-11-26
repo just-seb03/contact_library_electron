@@ -9,6 +9,7 @@ interface AgendaWeekViewProps {
   calendarEvents: CalendarEvent[];
   hearings: HearingEvent[];
   onSelectEvent: (event: CalendarEvent | HearingEvent) => void;
+  onCreateAtSlot?: (date: Date, startTime: string, endTime: string) => void;
 }
 
 const HOUR_HEIGHT = 68;
@@ -62,6 +63,7 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
   calendarEvents,
   hearings,
   onSelectEvent,
+  onCreateAtSlot,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentTime, setCurrentTime] = useState(() => new Date());
@@ -186,13 +188,13 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
                   backgroundColor: isSelected
                     ? 'var(--macos-active-bg, #323237)'
                     : isToday
-                    ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
-                    : 'transparent',
+                      ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
+                      : 'transparent',
                   border: isSelected
                     ? '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.35))'
                     : isToday
-                    ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.4))'
-                    : '1px solid transparent',
+                      ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.4))'
+                      : '1px solid transparent',
                 }}
               >
                 <span
@@ -227,9 +229,22 @@ export const AgendaWeekView: FC<AgendaWeekViewProps> = ({
             {days.map((day, dayIndex) => {
               const currentDayKey = dateKeys[dayIndex];
               const isTodayColumn = currentDayKey === todayKey;
+              const slotStart = `${String(hour).padStart(2, '0')}:00`;
+              const slotEnd = hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`;
 
               return (
-                <div key={`${hour}-${currentDayKey}`} style={dayCellStyle}>
+                <div
+                  key={`${hour}-${currentDayKey}`}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget && onCreateAtSlot) {
+                      onCreateAtSlot(day, slotStart, slotEnd);
+                    }
+                  }}
+                  style={{
+                    ...dayCellStyle,
+                    cursor: onCreateAtSlot ? 'pointer' : 'default',
+                  }}
+                >
                   {/* Contorno en el bloque horario actual de Hoy */}
                   {isTodayColumn && hour === currentHour && (
                     <div

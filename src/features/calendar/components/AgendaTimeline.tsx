@@ -8,6 +8,7 @@ interface AgendaTimelineProps {
   todayHearings: HearingEvent[];
   calendarEvents: CalendarEvent[];
   onSelectEvent: (event: CalendarEvent | HearingEvent) => void;
+  onCreateAtSlot?: (date: Date, startTime: string, endTime: string) => void;
   selectedDate?: Date;
 }
 
@@ -52,6 +53,7 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   todayHearings,
   calendarEvents,
   onSelectEvent,
+  onCreateAtSlot,
   selectedDate = new Date(),
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -147,19 +149,45 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
       />
 
       {/* Filas horarias */}
-      {HOURS.map((hour) => (
-        <div key={hour} style={hourRowStyle}>
-          <div
-            style={{
-              ...hourLabelStyle,
-              transform: 'translateY(-7px)',
-            }}
-          >
-            {hour === 0 ? '' : formatHour(hour, hourFormatter)}
+      {HOURS.map((hour) => {
+        const slotStart = `${String(hour).padStart(2, '0')}:00`;
+        const slotEnd = hour === 23 ? '23:59' : `${String(hour + 1).padStart(2, '0')}:00`;
+        return (
+          <div key={hour} style={hourRowStyle}>
+            <div
+              style={{
+                ...hourLabelStyle,
+                transform: 'translateY(-7px)',
+              }}
+            >
+              {hour === 0 ? '' : formatHour(hour, hourFormatter)}
+            </div>
+            <button
+              type="button"
+              aria-label={`Crear evento a las ${formatHour(hour, hourFormatter)}`}
+              onClick={() => onCreateAtSlot?.(selectedDate, slotStart, slotEnd)}
+              style={{
+                ...hourCellStyle,
+                padding: 0,
+                borderLeft: 'none',
+                borderRight: 'none',
+                borderBottom: 'none',
+                backgroundColor: 'transparent',
+                cursor: onCreateAtSlot ? 'pointer' : 'default',
+                transition: 'background-color 0.12s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (onCreateAtSlot) {
+                  e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(128, 128, 136, 0.08))';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            />
           </div>
-          <div style={hourCellStyle} />
-        </div>
-      ))}
+        );
+      })}
 
       {/* ── Contorno en el bloque horario actual (adaptado a claro/oscuro) ── */}
       {isToday && (

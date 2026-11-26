@@ -101,6 +101,7 @@ export default function Calendar() {
   } = useApp();
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [draftTimeRange, setDraftTimeRange] = useState({ start: '09:00', end: '10:00' });
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
@@ -190,6 +191,14 @@ export default function Calendar() {
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date);
     setSelectedEvent(null);
+    setIsWeekView(false);
+  };
+
+  const handleOpenCreateAtSlot = (date: Date, startTime: string, endTime: string) => {
+    setSelectedDate(date);
+    setEditingEvent(null);
+    setDraftTimeRange({ start: startTime, end: endTime });
+    setIsCreateEventOpen(true);
   };
 
   const handleDeleteEvent = (event: CalendarEvent) => {
@@ -323,6 +332,7 @@ export default function Calendar() {
                       calendarEvents={calendarEvents}
                       hearings={hearings}
                       onSelectEvent={setSelectedEvent}
+                      onCreateAtSlot={handleOpenCreateAtSlot}
                     />
                   </div>
                 </CardContent>
@@ -336,6 +346,7 @@ export default function Calendar() {
                       todayHearings={todayHearings}
                       calendarEvents={selectedDayEvents}
                       onSelectEvent={setSelectedEvent}
+                      onCreateAtSlot={handleOpenCreateAtSlot}
                       selectedDate={selectedDate}
                     />
                   </div>
@@ -374,6 +385,7 @@ export default function Calendar() {
                   type="button"
                   onClick={() => {
                     setEditingEvent(null);
+                    setDraftTimeRange({ start: '09:00', end: '10:00' });
                     setIsCreateEventOpen(true);
                   }}
                   aria-label="Añadir evento"
@@ -428,6 +440,8 @@ export default function Calendar() {
       <CreateEventPopup
         opened={isCreateEventOpen}
         selectedDate={selectedDate}
+        initialStartTime={draftTimeRange.start}
+        initialEndTime={draftTimeRange.end}
         clients={clients}
         existingEvents={calendarEvents}
         existingHearings={hearings}

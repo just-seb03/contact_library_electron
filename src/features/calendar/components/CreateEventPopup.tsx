@@ -11,6 +11,8 @@ import { EventDatePicker, EventTimePicker } from './EventDateTimePickers';
 interface CreateEventPopupProps {
   opened: boolean;
   selectedDate: Date;
+  initialStartTime?: string;
+  initialEndTime?: string;
   clients: Client[];
   existingEvents: CalendarEvent[];
   existingHearings: HearingEvent[];
@@ -145,6 +147,8 @@ function hearingTimeToMinutes(value: string): number | null {
 export function CreateEventPopup({
   opened,
   selectedDate,
+  initialStartTime = '09:00',
+  initialEndTime = '10:00',
   clients,
   existingEvents,
   existingHearings,
@@ -226,8 +230,8 @@ export function CreateEventPopup({
       : {
           title: '',
           date: toDateInputValue(selectedDate),
-          startTime: '09:00',
-          endTime: '10:00',
+          startTime: initialStartTime,
+          endTime: initialEndTime,
           colorId: 'lavender' as CalendarEventColorId,
           alarmMinutes: 10,
           clientId: '',
@@ -243,7 +247,7 @@ export function CreateEventPopup({
     setDetails(values.details);
     setErrorMessage('');
     initialValues.current = JSON.stringify(values);
-  }, [opened, selectedTime, editingEvent, selectedDate]);
+  }, [opened, selectedTime, editingEvent, selectedDate, initialStartTime, initialEndTime]);
 
   const animateAndClose = useCallback(() => {
     if (isClosing) return;
