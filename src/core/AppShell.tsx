@@ -9,6 +9,7 @@ import { CONTENT_VIEW_STYLE } from './theme/style';
 import { navigateToTab } from '../navigation/navigation';
 import { useSystemNavigation } from '../navigation/useSystemNavigation';
 import { useApp } from './context/AppContext';
+import { SlideFullscreenOverlay } from './slide/SlideFullscreenOverlay';
 
 export function AppShell() {
   const { setActiveTab } = useApp();
@@ -109,6 +110,8 @@ export function AppShell() {
         isOpen={isSpotlightOpen}
         onClose={() => setIsSpotlightOpen(false)}
       />
+
+      <SlideFullscreenOverlay />
     </>
   );
 }

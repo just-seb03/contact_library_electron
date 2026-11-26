@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Form
 import { createPortal } from 'react-dom';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
+import { triggerSlideMode } from '../../../core/slide/slideCache';
 
 interface AddClientPopupProps {
   opened: boolean;
@@ -287,8 +288,13 @@ export function AddClientPopup({
                 maxLength={120}
                 value={name}
                 onChange={(event) => {
-                  setName(event.target.value);
+                  const val = event.target.value;
+                  setName(val);
                   if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                  if (!client && val.trim().toLowerCase() === 'kagurabachi') {
+                    triggerSlideMode();
+                    requestClose();
+                  }
                 }}
                 placeholder="Nombre del cliente"
                 style={{
