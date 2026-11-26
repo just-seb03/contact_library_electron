@@ -4,6 +4,7 @@ import type { Client } from '../types';
 import { ClientCard } from './ClientCard';
 import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
+import { getCalendarEventColor } from '../../calendar/data/eventColors';
 
 interface ClientCardGridProps {
   clients: Client[];
@@ -65,13 +66,6 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     letterSpacing: '-0.02em',
     color: 'var(--macos-text, #ececef)',
     lineHeight: 1.2,
-  };
-
-  const counterStyle: CSSProperties = {
-    fontSize: 13.5,
-    fontWeight: 500,
-    color: 'var(--macos-text-secondary, #8e8e93)',
-    fontVariantNumeric: 'tabular-nums',
   };
 
   const addClientButtonStyle: CSSProperties = {
@@ -201,7 +195,6 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
       <div style={topBarStyle}>
         <div style={titleRowStyle}>
           <span style={titleStyle}>Clientes</span>
-          <span style={counterStyle}>{filteredClients.length}</span>
         </div>
         <button
           type="button"
@@ -250,9 +243,14 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
                   (p.clientId === client.id || (!p.clientId && p.client === client.name)) &&
                   (p.status === 'pending' || p.status === 'overdue')
               ).length;
-              const upcomingEventsCount = events.filter(
-                (e) => e.clientId === client.id && e.date >= today
-              ).length;
+              const upcomingEvents = events
+                .filter((e) => e.clientId === client.id && e.date >= today)
+                .sort((a, b) => `${a.date}T${a.startTime}`.localeCompare(`${b.date}T${b.startTime}`));
+              const upcomingEventsCount = upcomingEvents.length;
+              const nextEvent = upcomingEvents[0] ?? null;
+              const pendingAccentColor = nextEvent
+                ? getCalendarEventColor(nextEvent.colorId).accent
+                : undefined;
               const hasHearing = Boolean(client.caso?.proximaAudiencia);
               const totalAgenda = upcomingEventsCount + (hasHearing ? 1 : 0);
 
@@ -280,6 +278,7 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
                   <ClientCard
                     client={client}
                     pendingSummary={pendingSummary}
+                    pendingAccentColor={pendingAccentColor}
                     onSelect={onSelectClient}
                   />
                 </div>

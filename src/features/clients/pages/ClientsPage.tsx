@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { ClientCardGrid } from '../components/ClientCardGrid';
@@ -11,9 +11,26 @@ import type { Payment } from '../../payments/types';
 import { databaseService } from '../../../core/database/databaseService';
 import {
   BACK_BUTTON_STYLE,
-  PAGE_CONTENT_STYLE,
   PAGE_SCROLL_CONTENT_STYLE,
 } from '../../../core/theme/style';
+
+const glassClientsContainerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: 'calc(100% - 32px)',
+  maxWidth: 1080,
+  height: 'calc(100vh - 82px)',
+  minHeight: 320,
+  margin: '12px auto 0 auto',
+  borderRadius: 18,
+  backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
+  boxSizing: 'border-box',
+  overflow: 'hidden',
+};
 
 export default function Cliente() {
   const {
@@ -93,9 +110,9 @@ export default function Cliente() {
 
   return (
     <Page noNavbar noToolbar>
-      <div style={PAGE_CONTENT_STYLE}>
+      <div style={glassClientsContainerStyle}>
         {showDetail && selectedClient ? (
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 24px 0 24px', boxSizing: 'border-box' }}>
             {/* Botón volver */}
             <div>
               <button
@@ -141,7 +158,7 @@ export default function Cliente() {
                 onDeleteDocument={(document) => deleteClientDocument(selectedClient.id, document.id)}
               />
             </div>
-          </>
+          </div>
         ) : (
           /* Grilla de tarjetas */
           <ClientCardGrid
