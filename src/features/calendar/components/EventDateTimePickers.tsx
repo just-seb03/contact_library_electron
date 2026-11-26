@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 
 const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -27,14 +27,54 @@ const triggerButtonStyle: CSSProperties = {
   transition: 'border-color 0.14s ease, background-color 0.14s ease',
 };
 
+const PICKER_CLOSE_MS = 150;
+
 const panelStyle: CSSProperties = {
   marginTop: 8,
   padding: 12,
   borderRadius: 12,
   border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.2))',
   backgroundColor: 'var(--macos-input-bg, rgba(128, 128, 136, 0.08))',
-  animation: 'pickerReveal 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+  transformOrigin: 'top center',
 };
+
+function useAnimatedToggle() {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const close = useCallback(() => {
+    if (!isVisible || isClosing) return;
+    setIsClosing(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setIsClosing(false);
+      timerRef.current = null;
+    }, PICKER_CLOSE_MS);
+  }, [isVisible, isClosing]);
+
+  const toggle = useCallback(() => {
+    if (isVisible && !isClosing) {
+      close();
+    } else {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      setIsClosing(false);
+      setIsVisible(true);
+    }
+  }, [isVisible, isClosing, close]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  return { isVisible, isClosing, toggle, close };
+}
 
 function toDateValue(date: Date): string {
   const y = date.getFullYear();
@@ -55,7 +95,7 @@ interface EventDatePickerProps {
 }
 
 export function EventDatePicker({ id, value, onChange }: EventDatePickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isVisible, isClosing, toggle, close } = useAnimatedToggle();
   const selected = useMemo(() => (value ? fromDateValue(value) : new Date()), [value]);
   const [viewYear, setViewYear] = useState(selected.getFullYear());
   const [viewMonth, setViewMonth] = useState(selected.getMonth());
@@ -103,11 +143,23 @@ export function EventDatePicker({ id, value, onChange }: EventDatePickerProps) {
 
   return (
     <div>
+      <style>{`
+        @keyframes pickerRevealAnim {
+          from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes pickerHideAnim {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(-6px) scale(0.97); }
+        }
+        .picker-panel-in { animation: pickerRevealAnim 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .picker-panel-out { animation: pickerHideAnim 0.15s cubic-bezier(0.4, 0, 1, 1) forwards; pointer-events: none; }
+      `}</style>
       <button
         id={id}
         type="button"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isVisible && !isClosing}
+        onClick={toggle}
         style={triggerButtonStyle}
       >
         <span style={{ textTransform: 'capitalize' }}>{formattedDate}</span>
@@ -118,8 +170,8 @@ export function EventDatePicker({ id, value, onChange }: EventDatePickerProps) {
         />
       </button>
 
-      {isOpen && (
-        <div style={panelStyle}>
+      {isVisible && (
+        <div style={panelStyle} className={isClosing ? 'picker-panel-out' : 'picker-panel-in'}>
           <div
             style={{
               display: 'flex',
@@ -137,7 +189,7 @@ export function EventDatePicker({ id, value, onChange }: EventDatePickerProps) {
                 onClick={() => {
                   const now = new Date();
                   onChange(toDateValue(now));
-                  setIsOpen(false);
+                  close();
                 }}
                 style={{
                   height: 24,
@@ -204,7 +256,7 @@ export function EventDatePicker({ id, value, onChange }: EventDatePickerProps) {
                   type="button"
                   onClick={() => {
                     onChange(toDateValue(cellDate));
-                    setIsOpen(false);
+                    close();
                   }}
                   style={{
                     height: 28,
@@ -245,7 +297,7 @@ interface EventTimePickerProps {
 }
 
 export function EventTimePicker({ id, value, onChange }: EventTimePickerProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { isVisible, isClosing, toggle, close } = useAnimatedToggle();
   const [hoursStr, minutesStr] = value.split(':');
   const currentHour = Number(hoursStr) || 0;
   const currentMinute = Number(minutesStr) || 0;
@@ -267,8 +319,8 @@ export function EventTimePicker({ id, value, onChange }: EventTimePickerProps) {
       <button
         id={id}
         type="button"
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isVisible && !isClosing}
+        onClick={toggle}
         style={triggerButtonStyle}
       >
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{formattedTime}</span>
@@ -279,8 +331,8 @@ export function EventTimePicker({ id, value, onChange }: EventTimePickerProps) {
         />
       </button>
 
-      {isOpen && (
-        <div style={panelStyle}>
+      {isVisible && (
+        <div style={panelStyle} className={isClosing ? 'picker-panel-out' : 'picker-panel-in'}>
           {/* Horas */}
           <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--macos-text-muted, #8e8e93)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Hora
@@ -327,7 +379,7 @@ export function EventTimePicker({ id, value, onChange }: EventTimePickerProps) {
                   type="button"
                   onClick={() => {
                     updateTime(currentHour, minute);
-                    setIsOpen(false);
+                    close();
                   }}
                   style={{
                     height: 26,

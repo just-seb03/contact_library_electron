@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FC } from 'react';
 import { Icon } from 'framework7-react';
 
 interface PaymentActionsMenuProps {
@@ -6,20 +6,78 @@ interface PaymentActionsMenuProps {
   onDelete: () => void;
 }
 
+const CLOSE_ANIMATION_MS = 150;
+
 export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDelete }) => {
-  const [open, setOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const closeMenu = useCallback(() => {
+    if (!isVisible || isClosing) return;
+    setIsClosing(true);
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = setTimeout(() => {
+      setIsVisible(false);
+      setIsClosing(false);
+      closeTimerRef.current = null;
+    }, CLOSE_ANIMATION_MS);
+  }, [isVisible, isClosing]);
+
+  const toggleMenu = () => {
+    if (isVisible && !isClosing) {
+      closeMenu();
+    } else {
+      if (closeTimerRef.current) {
+        clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      setIsClosing(false);
+      setIsVisible(true);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        closeMenu();
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isVisible, closeMenu]);
 
   const menuStyle: CSSProperties = {
     position: 'absolute',
-    top: 'calc(100% + 4px)',
+    top: 'calc(100% + 6px)',
     right: 0,
-    zIndex: 2,
-    minWidth: 120,
+    zIndex: 30,
+    minWidth: 132,
     padding: 4,
-    border: '1px solid var(--macos-card-border, #e5e5ea)',
-    borderRadius: 10,
-    backgroundColor: 'var(--macos-modal-bg, #ffffff)',
-    boxShadow: '0 5px 18px rgba(0,0,0,0.22)',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+    borderRadius: 12,
+    backgroundColor: 'var(--macos-modal-bg, #242428)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+    boxShadow: '0 12px 32px rgba(0, 0, 0, 0.35)',
+    transformOrigin: 'top right',
   };
 
   const actionStyle: CSSProperties = {
@@ -29,21 +87,36 @@ export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDele
     width: '100%',
     padding: '8px 10px',
     border: 'none',
-    borderRadius: 7,
+    borderRadius: 8,
     backgroundColor: 'transparent',
-    color: 'var(--macos-text, #1c1c1e)',
-    fontSize: 13,
+    color: 'var(--macos-text, #ececef)',
+    fontSize: 12.5,
+    fontWeight: 500,
     textAlign: 'left',
     cursor: 'pointer',
+    transition: 'background-color 0.12s ease',
   };
 
   return (
-    <div style={{ position: 'relative', flexShrink: 0 }}>
+    <div ref={containerRef} style={{ position: 'relative', flexShrink: 0 }}>
+      <style>{`
+        @keyframes payMenuOpen {
+          from { opacity: 0; transform: translateY(-6px) scale(0.94); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes payMenuClose {
+          from { opacity: 1; transform: translateY(0) scale(1); }
+          to { opacity: 0; transform: translateY(-5px) scale(0.94); }
+        }
+        .pay-menu-in { animation: payMenuOpen 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .pay-menu-out { animation: payMenuClose 0.15s cubic-bezier(0.4, 0, 1, 1) forwards; pointer-events: none; }
+        .pay-menu-item:hover { background-color: var(--macos-hover-bg, rgba(255, 255, 255, 0.08)) !important; }
+      `}</style>
       <button
         type="button"
         aria-label="Acciones del pago"
-        aria-expanded={open}
-        onClick={() => setOpen((current) => !current)}
+        aria-expanded={isVisible && !isClosing}
+        onClick={toggleMenu}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -51,37 +124,43 @@ export const PaymentActionsMenu: FC<PaymentActionsMenuProps> = ({ onEdit, onDele
           width: 30,
           height: 30,
           border: 'none',
-          borderRadius: 8,
-          backgroundColor: open ? 'var(--macos-input-bg, #e5e5ea)' : 'transparent',
-          color: 'var(--macos-text-secondary, #6e6e73)',
+          borderRadius: 999,
+          backgroundColor: isVisible && !isClosing ? 'var(--macos-active-bg, rgba(255, 255, 255, 0.1))' : 'transparent',
+          color: 'var(--macos-text-secondary, #a4a4ab)',
           cursor: 'pointer',
+          transition: 'background-color 0.12s ease',
         }}
       >
-        <Icon f7="ellipsis_vertical" size="18px" />
+        <Icon f7="ellipsis_vertical" size="16px" />
       </button>
-      {open && (
-        <div style={menuStyle}>
+      {isVisible && (
+        <div
+          style={menuStyle}
+          className={isClosing ? 'pay-menu-out' : 'pay-menu-in'}
+        >
           <button
             type="button"
+            className="pay-menu-item"
             style={actionStyle}
             onClick={() => {
-              setOpen(false);
+              closeMenu();
               onEdit();
             }}
           >
-            <Icon f7="pencil" size="14px" />
-            Editar
+            <Icon f7="pencil" size="13px" />
+            <span>Editar</span>
           </button>
           <button
             type="button"
-            style={{ ...actionStyle, color: '#c62820' }}
+            className="pay-menu-item"
+            style={{ ...actionStyle, color: '#ff6961' }}
             onClick={() => {
-              setOpen(false);
+              closeMenu();
               onDelete();
             }}
           >
-            <Icon f7="trash" size="14px" />
-            Eliminar
+            <Icon f7="trash" size="13px" />
+            <span>Eliminar</span>
           </button>
         </div>
       )}
