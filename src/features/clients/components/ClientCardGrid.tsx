@@ -48,15 +48,15 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const topBarStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '18px 24px 14px 24px',
+    gap: 14,
+    padding: '18px 24px 16px 24px',
     flexShrink: 0,
   };
 
   const titleRowStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'baseline',
-    gap: 10,
+    flexShrink: 0,
   };
 
   const titleStyle: CSSProperties = {
@@ -74,8 +74,8 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: 6,
-    height: 30,
+    gap: 0,
+    height: 36,
     padding: '0 4px',
     border: 'none',
     backgroundColor: 'transparent',
@@ -88,8 +88,9 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   };
 
   const searchWrapperStyle: CSSProperties = {
-    padding: '0 24px 16px 24px',
-    flexShrink: 0,
+    flex: 1,
+    minWidth: 0,
+    transition: 'flex-basis 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
   };
 
   const searchInnerStyle: CSSProperties = {
@@ -193,16 +194,19 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
           display: inline-block;
           overflow: hidden;
           max-width: 0;
+          margin-right: 0;
           opacity: 0;
           transform: translateX(8px);
           transition: max-width 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+            margin-right 0.22s cubic-bezier(0.16, 1, 0.3, 1),
             opacity 0.18s ease,
             transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
           white-space: nowrap;
         }
         .add-client-btn:hover .add-client-label,
         .add-client-btn:focus-visible .add-client-label {
-          max-width: 120px;
+          max-width: 110px;
+          margin-right: 6px;
           opacity: 0.85;
           transform: translateX(0);
         }
@@ -216,11 +220,36 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
         }
       `}</style>
 
-      {/* Encabezado */}
+      {/* Encabezado unificado: Clientes + Buscador flexible + Botón + */}
       <div style={topBarStyle}>
         <div style={titleRowStyle}>
           <span style={titleStyle}>Clientes</span>
         </div>
+
+        <div style={searchWrapperStyle}>
+          <div style={searchInnerStyle}>
+            <Icon f7="search" size="15px" style={searchIconStyle} />
+            <input
+              type="text"
+              placeholder="Buscar por nombre o teléfono…"
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              style={searchInputStyle}
+            />
+            {filterText.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setFilterText('')}
+                style={clearBtnStyle}
+                title="Limpiar búsqueda"
+                aria-label="Limpiar búsqueda"
+              >
+                <Icon f7="xmark_circle_fill" size="16px" />
+              </button>
+            )}
+          </div>
+        </div>
+
         <button
           type="button"
           className="add-client-btn"
@@ -232,31 +261,6 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
           <span className="add-client-label">Nuevo cliente</span>
           <Icon f7="plus" size="17px" className="add-client-plus" />
         </button>
-      </div>
-
-      {/* Buscador */}
-      <div style={searchWrapperStyle}>
-        <div style={searchInnerStyle}>
-          <Icon f7="search" size="15px" style={searchIconStyle} />
-          <input
-            type="text"
-            placeholder="Buscar por nombre o teléfono…"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            style={searchInputStyle}
-          />
-          {filterText.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setFilterText('')}
-              style={clearBtnStyle}
-              title="Limpiar búsqueda"
-              aria-label="Limpiar búsqueda"
-            >
-              <Icon f7="xmark_circle_fill" size="16px" />
-            </button>
-          )}
-        </div>
       </div>
 
       {/* Lista de rectángulos */}
