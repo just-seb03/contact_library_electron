@@ -100,9 +100,8 @@ export default function PaymentsPage() {
   const rootWrapperStyle: CSSProperties = {
     height: 'calc(100vh - 58px)',
     width: '100%',
-    maxWidth: 1120,
-    margin: '0 auto',
-    padding: '20px 32px 0 32px',
+    margin: 0,
+    padding: '20px 24px 0 16px',
     display: 'grid',
     gridTemplateColumns: 'minmax(0, 1fr) 260px',
     gap: 36,
