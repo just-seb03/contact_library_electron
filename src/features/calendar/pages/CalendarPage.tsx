@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { Button, f7, Page, Block, Card, CardContent, Icon } from 'framework7-react';
+import { Button, Page, Block, Card, CardContent, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
+import { GlassConfirmDialog } from '../../../core/components/GlassConfirmDialog';
 import type { HearingEvent } from '../../../core/context/types';
 import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
@@ -106,6 +107,7 @@ export default function Calendar() {
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
   const [isWeekView, setIsWeekView] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -202,18 +204,18 @@ export default function Calendar() {
   };
 
   const handleDeleteEvent = (event: CalendarEvent) => {
-    f7.dialog.confirm(
-      `¿Quieres eliminar «${event.title}»?`,
-      'Eliminar evento',
-      () => {
-        const removed = removeCalendarEvent(event.id);
-        if (!removed) return;
-        setSelectedEvent(null);
-        setDeletedEvent(removed);
-        if (undoTimer.current) clearTimeout(undoTimer.current);
-        undoTimer.current = setTimeout(() => setDeletedEvent(null), 8000);
-      }
-    );
+    setEventToDelete(event);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (!eventToDelete) return;
+    const removed = removeCalendarEvent(eventToDelete.id);
+    setEventToDelete(null);
+    if (!removed) return;
+    setSelectedEvent(null);
+    setDeletedEvent(removed);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    undoTimer.current = setTimeout(() => setDeletedEvent(null), 8000);
   };
 
   const handleUndoDelete = () => {
@@ -449,6 +451,13 @@ export default function Calendar() {
         onClose={() => setIsCreateEventOpen(false)}
         onCreate={handleCreateEvent}
         onUpdate={handleUpdateEvent}
+      />
+      <GlassConfirmDialog
+        opened={eventToDelete !== null}
+        title="Eliminar evento"
+        message={eventToDelete ? `¿Quieres eliminar «${eventToDelete.title}»?` : ''}
+        onCancel={() => setEventToDelete(null)}
+        onConfirm={confirmDeleteEvent}
       />
     </Page>
   );

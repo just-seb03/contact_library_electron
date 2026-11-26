@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { f7, Icon } from 'framework7-react';
+import { Icon } from 'framework7-react';
+import { GlassConfirmDialog } from '../../../core/components/GlassConfirmDialog';
 import type { Client } from '../../clients/types';
 import { APP_COLORS } from '../../../core/theme/style';
 import { CALENDAR_EVENT_COLORS } from '../data/eventColors';
@@ -166,6 +167,7 @@ export function CreateEventPopup({
   const [clientId, setClientId] = useState('');
   const [details, setDetails] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(opened);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -264,11 +266,7 @@ export function CreateEventPopup({
       animateAndClose();
       return;
     }
-    f7.dialog.confirm(
-      'Se perderán los cambios que no hayas guardado.',
-      '¿Descartar cambios?',
-      animateAndClose
-    );
+    setConfirmDiscardOpen(true);
   }, [animateAndClose, getFormValues]);
 
   useEffect(() => {
@@ -626,6 +624,17 @@ export function CreateEventPopup({
           </div>
         </form>
       </div>
+      <GlassConfirmDialog
+        opened={confirmDiscardOpen}
+        title="¿Descartar cambios?"
+        message="Se perderán los cambios que no hayas guardado."
+        confirmLabel="Descartar"
+        onCancel={() => setConfirmDiscardOpen(false)}
+        onConfirm={() => {
+          setConfirmDiscardOpen(false);
+          animateAndClose();
+        }}
+      />
     </div>
   );
 

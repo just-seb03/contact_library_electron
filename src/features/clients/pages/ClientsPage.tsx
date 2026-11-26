@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type CSSProperties } from 'react';
-import { Page, Icon, f7 } from 'framework7-react';
+import { Page, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
+import { GlassConfirmDialog } from '../../../core/components/GlassConfirmDialog';
 import { ClientCardGrid } from '../components/ClientCardGrid';
 import { ClientDetails } from '../components/ClientDetails';
 import { AddClientPopup } from '../components/AddClientPopup';
@@ -61,6 +62,7 @@ export default function Cliente() {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [confirmDeleteClientOpen, setConfirmDeleteClientOpen] = useState(false);
   const [isClosingDetail, setIsClosingDetail] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -220,13 +222,7 @@ export default function Cliente() {
                 type="button"
                 aria-label="Eliminar cliente"
                 title="Eliminar cliente"
-                onClick={() => {
-                  f7.dialog.confirm(
-                    `Se eliminará a ${selectedClient.name}, sus pagos y se desvinculará de sus eventos. Esta acción no se puede deshacer.`,
-                    'Eliminar cliente',
-                    () => deleteClient(selectedClient.id)
-                  );
-                }}
+                onClick={() => setConfirmDeleteClientOpen(true)}
                 style={{
                   width: 30,
                   height: 30,
@@ -288,6 +284,20 @@ export default function Cliente() {
         onClose={() => setEditingPayment(null)}
         onRegister={() => undefined}
         onUpdate={updatePayment}
+      />
+      <GlassConfirmDialog
+        opened={confirmDeleteClientOpen && selectedClient !== null}
+        title="Eliminar cliente"
+        message={
+          selectedClient
+            ? `Se eliminará a ${selectedClient.name}, sus pagos y se desvinculará de sus eventos. Esta acción no se puede deshacer.`
+            : ''
+        }
+        onCancel={() => setConfirmDeleteClientOpen(false)}
+        onConfirm={() => {
+          if (selectedClient) deleteClient(selectedClient.id);
+          setConfirmDeleteClientOpen(false);
+        }}
       />
     </Page>
   );

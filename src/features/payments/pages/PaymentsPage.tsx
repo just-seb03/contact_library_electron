@@ -3,6 +3,7 @@ import { Icon, Page } from 'framework7-react';
 
 import { useApp } from '../../../core/context/AppContext';
 import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
+import { GlassConfirmDialog } from '../../../core/components/GlassConfirmDialog';
 import { fuzzyScore } from '../../../core/utils/fuzzySearch';
 import { PaymentsStats } from '../components/pagosStatistics';
 import { PaymentsTable } from '../components/pagosTable';
@@ -31,6 +32,7 @@ export default function PaymentsPage() {
   } = useApp();
   const [isRegisterPopupOpen, setIsRegisterPopupOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
+  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   const [statusTab, setStatusTab] = useState<PaymentStatusTab>('all');
   const [searchText, setSearchText] = useState('');
   const [highlightedPaymentId, setHighlightedPaymentId] = useState<string | null>(null);
@@ -362,7 +364,7 @@ export default function PaymentsPage() {
                 payments={filteredPayments}
                 highlightedPaymentId={highlightedPaymentId}
                 onEdit={setEditingPayment}
-                onDelete={deletePayment}
+                onDelete={setPaymentToDelete}
               />
             </div>
           </div>
@@ -388,6 +390,20 @@ export default function PaymentsPage() {
         }}
         onRegister={registerPayment}
         onUpdate={updatePayment}
+      />
+      <GlassConfirmDialog
+        opened={paymentToDelete !== null}
+        title="Eliminar pago"
+        message={
+          paymentToDelete
+            ? `¿Quieres eliminar «${paymentToDelete.concept}» de ${paymentToDelete.client}?`
+            : ''
+        }
+        onCancel={() => setPaymentToDelete(null)}
+        onConfirm={() => {
+          if (paymentToDelete) deletePayment(paymentToDelete);
+          setPaymentToDelete(null);
+        }}
       />
     </Page>
   );
