@@ -2,6 +2,7 @@ import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
 import { Icon } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import type { Payment } from '../types';
+import { EventDatePicker } from '../../calendar/components/EventDateTimePickers';
 import {
   formatPaymentDate,
   getTodayInputValue,
@@ -54,7 +55,7 @@ export function PaymentForm({
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(getTodayInputValue);
   const [status, setStatus] = useState<Payment['status']>('pending');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'clientId' | 'concept' | 'amount' | 'date', string>>>({});
 
   useEffect(() => {
     setClientId(payment?.clientId ? String(payment.clientId) : clients[0] ? String(clients[0].id) : '');
@@ -62,30 +63,35 @@ export function PaymentForm({
     setAmount(payment ? String(payment.amount) : '');
     setDate(payment ? toDateInputValue(payment.date) : getTodayInputValue());
     setStatus(payment?.status ?? 'pending');
-    setErrorMessage('');
+    setFieldErrors({});
   }, [clients, payment]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const client = clients.find((item) => String(item.id) === clientId);
     const numericAmount = Number(amount);
+    const nextErrors: Partial<Record<'clientId' | 'concept' | 'amount' | 'date', string>> = {};
 
     if (!client) {
-      setErrorMessage('Selecciona un cliente para registrar el pago.');
-      return;
+      nextErrors.clientId = 'Selecciona un cliente para registrar el pago.';
     }
     if (!concept.trim()) {
-      setErrorMessage('Ingresa el concepto del pago.');
-      return;
+      nextErrors.concept = 'Ingresa el concepto del pago.';
     }
-    if (!Number.isSafeInteger(numericAmount) || numericAmount <= 0) {
-      setErrorMessage('Ingresa un monto entero mayor a cero.');
-      return;
+    if (!amount.trim()) {
+      nextErrors.amount = 'Ingresa el monto del pago.';
+    } else if (!Number.isSafeInteger(numericAmount) || numericAmount <= 0) {
+      nextErrors.amount = 'Ingresa un monto entero mayor a cero.';
     }
     if (!date) {
-      setErrorMessage('Selecciona la fecha del pago.');
+      nextErrors.date = 'Selecciona la fecha del pago.';
+    }
+
+    if (Object.keys(nextErrors).length > 0 || !client) {
+      setFieldErrors(nextErrors);
       return;
     }
+    setFieldErrors({});
 
     const data = {
       concept: concept.trim(),
@@ -103,6 +109,7 @@ export function PaymentForm({
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       style={{
         display: 'flex',
@@ -153,16 +160,24 @@ export function PaymentForm({
             <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
             <select
               id="payment-client"
-              required
               value={clientId}
-              onChange={(event) => setClientId(event.target.value)}
-              style={controlStyle}
+              onChange={(event) => {
+                setClientId(event.target.value);
+                if (fieldErrors.clientId) setFieldErrors((prev) => ({ ...prev, clientId: undefined }));
+              }}
+              style={{
+                ...controlStyle,
+                borderColor: fieldErrors.clientId ? 'rgba(255, 69, 58, 0.6)' : undefined,
+              }}
             >
               <option value="" disabled>Seleccionar cliente</option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>{client.name}</option>
               ))}
             </select>
+            {fieldErrors.clientId && (
+              <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.clientId}</span>
+            )}
           </div>
         )}
 
@@ -170,40 +185,59 @@ export function PaymentForm({
           <label htmlFor="payment-concept" style={labelStyle}>Concepto</label>
           <input
             id="payment-concept"
-            required
             maxLength={120}
             value={concept}
-            onChange={(event) => setConcept(event.target.value)}
+            onChange={(event) => {
+              setConcept(event.target.value);
+              if (fieldErrors.concept) setFieldErrors((prev) => ({ ...prev, concept: undefined }));
+            }}
             placeholder="Ej.: Asesoría jurídica"
-            style={controlStyle}
+            style={{
+              ...controlStyle,
+              borderColor: fieldErrors.concept ? 'rgba(255, 69, 58, 0.6)' : undefined,
+            }}
           />
+          {fieldErrors.concept && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.concept}</span>
+          )}
         </div>
 
         <div style={fieldStyle}>
           <label htmlFor="payment-amount" style={labelStyle}>Monto (CLP)</label>
           <input
             id="payment-amount"
-            required
             type="number"
             min="1"
             step="1"
             value={amount}
-            onChange={(event) => setAmount(event.target.value)}
+            onChange={(event) => {
+              setAmount(event.target.value);
+              if (fieldErrors.amount) setFieldErrors((prev) => ({ ...prev, amount: undefined }));
+            }}
             placeholder="Ej.: 150000"
-            style={controlStyle}
+            style={{
+              ...controlStyle,
+              borderColor: fieldErrors.amount ? 'rgba(255, 69, 58, 0.6)' : undefined,
+            }}
           />
+          {fieldErrors.amount && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.amount}</span>
+          )}
         </div>
 
         <div style={fieldStyle}>
-          <label htmlFor="payment-date" style={labelStyle}>Fecha</label>
-          <input
+          <span style={labelStyle}>Fecha</span>
+          <EventDatePicker
             id="payment-date"
-            required
-            type="date"
             value={date}
-            onChange={(event) => setDate(event.target.value)}
-            style={controlStyle}
+            onChange={(val) => {
+              setDate(val);
+              if (fieldErrors.date) setFieldErrors((prev) => ({ ...prev, date: undefined }));
+            }}
           />
+          {fieldErrors.date && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.date}</span>
+          )}
         </div>
 
         <div style={{ ...fieldStyle, marginBottom: 0 }}>
@@ -219,12 +253,6 @@ export function PaymentForm({
             <option value="overdue">Vencido</option>
           </select>
         </div>
-
-        {errorMessage && (
-          <p role="alert" style={{ color: '#ff6961', fontSize: 12.5, margin: '12px 0 0' }}>
-            {errorMessage}
-          </p>
-        )}
       </div>
 
       <div

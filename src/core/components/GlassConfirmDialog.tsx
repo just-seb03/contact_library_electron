@@ -27,24 +27,29 @@ export const GlassConfirmDialog: FC<GlassConfirmDialogProps> = ({
   const [isVisible, setIsVisible] = useState(opened);
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevOpenedRef = useRef(opened);
 
   useEffect(() => {
-    if (opened) {
+    const wasOpened = prevOpenedRef.current;
+    prevOpenedRef.current = opened;
+
+    if (opened && !wasOpened) {
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
         closeTimerRef.current = null;
       }
       setIsClosing(false);
       setIsVisible(true);
-    } else if (isVisible && !isClosing) {
+    } else if (!opened && wasOpened && isVisible) {
       setIsClosing(true);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
       closeTimerRef.current = setTimeout(() => {
         setIsVisible(false);
         setIsClosing(false);
         closeTimerRef.current = null;
       }, CLOSE_ANIMATION_MS);
     }
-  }, [opened, isVisible, isClosing]);
+  }, [opened, isVisible]);
 
   useEffect(() => {
     return () => {

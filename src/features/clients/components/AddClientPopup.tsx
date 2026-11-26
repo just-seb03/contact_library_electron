@@ -79,13 +79,17 @@ export function AddClientPopup({
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [caseType, setCaseType] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'name' | 'phone' | 'email' | 'caseType', string>>>({});
   const [isVisible, setIsVisible] = useState(opened);
   const [isClosing, setIsClosing] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevOpenedRef = useRef(opened);
 
   useEffect(() => {
-    if (opened) {
+    const wasOpened = prevOpenedRef.current;
+    prevOpenedRef.current = opened;
+
+    if (opened && !wasOpened) {
       if (closeTimerRef.current) {
         clearTimeout(closeTimerRef.current);
         closeTimerRef.current = null;
@@ -96,16 +100,17 @@ export function AddClientPopup({
       setPhone(client?.phone ?? '');
       setEmail(client?.email ?? '');
       setCaseType(client?.caso?.materia ?? '');
-      setErrorMessage('');
-    } else if (isVisible && !isClosing) {
+      setFieldErrors({});
+    } else if (!opened && wasOpened && isVisible) {
       setIsClosing(true);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
       closeTimerRef.current = setTimeout(() => {
         setIsVisible(false);
         setIsClosing(false);
         closeTimerRef.current = null;
       }, CLOSE_ANIMATION_MS);
     }
-  }, [opened, client, isVisible, isClosing]);
+  }, [opened, client, isVisible]);
 
   useEffect(() => {
     return () => {
@@ -145,10 +150,23 @@ export function AddClientPopup({
     const trimmedCaseType = caseType.trim();
     const requiresCaseType = !client || Boolean(client.caso);
 
-    if (!trimmedName || !trimmedPhone || !trimmedEmail || (requiresCaseType && !trimmedCaseType)) {
-      setErrorMessage('Completa todos los campos.');
+    const nextErrors: Partial<Record<'name' | 'phone' | 'email' | 'caseType', string>> = {};
+    if (!trimmedName) nextErrors.name = 'Ingresa el nombre del cliente.';
+    if (!trimmedPhone) nextErrors.phone = 'Ingresa un teléfono de contacto.';
+    if (!trimmedEmail) {
+      nextErrors.email = 'Ingresa un correo electrónico.';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      nextErrors.email = 'El formato del correo no es válido.';
+    }
+    if (requiresCaseType && !trimmedCaseType) {
+      nextErrors.caseType = 'Indica el tipo de caso o materia.';
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
       return;
     }
+    setFieldErrors({});
 
     if (client) {
       onUpdate(client.id, {
@@ -226,6 +244,7 @@ export function AddClientPopup({
         onClick={(e) => e.stopPropagation()}
       >
         <form
+          noValidate
           onSubmit={handleSubmit}
           style={{ display: 'flex', flexDirection: 'column', height: '100%', maxHeight: 'min(620px, calc(100vh - 40px))', minHeight: 0, overflow: 'hidden' }}
         >
@@ -268,61 +287,87 @@ export function AddClientPopup({
               <label htmlFor="new-client-name" style={labelStyle}>Nombre</label>
               <input
                 id="new-client-name"
-                required
                 maxLength={120}
                 value={name}
-                onChange={(event) => setName(event.target.value)}
+                onChange={(event) => {
+                  setName(event.target.value);
+                  if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                }}
                 placeholder="Nombre del cliente"
-                style={controlStyle}
+                style={{
+                  ...controlStyle,
+                  borderColor: fieldErrors.name ? 'rgba(255, 69, 58, 0.6)' : undefined,
+                }}
               />
+              {fieldErrors.name && (
+                <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.name}</span>
+              )}
             </div>
 
             <div style={fieldStyle}>
               <label htmlFor="new-client-phone" style={labelStyle}>Teléfono</label>
               <input
                 id="new-client-phone"
-                required
                 type="tel"
                 maxLength={30}
                 value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                  if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                }}
                 placeholder="Teléfono de contacto"
-                style={controlStyle}
+                style={{
+                  ...controlStyle,
+                  borderColor: fieldErrors.phone ? 'rgba(255, 69, 58, 0.6)' : undefined,
+                }}
               />
+              {fieldErrors.phone && (
+                <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.phone}</span>
+              )}
             </div>
 
             <div style={fieldStyle}>
               <label htmlFor="new-client-email" style={labelStyle}>Correo</label>
               <input
                 id="new-client-email"
-                required
                 type="email"
                 maxLength={254}
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                }}
                 placeholder="correo@ejemplo.cl"
-                style={controlStyle}
+                style={{
+                  ...controlStyle,
+                  borderColor: fieldErrors.email ? 'rgba(255, 69, 58, 0.6)' : undefined,
+                }}
               />
+              {fieldErrors.email && (
+                <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.email}</span>
+              )}
             </div>
 
             <div style={{ ...fieldStyle, marginBottom: 0 }}>
               <label htmlFor="new-client-case-type" style={labelStyle}>Tipo de caso</label>
               <input
                 id="new-client-case-type"
-                required={!client || Boolean(client.caso)}
                 maxLength={120}
                 value={caseType}
-                onChange={(event) => setCaseType(event.target.value)}
+                onChange={(event) => {
+                  setCaseType(event.target.value);
+                  if (fieldErrors.caseType) setFieldErrors((prev) => ({ ...prev, caseType: undefined }));
+                }}
                 placeholder="Ej.: Asesoría jurídica"
-                style={controlStyle}
+                style={{
+                  ...controlStyle,
+                  borderColor: fieldErrors.caseType ? 'rgba(255, 69, 58, 0.6)' : undefined,
+                }}
               />
+              {fieldErrors.caseType && (
+                <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.caseType}</span>
+              )}
             </div>
-
-            {errorMessage && (
-              <p role="alert" style={{ color: '#ff6961', fontSize: 12.5, margin: '12px 0 0' }}>
-                {errorMessage}
-              </p>
-            )}
           </div>
 
           <div
