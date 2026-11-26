@@ -48,23 +48,9 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const topBarStyle: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
-    gap: 14,
+    gap: 12,
     padding: '18px 24px 16px 24px',
     flexShrink: 0,
-  };
-
-  const titleRowStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'baseline',
-    flexShrink: 0,
-  };
-
-  const titleStyle: CSSProperties = {
-    fontSize: 22,
-    fontWeight: 650,
-    letterSpacing: '-0.02em',
-    color: 'var(--macos-text, #ececef)',
-    lineHeight: 1.2,
   };
 
   const addClientButtonStyle: CSSProperties = {
@@ -220,12 +206,8 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
         }
       `}</style>
 
-      {/* Encabezado unificado: Clientes + Buscador flexible + Botón + */}
+      {/* Encabezado unificado: Buscador flexible + Botón + */}
       <div style={topBarStyle}>
-        <div style={titleRowStyle}>
-          <span style={titleStyle}>Clientes</span>
-        </div>
-
         <div style={searchWrapperStyle}>
           <div style={searchInnerStyle}>
             <Icon f7="search" size="15px" style={searchIconStyle} />
