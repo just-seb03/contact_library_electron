@@ -26,6 +26,8 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client, onEdit }) => {
     borderRadius: 16,
     padding: '18px 22px',
     color: 'var(--macos-text, #ececef)',
+    userSelect: 'text',
+    WebkitUserSelect: 'text',
   };
 
   const headerRowStyle: CSSProperties = {

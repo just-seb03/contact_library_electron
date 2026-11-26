@@ -1,5 +1,4 @@
-import { useState, type FC, type CSSProperties } from 'react';
-import { Icon } from 'framework7-react';
+import type { FC, CSSProperties } from 'react';
 import type { Client } from '../types';
 
 interface ClientCaseDetailsProps {
@@ -14,6 +13,8 @@ const sectionStyle: CSSProperties = {
   WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   borderRadius: 16,
   padding: '16px 20px',
+  userSelect: 'text',
+  WebkitUserSelect: 'text',
 };
 
 const headingStyle: CSSProperties = {
@@ -44,18 +45,11 @@ const valueStyle: CSSProperties = {
   color: 'var(--macos-text, #ececef)',
   textAlign: 'right',
   overflowWrap: 'anywhere',
+  cursor: 'text',
 };
 
 export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
   const { caso } = client;
-  const [copied, setCopied] = useState(false);
-
-  const handleCopyExpediente = () => {
-    if (!caso?.expediente) return;
-    navigator.clipboard.writeText(caso.expediente);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1800);
-  };
 
   if (!caso) {
     return (
@@ -74,30 +68,7 @@ export const ClientCaseDetails: FC<ClientCaseDetailsProps> = ({ client }) => {
 
       <div style={rowStyle(false)}>
         <span style={labelStyle}>Número</span>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <span style={valueStyle}>{caso.expediente}</span>
-          <button
-            type="button"
-            onClick={handleCopyExpediente}
-            title="Copiar expediente"
-            aria-label="Copiar expediente"
-            style={{
-              width: 'auto',
-              minWidth: 'auto',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              border: 'none',
-              background: 'transparent',
-              color: 'var(--macos-text-secondary, #a4a4ab)',
-              fontSize: 11.5,
-              cursor: 'pointer',
-              padding: '2px 4px',
-            }}
-          >
-            <Icon f7={copied ? 'checkmark_alt' : 'doc_on_doc'} size="12px" />
-          </button>
-        </div>
+        <span style={valueStyle}>{caso.expediente}</span>
       </div>
 
       <div style={rowStyle(!caso.juzgado && !caso.estado)}>

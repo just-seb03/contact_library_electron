@@ -45,7 +45,8 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
   const containerStyle: CSSProperties = {
     padding: '16px 14px',
     borderTop: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
-    userSelect: 'none',
+    userSelect: 'text',
+    WebkitUserSelect: 'text',
   };
 
   const titleStyle: CSSProperties = {

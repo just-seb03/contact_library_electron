@@ -50,6 +50,8 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
     width: '100%',
     margin: '0 auto',
     paddingBottom: 16,
+    userSelect: 'text',
+    WebkitUserSelect: 'text',
   };
 
   const tabRowStyle: CSSProperties = {
