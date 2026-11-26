@@ -3,6 +3,7 @@ import type { Client, ClientDocument } from '../types';
 import { ClientBanner } from './ClientBanner';
 import { ClientCaseDetails } from './ClientCaseDetails';
 import { ClientActivityDetails } from './ClientActivityDetails';
+import { ClientDocumentsSection } from './ClientDocumentsSection';
 import type { Payment } from '../../payments/types';
 import type { CalendarEvent } from '../../calendar/types';
 import type { HearingEvent } from '../../../core/context/types';
@@ -12,8 +13,6 @@ interface ClientDetailsProps {
   payments: Payment[];
   events: CalendarEvent[];
   legacyHearing: HearingEvent | null;
-  onEdit: () => void;
-  onDelete: () => void;
   onEditPayment: (payment: Payment) => void;
   onDeletePayment: (payment: Payment) => void;
   onUploadDocument: (file: File) => Promise<void>;
@@ -25,8 +24,6 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
   payments,
   events,
   legacyHearing,
-  onEdit,
-  onDelete,
   onEditPayment,
   onDeletePayment,
   onUploadDocument,
@@ -39,20 +36,44 @@ export const ClientDetails: FC<ClientDetailsProps> = ({
     paddingBottom: 16,
   };
 
+  const columnsStyle: CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+    gap: 16,
+    alignItems: 'start',
+  };
+
+  const columnStackStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+    minWidth: 0,
+  };
+
   return (
     <div style={containerStyle}>
       <ClientBanner client={client} />
-      <ClientCaseDetails client={client} onEdit={onEdit} onDelete={onDelete} />
-      <ClientActivityDetails
-        payments={payments}
-        events={events}
-        legacyHearing={legacyHearing}
-        onEditPayment={onEditPayment}
-        onDeletePayment={onDeletePayment}
-        documents={client.documentos ?? []}
-        onUploadDocument={onUploadDocument}
-        onDeleteDocument={onDeleteDocument}
-      />
+
+      <div style={columnsStyle}>
+        <div style={columnStackStyle}>
+          <ClientCaseDetails client={client} />
+          <ClientDocumentsSection
+            documents={client.documentos ?? []}
+            onUpload={onUploadDocument}
+            onDelete={onDeleteDocument}
+          />
+        </div>
+
+        <div style={columnStackStyle}>
+          <ClientActivityDetails
+            payments={payments}
+            events={events}
+            legacyHearing={legacyHearing}
+            onEditPayment={onEditPayment}
+            onDeletePayment={onDeletePayment}
+          />
+        </div>
+      </div>
     </div>
   );
 };

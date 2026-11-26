@@ -1,43 +1,38 @@
 import type { FC, CSSProperties } from 'react';
-import { Icon } from 'framework7-react';
 import type { CalendarEvent } from '../../calendar/types';
-import type { ClientDocument } from '../types';
 import type { Payment } from '../../payments/types';
 import type { HearingEvent } from '../../../core/context/types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
 import { PaymentStatusIndicator } from '../../payments/components/PaymentStatusIndicator';
-import { ClientDocumentsSection } from './ClientDocumentsSection';
 
-const glassSectionStyle: CSSProperties = {
+const sectionStyle: CSSProperties = {
   backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
   border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
   backdropFilter: 'blur(24px) saturate(160%)',
   WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   borderRadius: 16,
-  padding: '18px 20px',
+  padding: '16px 20px',
 };
 
-const glassItemStyle: CSSProperties = {
+const headingStyle: CSSProperties = {
+  fontSize: 13.5,
+  fontWeight: 600,
+  color: 'var(--macos-text, #ececef)',
+  margin: '0 0 10px 0',
+};
+
+const rowStyle = (isLast: boolean): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 12,
-  padding: '12px 14px',
-  borderRadius: 12,
-  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.035))',
-  border: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
-};
+  padding: '10px 0',
+  borderBottom: isLast ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+});
 
-const glassHeadingStyle: CSSProperties = {
-  fontSize: 15,
-  fontWeight: 600,
-  color: 'var(--macos-text, #ececef)',
-  margin: '0 0 12px 0',
-};
-
-const glassEmptyStyle: CSSProperties = {
+const emptyStyle: CSSProperties = {
   margin: 0,
   fontSize: 13,
   color: 'var(--macos-text-secondary, #8e8e93)',
@@ -49,16 +44,13 @@ interface ClientActivityDetailsProps {
   legacyHearing: HearingEvent | null;
   onEditPayment: (payment: Payment) => void;
   onDeletePayment: (payment: Payment) => void;
-  documents: ClientDocument[];
-  onUploadDocument: (file: File) => Promise<void>;
-  onDeleteDocument: (document: ClientDocument) => void;
 }
 
 function formatEventDate(value: string): string {
   const [year, month, day] = value.split('-').map(Number);
   return new Intl.DateTimeFormat('es-CL', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   }).format(new Date(year, month - 1, day));
 }
@@ -76,9 +68,6 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
   legacyHearing,
   onEditPayment,
   onDeletePayment,
-  documents,
-  onUploadDocument,
-  onDeleteDocument,
 }) => {
   const today = getLocalDateValue();
   const orderedEvents = [...events].sort((first, second) => {
@@ -90,28 +79,32 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
     );
     return firstIsUpcoming ? comparison : -comparison;
   });
-  const nextEvent = orderedEvents.find((event) => event.date >= today);
+
   const legacyHearingDate = legacyHearing
     ? `${legacyHearing.year}-${String(legacyHearing.monthIndex + 1).padStart(2, '0')}-${String(legacyHearing.day).padStart(2, '0')}`
     : null;
-  const showLegacyHearing = !nextEvent
-    && legacyHearing
-    && legacyHearingDate !== null
-    && legacyHearingDate >= today;
+  const showLegacyHearing =
+    legacyHearing !== null &&
+    legacyHearingDate !== null &&
+    legacyHearingDate >= today;
+
+  const hasAnyEvent = showLegacyHearing || orderedEvents.length > 0;
 
   return (
     <>
-      <section style={glassSectionStyle} aria-labelledby="client-payments-heading">
-        <h2 id="client-payments-heading" style={glassHeadingStyle}>Gestión de pagos</h2>
+      <section style={sectionStyle} aria-labelledby="client-payments-heading">
+        <h2 id="client-payments-heading" style={headingStyle}>Pagos</h2>
         {payments.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {payments.map((payment) => (
-              <div key={payment.id} style={glassItemStyle}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                  <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
-                    {payment.concept} · {formatCLP(payment.amount)}
+          <div>
+            {payments.map((payment, index) => (
+              <div key={payment.id} style={rowStyle(index === payments.length - 1)}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 13.5, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {payment.concept}
                   </span>
-                  <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>Fecha: {payment.date}</span>
+                  <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
+                    {formatCLP(payment.amount)} · {payment.date}
+                  </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
                   <PaymentStatusIndicator status={payment.status} />
@@ -124,65 +117,49 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
             ))}
           </div>
         ) : (
-          <p style={glassEmptyStyle}>Este cliente aún no tiene pagos registrados.</p>
+          <p style={emptyStyle}>Sin pagos registrados</p>
         )}
       </section>
 
-      <section style={glassSectionStyle} aria-labelledby="client-events-heading">
-        <h2 id="client-events-heading" style={glassHeadingStyle}>Agenda del cliente</h2>
-        {nextEvent && (
-          <p style={{ ...glassEmptyStyle, marginBottom: 12, color: 'var(--macos-text, #ececef)', fontWeight: 550 }}>
-            Próxima reunión: {nextEvent.title} · {formatEventDate(nextEvent.date)} · {nextEvent.startTime}
-          </p>
-        )}
-        {showLegacyHearing && legacyHearing && (
-          <div style={{ ...glassItemStyle, justifyContent: 'flex-start', marginBottom: 8 }}>
-            <Icon f7="calendar" size="16px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)', flexShrink: 0 }} />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-              <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
-                Próxima audiencia
-              </span>
-              <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
-                {new Intl.DateTimeFormat('es-CL', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                }).format(new Date(legacyHearing.year, legacyHearing.monthIndex, legacyHearing.day))}
-                {' · '}{legacyHearing.timeStr}
-              </span>
-            </div>
-          </div>
-        )}
-        {orderedEvents.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {orderedEvents.map((event) => (
-              <div key={event.id} style={glassItemStyle}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-                  <Icon f7="calendar" size="16px" style={{ color: 'var(--macos-text-secondary, #a4a4ab)', flexShrink: 0 }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0 }}>
-                    <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 14, fontWeight: 550 }}>
-                      {event.title}
-                    </span>
-                    <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
-                      {formatEventDate(event.date)} · {event.startTime}–{event.endTime}
-                    </span>
-                    {event.details && (
-                      <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>{event.details}</span>
-                    )}
-                  </div>
+      <section style={sectionStyle} aria-labelledby="client-events-heading">
+        <h2 id="client-events-heading" style={headingStyle}>Agenda</h2>
+        {hasAnyEvent ? (
+          <div>
+            {showLegacyHearing && legacyHearing && (
+              <div style={rowStyle(orderedEvents.length === 0)}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 13.5, fontWeight: 500 }}>
+                    Audiencia · {legacyHearing.juzgado}
+                  </span>
+                  <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
+                    {new Intl.DateTimeFormat('es-CL', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    }).format(new Date(legacyHearing.year, legacyHearing.monthIndex, legacyHearing.day))}
+                    {' · '}{legacyHearing.timeStr}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {orderedEvents.map((event, index) => (
+              <div key={event.id} style={rowStyle(index === orderedEvents.length - 1)}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
+                  <span style={{ color: 'var(--macos-text, #ececef)', fontSize: 13.5, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {event.title}
+                  </span>
+                  <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
+                    {formatEventDate(event.date)} · {event.startTime}–{event.endTime}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p style={glassEmptyStyle}>Este cliente aún no tiene eventos asociados.</p>
+          <p style={emptyStyle}>Sin eventos próximos</p>
         )}
       </section>
-      <ClientDocumentsSection
-        documents={documents}
-        onUpload={onUploadDocument}
-        onDelete={onDeleteDocument}
-      />
     </>
   );
 };

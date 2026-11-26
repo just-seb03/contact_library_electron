@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type CSSProperties } from 'react';
-import { Page } from 'framework7-react';
+import { Page, Icon, f7 } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { ClientCardGrid } from '../components/ClientCardGrid';
 import { ClientDetails } from '../components/ClientDetails';
@@ -189,10 +189,10 @@ export default function Cliente() {
           <div
             key={selectedClient.id}
             className={isClosingDetail ? 'client-detail-exit' : 'client-detail-enter'}
-            style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '18px 24px 0 24px', boxSizing: 'border-box', gap: 12 }}
+            style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '18px 24px 0 24px', boxSizing: 'border-box', gap: 14 }}
           >
-            {/* Botón volver */}
-            <div>
+            {/* Barra superior: Volver + Editar + Eliminar */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
               <button
                 type="button"
                 style={clientBackButtonStyle}
@@ -215,10 +215,47 @@ export default function Cliente() {
                 </svg>
                 <span>Clientes</span>
               </button>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  type="button"
+                  style={clientBackButtonStyle}
+                  onClick={() => setEditingClient(selectedClient)}
+                >
+                  <Icon f7="pencil" size="12px" />
+                  <span>Editar</span>
+                </button>
+                <button
+                  type="button"
+                  aria-label="Eliminar cliente"
+                  title="Eliminar cliente"
+                  onClick={() => {
+                    f7.dialog.confirm(
+                      `Se eliminará a ${selectedClient.name}, sus pagos y se desvinculará de sus eventos. Esta acción no se puede deshacer.`,
+                      'Eliminar cliente',
+                      () => deleteClient(selectedClient.id)
+                    );
+                  }}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    padding: 0,
+                    border: 'none',
+                    background: 'transparent',
+                    color: 'var(--macos-text-secondary, #a4a4ab)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Icon f7="trash" size="15px" />
+                </button>
+              </div>
             </div>
 
             {/* Detalle del cliente seleccionado */}
-            <div style={{ ...PAGE_SCROLL_CONTENT_STYLE, paddingBottom: 110 }}>
+            <div style={{ ...PAGE_SCROLL_CONTENT_STYLE, paddingBottom: 120 }}>
               <ClientDetails
                 client={selectedClient}
                 payments={payments.filter((payment) => (
@@ -227,8 +264,6 @@ export default function Cliente() {
                 ))}
                 events={calendarEvents.filter((event) => event.clientId === selectedClient.id)}
                 legacyHearing={hearings.find((hearing) => hearing.clientId === selectedClient.id) ?? null}
-                onEdit={() => setEditingClient(selectedClient)}
-                onDelete={() => deleteClient(selectedClient.id)}
                 onEditPayment={(payment) => setEditingPayment(payment)}
                 onDeletePayment={deletePayment}
                 onUploadDocument={handleUploadDocument}
