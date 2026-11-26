@@ -223,10 +223,13 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
           {/* Acciones */}
           {'date' in event && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
               <button
                 type="button"
-                style={actionButtonStyle}
+                style={{
+                  ...actionButtonStyle,
+                  flex: 1,
+                }}
                 onClick={() => onEdit?.(event)}
               >
                 <Icon f7="pencil" size="12px" />
@@ -235,16 +238,34 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
               <button
                 type="button"
-                style={{
-                  ...actionButtonStyle,
-                  color: '#ff6961',
-                  borderColor: 'rgba(255, 69, 58, 0.25)',
-                  backgroundColor: 'rgba(255, 69, 58, 0.08)',
-                }}
+                aria-label="Eliminar evento"
+                title="Eliminar evento"
                 onClick={() => onDelete?.(event)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 30,
+                  height: 30,
+                  padding: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--macos-text, #1c1c1e)',
+                  opacity: 0.75,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'opacity 0.12s ease, transform 0.12s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'scale(1.08)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '0.75';
+                  e.currentTarget.style.transform = 'none';
+                }}
               >
-                <Icon f7="trash" size="12px" />
-                <span>Eliminar</span>
+                <Icon f7="trash" size="15px" />
               </button>
             </div>
           )}
