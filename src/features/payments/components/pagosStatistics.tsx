@@ -5,57 +5,99 @@ interface StatsProps {
   totalIngresos: number;
   totalPendientes: number;
   totalVencidos: number;
+  pendingCount: number;
+  overdueCount: number;
+  completedCount: number;
 }
 
-const statCardStyle: CSSProperties = {
-  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
-  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
-  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.14)',
-  backdropFilter: 'blur(24px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-  borderRadius: 16,
-  minWidth: 0,
-  padding: '16px 20px',
-  userSelect: 'text',
-  WebkitUserSelect: 'text',
+const labelStyle: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 500,
+  letterSpacing: '0.02em',
+  color: 'var(--macos-text-secondary, #8e8e93)',
 };
 
 export const PaymentsStats = ({
   totalIngresos,
   totalPendientes,
   totalVencidos,
+  pendingCount,
+  overdueCount,
+  completedCount,
 }: StatsProps) => (
-  <section
+  <aside
     aria-label="Resumen de pagos"
     style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-      gap: 12,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      gap: 22,
+      userSelect: 'text',
+      WebkitUserSelect: 'text',
     }}
   >
-    {[
-      { label: 'Cobrado', value: formatCLP(totalIngresos) },
-      { label: 'Pendiente', value: formatCLP(totalPendientes) },
-      { label: 'Vencido', value: formatCLP(totalVencidos) },
-    ].map(({ label, value }) => (
-      <article key={label} style={statCardStyle}>
-        <div style={{ fontSize: 12.5, fontWeight: 500, color: 'var(--macos-text-secondary, #8e8e93)' }}>
-          {label}
+    {/* Pendientes en grande arriba */}
+    <div>
+      <div style={labelStyle}>
+        Pendientes{pendingCount > 0 ? ` · ${pendingCount}` : ''}
+      </div>
+      <div
+        style={{
+          marginTop: 4,
+          color: 'var(--macos-text, #ececef)',
+          fontSize: 'clamp(32px, 3.4vw, 44px)',
+          fontWeight: 300,
+          letterSpacing: '-0.03em',
+          lineHeight: 1.05,
+          fontVariantNumeric: 'tabular-nums',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {formatCLP(totalPendientes)}
+      </div>
+    </div>
+
+    {/* Vencidos y Pagados debajo, más pequeños */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div>
+        <div style={labelStyle}>
+          Vencidos{overdueCount > 0 ? ` · ${overdueCount}` : ''}
         </div>
         <div
           style={{
-            marginTop: 6,
+            marginTop: 2,
             color: 'var(--macos-text, #ececef)',
-            fontSize: 'clamp(18px, 2.2vw, 23px)',
-            fontWeight: 550,
-            lineHeight: 1.2,
-            overflowWrap: 'anywhere',
+            opacity: 0.86,
+            fontSize: 21,
+            fontWeight: 350,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
             fontVariantNumeric: 'tabular-nums',
           }}
         >
-          {value}
+          {formatCLP(totalVencidos)}
         </div>
-      </article>
-    ))}
-  </section>
+      </div>
+
+      <div>
+        <div style={labelStyle}>
+          Pagados{completedCount > 0 ? ` · ${completedCount}` : ''}
+        </div>
+        <div
+          style={{
+            marginTop: 2,
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.72,
+            fontSize: 21,
+            fontWeight: 350,
+            letterSpacing: '-0.02em',
+            lineHeight: 1.15,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {formatCLP(totalIngresos)}
+        </div>
+      </div>
+    </div>
+  </aside>
 );

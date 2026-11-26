@@ -27,23 +27,18 @@ function formatPaymentDate(value: string): string {
   }).format(date);
 }
 
-const rowCardStyle = (isHighlighted: boolean): CSSProperties => ({
+const metroRowStyle = (isHighlighted: boolean, isLast: boolean): CSSProperties => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 16,
-  padding: '15px 20px',
-  borderRadius: 14,
-  backgroundColor: isHighlighted
-    ? 'var(--macos-active-bg, rgba(255, 255, 255, 0.1))'
-    : 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
-  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
-  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.14)',
-  backdropFilter: 'blur(24px) saturate(160%)',
-  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  padding: '14px 10px',
+  borderBottom: isLast ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+  backgroundColor: isHighlighted ? 'var(--macos-active-bg, rgba(255, 255, 255, 0.08))' : 'transparent',
+  borderRadius: isHighlighted ? 10 : 0,
   userSelect: 'text',
   WebkitUserSelect: 'text',
-  transition: 'background-color 0.25s ease',
+  transition: 'background-color 0.16s ease',
 });
 
 export const PaymentsTable: FC<TableProps> = ({
@@ -64,10 +59,10 @@ export const PaymentsTable: FC<TableProps> = ({
     return (
       <div
         style={{
-          padding: '44px 16px',
-          textAlign: 'center',
+          padding: '44px 10px',
           color: 'var(--macos-text-secondary, #8e8e93)',
-          fontSize: 13.5,
+          fontSize: 14,
+          fontWeight: 350,
         }}
       >
         No hay pagos que coincidan
@@ -76,25 +71,34 @@ export const PaymentsTable: FC<TableProps> = ({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {payments.map((payment) => {
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <style>{`
+        .wp-payment-row:hover {
+          background-color: var(--macos-hover-bg, rgba(255, 255, 255, 0.035));
+        }
+      `}</style>
+      {payments.map((payment, index) => {
         const isHighlighted = payment.id === highlightedPaymentId;
+        const isLast = index === payments.length - 1;
         return (
           <div
             key={payment.id}
             ref={isHighlighted ? highlightedRowRef : undefined}
             aria-current={isHighlighted ? 'true' : undefined}
-            style={rowCardStyle(isHighlighted)}
+            className="wp-payment-row"
+            style={metroRowStyle(isHighlighted, isLast)}
           >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, minWidth: 0, flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
               <span
                 style={{
-                  fontSize: 16,
-                  fontWeight: 450,
+                  fontSize: 19,
+                  fontWeight: 350,
+                  letterSpacing: '-0.015em',
                   color: 'var(--macos-text, #ececef)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  lineHeight: 1.2,
                 }}
               >
                 {payment.client}
@@ -116,8 +120,8 @@ export const PaymentsTable: FC<TableProps> = ({
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
                 <span
                   style={{
-                    fontSize: 15,
-                    fontWeight: 550,
+                    fontSize: 17,
+                    fontWeight: 400,
                     color: 'var(--macos-text, #ececef)',
                     fontVariantNumeric: 'tabular-nums',
                     whiteSpace: 'nowrap',
