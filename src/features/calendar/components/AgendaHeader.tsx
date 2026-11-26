@@ -3,179 +3,117 @@ import { Icon } from 'framework7-react';
 import { CalendarViewSwitcher } from './CalendarViewSwitcher';
 
 interface AgendaHeaderProps {
-  day: number;
-  monthShort: string;
-  fullDateLabel: string;
+  year: number;
+  monthIndex: number;
+  selectedDay: number;
+  eventDates: ReadonlySet<string>;
   isWeekView: boolean;
-  onPreviousDay: () => void;
   onToggleWeekView: () => void;
-  onNextDay: () => void;
+  onSelectDay?: (day: number) => void;
   onAddEvent: () => void;
-  onToday?: () => void;
 }
 
 export const AgendaHeader: FC<AgendaHeaderProps> = ({
-  day,
-  monthShort,
-  fullDateLabel,
+  year,
+  monthIndex,
+  selectedDay,
+  eventDates,
   isWeekView,
-  onPreviousDay,
   onToggleWeekView,
-  onNextDay,
+  onSelectDay,
   onAddEvent,
-  onToday,
 }) => {
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const monthPadded = String(monthIndex + 1).padStart(2, '0');
+  const rows = [
+    { start: 1, end: 8 },
+    { start: 9, end: 18 },
+    { start: 19, end: daysInMonth },
+  ];
+
   const headerStyle: CSSProperties = {
-    padding: '14px 20px',
-    borderBottom: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.07))',
-    backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.8))',
+    padding: '10px 18px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
+    backgroundColor: 'rgba(255, 255, 255, 0.025)',
     backdropFilter: 'blur(20px)',
     WebkitBackdropFilter: 'blur(20px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
-    flexWrap: 'wrap',
-  };
-
-  const badgeContainerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: 'var(--macos-card-bg, #ffffff)',
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)',
-    flexShrink: 0,
-    overflow: 'hidden',
-  };
-
-  const badgeMonthStyle: CSSProperties = {
-    fontSize: 9,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    color: '#ff3b30',
-    lineHeight: 1,
-    letterSpacing: 0.6,
-    marginBottom: 2,
-  };
-
-  const badgeDayStyle: CSSProperties = {
-    fontSize: 18,
-    fontWeight: 700,
-    color: 'var(--macos-text, #1c1c1e)',
-    lineHeight: 1.1,
-  };
-
-  const macNavButtonStyle: CSSProperties = {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
-    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
-    color: 'var(--macos-text, #1c1c1e)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-    transition: 'all 0.12s ease',
-  };
-
-  const todayButtonStyle: CSSProperties = {
-    height: 28,
-    padding: '0 10px',
-    borderRadius: 6,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
-    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
-    color: 'var(--macos-text, #1c1c1e)',
-    fontSize: 12,
-    fontWeight: 500,
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-    transition: 'all 0.12s ease',
-  };
-
-  const addButtonStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    height: 32,
-    padding: '0 14px',
-    borderRadius: 8,
-    border: 'none',
-    backgroundColor: 'var(--macos-accent-color, #0056b8)',
-    color: 'var(--macos-on-accent, #ffffff)',
-    fontSize: 12.5,
-    fontWeight: 600,
-    cursor: 'pointer',
-    boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
-    transition: 'all 0.12s ease',
   };
 
   return (
     <div style={headerStyle}>
-      {/* ── Izquierda: Insignia de fecha + Título de fecha + Botones Hoy / Flechas ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={badgeContainerStyle}>
-          <span style={badgeMonthStyle}>{monthShort}</span>
-          <span style={badgeDayStyle}>{day}</span>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span
+      {/* ── Izquierda: Puntos en tres filas tipo escalera por cada día del mes ── */}
+      <div
+        className="cal-step-anim"
+        key={`${year}-${monthIndex}`}
+        role="group"
+        aria-label="Días del mes"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 5,
+          minWidth: 0,
+        }}
+      >
+        {rows.map((row, rowIndex) => (
+          <div
+            key={rowIndex}
             style={{
-              fontSize: 17,
-              fontWeight: 650,
-              color: 'var(--macos-text, #1c1c1e)',
-              lineHeight: 1.3,
-              letterSpacing: '-0.01em',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
             }}
           >
-            {fullDateLabel}
-          </span>
-        </div>
+            {Array.from({ length: Math.max(0, row.end - row.start + 1) }, (_, idx) => {
+              const dayNum = row.start + idx;
+              const dateKey = `${year}-${monthPadded}-${String(dayNum).padStart(2, '0')}`;
+              const hasEvent = eventDates.has(dateKey);
+              const isFilled = dayNum <= selectedDay;
+              const isCurrentDay = dayNum === selectedDay;
 
-        {/* Grupo de navegación: Hoy, ‹, › */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 8 }}>
-          {onToday && (
-            <button
-              type="button"
-              onClick={onToday}
-              style={todayButtonStyle}
-              title="Ir al día actual"
-            >
-              Hoy
-            </button>
-          )}
+              const dotColor = hasEvent
+                ? '#ff3b30'
+                : isFilled
+                ? 'var(--macos-text, #ececef)'
+                : 'rgba(255, 255, 255, 0.16)';
 
-          <button
-            type="button"
-            onClick={onPreviousDay}
-            style={macNavButtonStyle}
-            aria-label="Periodo anterior"
-            title="Periodo anterior"
-          >
-            <Icon f7="chevron_left" size="12px" />
-          </button>
-
-          <button
-            type="button"
-            onClick={onNextDay}
-            style={macNavButtonStyle}
-            aria-label="Periodo siguiente"
-            title="Periodo siguiente"
-          >
-            <Icon f7="chevron_right" size="12px" />
-          </button>
-        </div>
+              return (
+                <button
+                  key={dayNum}
+                  type="button"
+                  onClick={() => onSelectDay?.(dayNum)}
+                  title={`Día ${dayNum}${hasEvent ? ' • Con eventos' : ''}`}
+                  aria-label={`Día ${dayNum}${hasEvent ? ', tiene eventos' : ''}`}
+                  aria-pressed={isCurrentDay}
+                  style={{
+                    width: isCurrentDay ? 8 : 6,
+                    height: isCurrentDay ? 8 : 6,
+                    padding: 0,
+                    border: 'none',
+                    borderRadius: '50%',
+                    backgroundColor: dotColor,
+                    opacity: hasEvent ? (isFilled ? 1 : 0.72) : isFilled ? (isCurrentDay ? 1 : 0.78) : 1,
+                    boxShadow: hasEvent
+                      ? '0 0 6px rgba(255, 59, 48, 0.5)'
+                      : isCurrentDay
+                      ? '0 0 0 2px rgba(255, 255, 255, 0.2)'
+                      : 'none',
+                    cursor: onSelectDay ? 'pointer' : 'default',
+                    transition: 'all 0.16s cubic-bezier(0.16, 1, 0.3, 1)',
+                    flexShrink: 0,
+                  }}
+                />
+              );
+            })}
+          </div>
+        ))}
       </div>
 
-      {/* ── Derecha: Segmented Control (Día | Semana) + Botón Añadir Evento ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* ── Derecha: Píldora Día / Semana + Icono + grande ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
         <CalendarViewSwitcher
           isWeekView={isWeekView}
           onToggleWeekView={(isWeek) => {
@@ -188,10 +126,34 @@ export const AgendaHeader: FC<AgendaHeaderProps> = ({
         <button
           type="button"
           onClick={onAddEvent}
-          style={addButtonStyle}
+          aria-label="Añadir evento"
+          title="Añadir evento"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 34,
+            height: 34,
+            padding: 0,
+            border: 'none',
+            outline: 'none',
+            backgroundColor: 'transparent',
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.85,
+            cursor: 'pointer',
+            transition: 'opacity 0.14s ease, transform 0.14s ease',
+            flexShrink: 0,
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.opacity = '1';
+            e.currentTarget.style.transform = 'scale(1.08)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.opacity = '0.85';
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
         >
-          <Icon f7="plus" size="13px" style={{ strokeWidth: 2 }} />
-          <span>Añadir evento</span>
+          <Icon f7="plus" size="24px" />
         </button>
       </div>
     </div>

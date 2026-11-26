@@ -1,15 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { Button, Icon } from 'framework7-react';
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react';
+import { Icon } from 'framework7-react';
 import type { Client } from '../../clients/types';
 import type { Payment } from '../types';
-import { APP_COLORS } from '../../../core/theme/style';
-import {
-  PAYMENT_ACTION_BUTTON_STYLE,
-  PAYMENT_CONTROL_STYLE,
-  PAYMENT_FIELD_STYLE,
-  PAYMENT_LABEL_STYLE,
-  PAYMENT_MODAL_FOOTER_STYLE,
-} from '../styles';
+import { EventDatePicker } from '../../calendar/components/EventDateTimePickers';
 import {
   formatPaymentDate,
   getTodayInputValue,
@@ -24,6 +17,32 @@ interface PaymentFormProps {
   onUpdate?: (payment: Payment, data: Omit<Payment, 'id' | 'client' | 'clientId'>) => void;
 }
 
+const fieldStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+  marginBottom: 14,
+};
+
+const labelStyle: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 550,
+  color: 'var(--macos-text-secondary, #a4a4ab)',
+};
+
+const controlStyle: CSSProperties = {
+  width: '100%',
+  boxSizing: 'border-box',
+  height: 38,
+  padding: '0 12px',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.2))',
+  borderRadius: 10,
+  backgroundColor: 'var(--macos-input-bg, rgba(128, 128, 136, 0.1))',
+  color: 'var(--macos-text, #ececef)',
+  fontSize: 13.5,
+  outline: 'none',
+};
+
 export function PaymentForm({
   clients,
   payment,
@@ -36,7 +55,7 @@ export function PaymentForm({
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState(getTodayInputValue);
   const [status, setStatus] = useState<Payment['status']>('pending');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<'clientId' | 'concept' | 'amount' | 'date', string>>>({});
 
   useEffect(() => {
     setClientId(payment?.clientId ? String(payment.clientId) : clients[0] ? String(clients[0].id) : '');
@@ -44,30 +63,35 @@ export function PaymentForm({
     setAmount(payment ? String(payment.amount) : '');
     setDate(payment ? toDateInputValue(payment.date) : getTodayInputValue());
     setStatus(payment?.status ?? 'pending');
-    setErrorMessage('');
+    setFieldErrors({});
   }, [clients, payment]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const client = clients.find((item) => String(item.id) === clientId);
     const numericAmount = Number(amount);
+    const nextErrors: Partial<Record<'clientId' | 'concept' | 'amount' | 'date', string>> = {};
 
     if (!client) {
-      setErrorMessage('Selecciona un cliente para registrar el pago.');
-      return;
+      nextErrors.clientId = 'Selecciona un cliente para registrar el pago.';
     }
     if (!concept.trim()) {
-      setErrorMessage('Ingresa el concepto del pago.');
-      return;
+      nextErrors.concept = 'Ingresa el concepto del pago.';
     }
-    if (!Number.isSafeInteger(numericAmount) || numericAmount <= 0) {
-      setErrorMessage('Ingresa un monto entero mayor a cero.');
-      return;
+    if (!amount.trim()) {
+      nextErrors.amount = 'Ingresa el monto del pago.';
+    } else if (!Number.isSafeInteger(numericAmount) || numericAmount <= 0) {
+      nextErrors.amount = 'Ingresa un monto entero mayor a cero.';
     }
     if (!date) {
-      setErrorMessage('Selecciona la fecha del pago.');
+      nextErrors.date = 'Selecciona la fecha del pago.';
+    }
+
+    if (Object.keys(nextErrors).length > 0 || !client) {
+      setFieldErrors(nextErrors);
       return;
     }
+    setFieldErrors({});
 
     const data = {
       concept: concept.trim(),
@@ -85,134 +109,202 @@ export function PaymentForm({
 
   return (
     <form
+      noValidate
       onSubmit={handleSubmit}
       style={{
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        maxHeight: 'min(640px, calc(100vh - 40px))',
+        maxHeight: 'min(620px, calc(100vh - 40px))',
         minHeight: 0,
         overflow: 'hidden',
       }}
     >
-      <div style={{ padding: '22px 24px 14px', flexShrink: 0, borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))' }}>
-        <h2 style={{ margin: 0, color: 'var(--macos-text, #1c1c1e)', fontSize: 21, fontWeight: 700 }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 12,
+          padding: '18px 24px 12px',
+          borderBottom: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.12))',
+          flexShrink: 0,
+        }}
+      >
+        <h2 style={{ margin: 0, color: 'var(--macos-text, #ececef)', fontSize: 17, fontWeight: 600 }}>
           {payment ? 'Editar pago' : 'Registrar pago'}
         </h2>
-        <p style={{ margin: '6px 0 0', color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 13 }}>
-          {payment ? 'Actualiza los datos de esta transacción.' : 'Agrega una nueva transacción sin modificar los pagos existentes.'}
-        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          style={{
+            width: 28,
+            height: 28,
+            border: 'none',
+            background: 'transparent',
+            color: 'var(--macos-text-secondary, #a4a4ab)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <Icon f7="xmark" size="15px" />
+        </button>
       </div>
 
-      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '18px 24px 20px', backgroundColor: 'var(--macos-modal-bg, #ffffff)' }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px 24px 12px' }}>
         {!payment && (
-          <div style={PAYMENT_FIELD_STYLE}>
-            <label htmlFor="payment-client" style={PAYMENT_LABEL_STYLE}>Cliente</label>
+          <div style={fieldStyle}>
+            <label htmlFor="payment-client" style={labelStyle}>Cliente</label>
             <select
               id="payment-client"
-              required
               value={clientId}
-              onChange={(event) => setClientId(event.target.value)}
-              style={PAYMENT_CONTROL_STYLE}
+              onChange={(event) => {
+                setClientId(event.target.value);
+                if (fieldErrors.clientId) setFieldErrors((prev) => ({ ...prev, clientId: undefined }));
+              }}
+              style={{
+                ...controlStyle,
+                borderColor: fieldErrors.clientId ? 'rgba(255, 69, 58, 0.6)' : undefined,
+              }}
             >
               <option value="" disabled>Seleccionar cliente</option>
               {clients.map((client) => (
                 <option key={client.id} value={client.id}>{client.name}</option>
               ))}
             </select>
+            {fieldErrors.clientId && (
+              <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.clientId}</span>
+            )}
           </div>
         )}
 
-        <div style={PAYMENT_FIELD_STYLE}>
-          <label htmlFor="payment-concept" style={PAYMENT_LABEL_STYLE}>Concepto</label>
+        <div style={fieldStyle}>
+          <label htmlFor="payment-concept" style={labelStyle}>Concepto</label>
           <input
             id="payment-concept"
-            required
             maxLength={120}
             value={concept}
-            onChange={(event) => setConcept(event.target.value)}
+            onChange={(event) => {
+              setConcept(event.target.value);
+              if (fieldErrors.concept) setFieldErrors((prev) => ({ ...prev, concept: undefined }));
+            }}
             placeholder="Ej.: Asesoría jurídica"
-            style={PAYMENT_CONTROL_STYLE}
+            style={{
+              ...controlStyle,
+              borderColor: fieldErrors.concept ? 'rgba(255, 69, 58, 0.6)' : undefined,
+            }}
           />
+          {fieldErrors.concept && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.concept}</span>
+          )}
         </div>
 
-        <div style={PAYMENT_FIELD_STYLE}>
-          <label htmlFor="payment-amount" style={PAYMENT_LABEL_STYLE}>Monto (CLP)</label>
+        <div style={fieldStyle}>
+          <label htmlFor="payment-amount" style={labelStyle}>Monto (CLP)</label>
           <input
             id="payment-amount"
-            required
             type="number"
             min="1"
             step="1"
             value={amount}
-            onChange={(event) => setAmount(event.target.value)}
+            onChange={(event) => {
+              setAmount(event.target.value);
+              if (fieldErrors.amount) setFieldErrors((prev) => ({ ...prev, amount: undefined }));
+            }}
             placeholder="Ej.: 150000"
-            style={PAYMENT_CONTROL_STYLE}
+            style={{
+              ...controlStyle,
+              borderColor: fieldErrors.amount ? 'rgba(255, 69, 58, 0.6)' : undefined,
+            }}
           />
+          {fieldErrors.amount && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.amount}</span>
+          )}
         </div>
 
-        <div style={PAYMENT_FIELD_STYLE}>
-          <label htmlFor="payment-date" style={PAYMENT_LABEL_STYLE}>Fecha</label>
-          <input
+        <div style={fieldStyle}>
+          <span style={labelStyle}>Fecha</span>
+          <EventDatePicker
             id="payment-date"
-            required
-            type="date"
             value={date}
-            onChange={(event) => setDate(event.target.value)}
-            style={PAYMENT_CONTROL_STYLE}
+            onChange={(val) => {
+              setDate(val);
+              if (fieldErrors.date) setFieldErrors((prev) => ({ ...prev, date: undefined }));
+            }}
           />
+          {fieldErrors.date && (
+            <span role="alert" style={{ color: '#ff6961', fontSize: 11.5 }}>{fieldErrors.date}</span>
+          )}
         </div>
 
-        <div style={{ ...PAYMENT_FIELD_STYLE, marginBottom: 0 }}>
-          <label htmlFor="payment-status" style={PAYMENT_LABEL_STYLE}>Estado</label>
+        <div style={{ ...fieldStyle, marginBottom: 0 }}>
+          <label htmlFor="payment-status" style={labelStyle}>Estado</label>
           <select
             id="payment-status"
             value={status}
             onChange={(event) => setStatus(event.target.value as Payment['status'])}
-            style={PAYMENT_CONTROL_STYLE}
+            style={controlStyle}
           >
             <option value="pending">Pendiente</option>
             <option value="completed">Cobrado</option>
             <option value="overdue">Vencido</option>
           </select>
         </div>
-
-        {errorMessage && (
-          <p role="alert" style={{ color: APP_COLORS.danger, fontSize: 13, margin: '14px 0 0' }}>
-            {errorMessage}
-          </p>
-        )}
       </div>
 
-      <div style={PAYMENT_MODAL_FOOTER_STYLE}>
-        <Button
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          gap: 10,
+          padding: '14px 24px',
+          borderTop: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.12))',
+          flexShrink: 0,
+        }}
+      >
+        <button
           type="button"
           onClick={onClose}
           style={{
-            ...PAYMENT_ACTION_BUTTON_STYLE,
-            border: '1px solid var(--macos-card-border, #d1d1d6)',
-            backgroundColor: 'var(--macos-input-bg, #ffffff)',
-            color: 'var(--macos-text, #1c1c1e)',
+            width: 'auto',
+            minWidth: 'auto',
+            height: 32,
+            padding: '0 14px',
+            borderRadius: 999,
+            border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.06))',
+            color: 'var(--macos-text, #ececef)',
+            fontSize: 12.5,
+            fontWeight: 500,
+            cursor: 'pointer',
           }}
         >
           Cancelar
-        </Button>
-        <Button
+        </button>
+        <button
           type="submit"
-          fill
           disabled={clients.length === 0}
           style={{
-            ...PAYMENT_ACTION_BUTTON_STYLE,
-            backgroundColor: APP_COLORS.primary,
-            color: APP_COLORS.white,
+            width: 'auto',
+            minWidth: 'auto',
+            height: 32,
+            padding: '0 16px',
+            borderRadius: 999,
+            border: '1px solid rgba(255, 255, 255, 0.14)',
+            backgroundColor: 'var(--macos-text, #ececef)',
+            color: 'var(--macos-canvas-bg, #18181a)',
+            fontSize: 12.5,
             fontWeight: 600,
-            padding: '0 18px',
-            boxShadow: '0 2px 6px rgba(0, 122, 255, 0.35)',
+            cursor: clients.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: clients.length === 0 ? 0.5 : 1,
           }}
         >
-          <Icon f7={payment ? 'checkmark' : 'plus'} size="14px" className="margin-right-half" />
-          {payment ? 'Guardar cambios' : 'Guardar pago'}
-        </Button>
+          {payment ? 'Guardar cambios' : 'Guardar'}
+        </button>
       </div>
     </form>
   );

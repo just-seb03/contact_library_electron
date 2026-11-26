@@ -28,13 +28,13 @@ export const SettingsGroup: React.FC<SettingsGroupProps> = ({
   };
 
   const cardStyle: CSSProperties = {
-    backgroundColor: 'var(--macos-card-bg, rgba(255, 255, 255, 0.85))',
-    borderRadius: 12,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.07))',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
+    borderRadius: 16,
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
     overflow: 'hidden',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   };
 
   const footerStyle: CSSProperties = {

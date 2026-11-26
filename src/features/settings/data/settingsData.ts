@@ -118,7 +118,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   soundEffects: true,
   themeId: 'default',
   minimizeToTray: true,
-  accentColor: 'blue',
+  accentColor: 'graphite',
   lawyerName: 'Sebastián Contreras',
   lawyerEmail: 's.contreras@estudiojuridico.cl',
   lawyerFirm: 'Contreras & Asociados • Derecho Civil y Litigios',

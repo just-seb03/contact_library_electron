@@ -1,45 +1,29 @@
-import { useState, useEffect, type FC, type CSSProperties } from 'react';
+import { useState, useEffect, useRef, useMemo, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { HearingEvent } from '../../../core/context/types';
 import type { CalendarEvent } from '../types';
 import { getCalendarEventColor } from '../data/eventColors';
+import { groupDayOverlaps } from '../utils/timelineLayout';
 
 interface AgendaTimelineProps {
   todayHearings: HearingEvent[];
   calendarEvents: CalendarEvent[];
   onSelectEvent: (event: CalendarEvent | HearingEvent) => void;
+  onCreateAtSlot?: (date: Date, startTime: string, endTime: string) => void;
   selectedDate?: Date;
 }
 
-const HOURS = Array.from({ length: 24 }, (_, hour) => hour);
-const HOUR_HEIGHT = 68;
+const HALF_HOURS = Array.from({ length: 48 }, (_, index) => index);
+const HALF_HOUR_HEIGHT = 44;
+const HOUR_HEIGHT = HALF_HOUR_HEIGHT * 2;
 const HOUR_COLUMN_WIDTH = 74;
 const EVENT_LEFT = HOUR_COLUMN_WIDTH + 14;
+const TIMELINE_TOP_PADDING = 6;
 
 function formatMinutesOfDay(minutes: number, formatter: Intl.DateTimeFormat): string {
   const time = new Date(2000, 0, 1);
   time.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
   return formatter.format(time);
-}
-
-function formatHour(hour: number, formatter: Intl.DateTimeFormat): string {
-  return formatMinutesOfDay(hour * 60, formatter);
-}
-
-function parseTimeToHour(timeStr: string): number {
-  const match = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
-  if (!match) return 9;
-  let hour = parseInt(match[1], 10);
-  const minutes = parseInt(match[2], 10);
-  const period = match[3].toUpperCase();
-  if (period === 'PM' && hour !== 12) hour += 12;
-  if (period === 'AM' && hour === 12) hour = 0;
-  return hour + minutes / 60;
-}
-
-function parseClockTime(time: string): number {
-  const [hours, minutes] = time.split(':').map(Number);
-  return hours + minutes / 60;
 }
 
 function formatClockTime(time: string, formatter: Intl.DateTimeFormat): string {
@@ -51,11 +35,13 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   todayHearings,
   calendarEvents,
   onSelectEvent,
+  onCreateAtSlot,
   selectedDate = new Date(),
 }) => {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const hasMountedRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
-  // Actualizador en tiempo real de la hora actual de Apple
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 30000);
     return () => clearInterval(timer);
@@ -77,45 +63,67 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     selectedDate.getMonth() === currentTime.getMonth() &&
     selectedDate.getFullYear() === currentTime.getFullYear();
 
-  const currentHourDecimal = currentTime.getHours() + currentTime.getMinutes() / 60;
-  const nowLineTop = currentHourDecimal * HOUR_HEIGHT;
+  const currentDecimalHour = currentTime.getHours() + currentTime.getMinutes() / 60;
+  const currentLineTop = TIMELINE_TOP_PADDING + currentDecimalHour * HOUR_HEIGHT;
+
+  const clusters = useMemo(
+    () => groupDayOverlaps(todayHearings, calendarEvents, 0.75),
+    [todayHearings, calendarEvents]
+  );
+
+  const selectedDayKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
+
+  // Al iniciar o al cambiar de día, desplazar al evento más cercano (o a la hora actual/08:00)
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      const scrollParent = rootRef.current?.closest('.card-content') ?? rootRef.current?.parentElement;
+      if (!scrollParent) return;
+
+      let targetHour: number;
+      if (clusters.length > 0) {
+        const now = new Date();
+        const nowDecimal = now.getHours() + now.getMinutes() / 60;
+        const nearest = isToday
+          ? clusters.find((c) => c.endHour >= nowDecimal) ?? clusters[0]
+          : clusters[0];
+        targetHour = nearest.startHour;
+      } else if (isToday) {
+        const now = new Date();
+        targetHour = now.getHours() + now.getMinutes() / 60;
+      } else {
+        targetHour = 8;
+      }
+
+      const targetTop = Math.max(0, targetHour * HOUR_HEIGHT - 90);
+      if (hasMountedRef.current && typeof scrollParent.scrollTo === 'function') {
+        scrollParent.scrollTo({ top: targetTop, behavior: 'smooth' });
+      } else {
+        scrollParent.scrollTop = targetTop;
+      }
+      hasMountedRef.current = true;
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, [selectedDayKey, clusters, isToday]);
 
   const containerStyle: CSSProperties = {
     position: 'relative',
-    minHeight: HOURS.length * HOUR_HEIGHT,
-    paddingTop: 8,
+    height: HALF_HOURS.length * HALF_HOUR_HEIGHT + TIMELINE_TOP_PADDING,
+    paddingTop: TIMELINE_TOP_PADDING,
+    boxSizing: 'border-box',
     userSelect: 'none',
   };
 
-  const hourRowStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'flex-start',
-    height: HOUR_HEIGHT,
-  };
-
-  const hourLabelStyle: CSSProperties = {
-    position: 'relative',
-    zIndex: 2,
-    width: HOUR_COLUMN_WIDTH,
-    boxSizing: 'border-box',
-    flexShrink: 0,
-    fontSize: 11,
-    fontWeight: 500,
-    color: 'var(--macos-text-secondary, #8e8e93)',
-    textAlign: 'center',
-    transform: 'translateY(-7px)',
-    fontVariantNumeric: 'tabular-nums',
-  };
-
-  const hourCellStyle: CSSProperties = {
-    flex: 1,
-    height: '100%',
-    position: 'relative',
-    borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-  };
-
   return (
-    <div style={containerStyle}>
+    <div ref={rootRef} style={containerStyle}>
+      <style>{`
+        .day-half-slot:hover {
+          background-color: var(--macos-hover-bg, rgba(128, 128, 136, 0.08)) !important;
+        }
+        .day-cluster-item:hover {
+          background-color: var(--macos-hover-bg, rgba(255, 255, 255, 0.08)) !important;
+        }
+      `}</style>
+
       {/* Fondo tenue de la columna horaria */}
       <div
         style={{
@@ -125,234 +133,436 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
           left: 0,
           width: HOUR_COLUMN_WIDTH,
           backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.015))',
-          borderRight: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
+          borderRight: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
           pointerEvents: 'none',
           zIndex: 1,
         }}
       />
 
-      {/* Filas horarias */}
-      {HOURS.map((hour) => (
-        <div key={hour} style={hourRowStyle}>
-          <div style={hourLabelStyle}>{formatHour(hour, hourFormatter)}</div>
-          <div style={hourCellStyle} />
-        </div>
-      ))}
+      {/* Filas cada 30 minutos (00:00, 00:30, 01:00, 01:30...) */}
+      {HALF_HOURS.map((slotIndex) => {
+        const hour = Math.floor(slotIndex / 2);
+        const isHalf = slotIndex % 2 === 1;
+        const startMins = slotIndex * 30;
+        const endMins = slotIndex === 47 ? 23 * 60 + 59 : (slotIndex + 1) * 30;
+        const slotStart = `${String(hour).padStart(2, '0')}:${isHalf ? '30' : '00'}`;
+        const slotEnd = `${String(Math.floor(endMins / 60)).padStart(2, '0')}:${String(endMins % 60).padStart(2, '0')}`;
 
-      {/* ── Indicador de Hora Actual estilo Apple Calendar (Apple Red) ── */}
+        return (
+          <div
+            key={slotIndex}
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              height: HALF_HOUR_HEIGHT,
+            }}
+          >
+            <div
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                width: HOUR_COLUMN_WIDTH,
+                boxSizing: 'border-box',
+                flexShrink: 0,
+                fontSize: isHalf ? 10 : 11,
+                fontWeight: isHalf ? 400 : 550,
+                color: 'var(--macos-text-secondary, #8e8e93)',
+                opacity: isHalf ? 0.65 : 1,
+                textAlign: 'center',
+                transform: 'translateY(-7px)',
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {slotIndex === 0 ? '' : formatMinutesOfDay(startMins, hourFormatter)}
+            </div>
+
+            <button
+              type="button"
+              className={onCreateAtSlot ? 'day-half-slot' : undefined}
+              aria-label={`Crear evento a las ${formatMinutesOfDay(startMins, hourFormatter)}`}
+              onClick={() => onCreateAtSlot?.(selectedDate, slotStart, slotEnd)}
+              style={{
+                flex: 1,
+                height: '100%',
+                position: 'relative',
+                padding: 0,
+                border: 'none',
+                borderTop: isHalf
+                  ? '1px dashed var(--macos-divider, rgba(128, 128, 136, 0.11))'
+                  : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.16))',
+                backgroundColor: 'transparent',
+                cursor: onCreateAtSlot ? 'pointer' : 'default',
+                transition: 'background-color 0.12s ease',
+              }}
+            />
+          </div>
+        );
+      })}
+
+      {/* ── Capa de eventos y audiencias (estética glass grafito, agrupados si coinciden) ── */}
+      <div
+        style={{
+          position: 'absolute',
+          left: EVENT_LEFT,
+          right: 16,
+          top: 0,
+          bottom: 0,
+          pointerEvents: 'none',
+          zIndex: 2,
+        }}
+      >
+        {clusters.map((cluster) => {
+          const overlapsLine =
+            isToday && Math.abs(cluster.startHour - currentDecimalHour) < 0.35;
+          const duration = Math.max(cluster.endHour - cluster.startHour, 0.5);
+          const minHeight =
+            cluster.items.length > 1
+              ? Math.max(duration * HOUR_HEIGHT - 2, cluster.items.length * 32 + 16)
+              : Math.max(duration * HOUR_HEIGHT - 2, 42);
+
+          if (cluster.items.length === 1) {
+            const entry = cluster.items[0];
+            if (entry.kind === 'hearing') {
+              const { hearing } = entry;
+              return (
+                <button
+                  type="button"
+                  key={cluster.id}
+                  aria-label={`Audiencia: ${hearing.clientName}, ${hearing.timeStr}`}
+                  onClick={() => onSelectEvent(hearing)}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    right: 0,
+                    top: TIMELINE_TOP_PADDING + cluster.startHour * HOUR_HEIGHT,
+                    height: Math.max(minHeight, 58),
+                    borderRadius: 10,
+                    padding: overlapsLine ? '8px 94px 8px 12px' : '8px 12px',
+                    zIndex: 3,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    pointerEvents: 'auto',
+                    border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.1))',
+                    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.055))',
+                    boxShadow: '0 4px 14px rgba(0, 0, 0, 0.16)',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
+                    backdropFilter: 'blur(20px) saturate(150%)',
+                    WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                    transition: 'transform 0.12s ease, border-color 0.12s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-1px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'none';
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      <span
+                        style={{
+                          width: 7,
+                          height: 7,
+                          borderRadius: '50%',
+                          backgroundColor: '#ff453a',
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 13,
+                          fontWeight: 600,
+                          color: 'var(--macos-text, #ececef)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {hearing.clientName}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                        padding: '2px 7px',
+                        borderRadius: 999,
+                        border: '1px solid rgba(255, 69, 58, 0.35)',
+                        backgroundColor: 'rgba(255, 69, 58, 0.12)',
+                        color: '#ff6961',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.03em',
+                        flexShrink: 0,
+                      }}
+                    >
+                      Audiencia
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      fontSize: 11.5,
+                      color: 'var(--macos-text-secondary, #a4a4ab)',
+                      marginTop: 4,
+                      paddingLeft: 15,
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    <span style={{ fontWeight: 550, flexShrink: 0 }}>{hearing.timeStr}</span>
+                    {hearing.materia && (
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {hearing.materia}
+                      </span>
+                    )}
+                    {hearing.juzgado && (
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', opacity: 0.85 }}>
+                        • {hearing.juzgado}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            }
+
+            const { event } = entry;
+            const color = getCalendarEventColor(event.colorId);
+
+            return (
+              <button
+                type="button"
+                key={cluster.id}
+                aria-label={`${event.title}, ${formatClockTime(event.startTime, eventTimeFormatter)} a ${formatClockTime(event.endTime, eventTimeFormatter)}`}
+                onClick={() => onSelectEvent(event)}
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: TIMELINE_TOP_PADDING + cluster.startHour * HOUR_HEIGHT,
+                  height: minHeight,
+                  borderRadius: 10,
+                  padding: overlapsLine ? '6px 94px 6px 12px' : '6px 12px',
+                  zIndex: 2,
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  pointerEvents: 'auto',
+                  border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.1))',
+                  backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.055))',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.16)',
+                  textAlign: 'left',
+                  fontFamily: 'inherit',
+                  backdropFilter: 'blur(20px) saturate(150%)',
+                  WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                  transition: 'transform 0.12s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'none';
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <span
+                    style={{
+                      width: 7,
+                      height: 7,
+                      borderRadius: '50%',
+                      backgroundColor: color.accent,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'var(--macos-text, #ececef)',
+                      lineHeight: 1.25,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {event.title}
+                  </span>
+                </div>
+
+                <div
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 500,
+                    color: 'var(--macos-text-secondary, #a4a4ab)',
+                    marginTop: 3,
+                    paddingLeft: 15,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <Icon f7="clock" size="11px" style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {formatClockTime(event.startTime, eventTimeFormatter)} – {formatClockTime(event.endTime, eventTimeFormatter)}
+                  </span>
+                </div>
+              </button>
+            );
+          }
+
+          // Cuadro conjunto cuando coinciden dos o más eventos/audiencias
+          return (
+            <div
+              key={cluster.id}
+              style={{
+                position: 'absolute',
+                left: 0,
+                right: 0,
+                top: TIMELINE_TOP_PADDING + cluster.startHour * HOUR_HEIGHT,
+                minHeight,
+                borderRadius: 10,
+                padding: overlapsLine ? '6px 94px 6px 8px' : '6px 8px',
+                zIndex: 3,
+                pointerEvents: 'auto',
+                border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.11))',
+                backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.055))',
+                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.18)',
+                backdropFilter: 'blur(20px) saturate(150%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(150%)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2,
+                boxSizing: 'border-box',
+              }}
+            >
+              {cluster.items.map((entry) => {
+                const isHearing = entry.kind === 'hearing';
+                const title = isHearing ? entry.hearing.clientName : entry.event.title;
+                const dotColor = isHearing
+                  ? '#ff453a'
+                  : getCalendarEventColor(entry.event.colorId).accent;
+                const timeLabel = isHearing
+                  ? entry.hearing.timeStr
+                  : `${formatClockTime(entry.event.startTime, eventTimeFormatter)} – ${formatClockTime(entry.event.endTime, eventTimeFormatter)}`;
+
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    className="day-cluster-item"
+                    onClick={() => onSelectEvent(isHearing ? entry.hearing : entry.event)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                      width: '100%',
+                      padding: '4px 8px',
+                      borderRadius: 6,
+                      border: 'none',
+                      backgroundColor: 'transparent',
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontFamily: 'inherit',
+                      transition: 'background-color 0.12s ease',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: '50%',
+                          backgroundColor: dotColor,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          fontWeight: 600,
+                          color: 'var(--macos-text, #ececef)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {title}
+                      </span>
+                    </div>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--macos-text-secondary, #a4a4ab)',
+                        flexShrink: 0,
+                        fontVariantNumeric: 'tabular-nums',
+                      }}
+                    >
+                      {timeLabel}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Línea única de hora actual + píldora "estás aquí" (sin doble borde) ── */}
       {isToday && (
         <div
+          aria-hidden="true"
           style={{
             position: 'absolute',
-            left: HOUR_COLUMN_WIDTH - 5,
-            right: 12,
-            top: nowLineTop,
-            zIndex: 10,
+            left: HOUR_COLUMN_WIDTH + 6,
+            right: 10,
+            top: currentLineTop,
+            zIndex: 4,
             pointerEvents: 'none',
             display: 'flex',
             alignItems: 'center',
+            transform: 'translateY(-50%)',
           }}
         >
-          {/* Círculo indicador */}
           <div
             style={{
-              width: 10,
-              height: 10,
+              width: 7,
+              height: 7,
               borderRadius: '50%',
-              backgroundColor: '#ff3b30',
-              boxShadow: '0 0 6px rgba(255, 59, 48, 0.5)',
+              backgroundColor: 'var(--macos-text-secondary, #8e8e93)',
               flexShrink: 0,
             }}
           />
-          {/* Línea horizontal continua */}
           <div
             style={{
               flex: 1,
-              height: 2,
-              backgroundColor: '#ff3b30',
-              borderRadius: 1,
+              height: 1.5,
+              backgroundColor: 'var(--macos-text-secondary, rgba(142, 142, 147, 0.55))',
             }}
           />
+          <span
+            style={{
+              fontFamily: 'Georgia, "Times New Roman", serif',
+              fontStyle: 'italic',
+              fontSize: 11.5,
+              color: 'var(--macos-text, #ececef)',
+              backgroundColor: 'var(--macos-modal-bg, #242428)',
+              border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.3))',
+              borderRadius: 999,
+              padding: '1px 8px',
+              marginLeft: 6,
+              opacity: 0.92,
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.16)',
+            }}
+          >
+            estás aquí
+          </span>
         </div>
       )}
-
-      {/* ── Chips de Audiencias (Judiciales) ── */}
-      {todayHearings.map((hearing) => {
-        const hourDecimal = parseTimeToHour(hearing.timeStr);
-        const eventHeight = Math.max(HOUR_HEIGHT * 1.15, 60);
-
-        return (
-          <button
-            type="button"
-            key={hearing.id}
-            aria-label={`Audiencia: ${hearing.clientName}, ${hearing.timeStr}`}
-            onClick={() => onSelectEvent(hearing)}
-            style={{
-              position: 'absolute',
-              left: EVENT_LEFT,
-              right: 16,
-              top: hourDecimal * HOUR_HEIGHT,
-              height: eventHeight,
-              borderRadius: 8,
-              padding: '8px 12px',
-              zIndex: 3,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              border: 'none',
-              borderLeft: '4px solid #ff3b30',
-              backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.12))',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
-              textAlign: 'left',
-              fontFamily: 'inherit',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              transition: 'transform 0.12s ease, box-shadow 0.12s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 59, 48, 0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.04)';
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 650,
-                  color: 'var(--macos-text, #1c1c1e)',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {hearing.clientName}
-              </div>
-              <span
-                style={{
-                  fontSize: 10.5,
-                  fontWeight: 700,
-                  padding: '1px 6px',
-                  borderRadius: 4,
-                  backgroundColor: 'rgba(255, 59, 48, 0.2)',
-                  color: '#ff3b30',
-                  textTransform: 'uppercase',
-                  flexShrink: 0,
-                }}
-              >
-                Audiencia
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                fontSize: 11.5,
-                color: 'var(--macos-text-muted, #555558)',
-                marginTop: 4,
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Icon f7="clock_fill" size="12px" style={{ color: '#ff3b30' }} />
-                <span style={{ fontWeight: 600 }}>{hearing.timeStr}</span>
-              </div>
-              {hearing.materia && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Icon f7="briefcase_fill" size="12px" style={{ opacity: 0.7 }} />
-                  <span>{hearing.materia}</span>
-                </div>
-              )}
-              {hearing.juzgado && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Icon f7="building_columns_fill" size="12px" style={{ opacity: 0.7 }} />
-                  <span>{hearing.juzgado}</span>
-                </div>
-              )}
-            </div>
-          </button>
-        );
-      })}
-
-      {/* ── Chips de Eventos Regulares (Apple Translucent Cards) ── */}
-      {calendarEvents.map((event) => {
-        const hourDecimal = parseClockTime(event.startTime);
-        const duration = Math.max(parseClockTime(event.endTime) - hourDecimal, 0.5);
-        const eventHeight = Math.max(duration * HOUR_HEIGHT, 48);
-        const color = getCalendarEventColor(event.colorId);
-
-        return (
-          <button
-            type="button"
-            key={event.id}
-            aria-label={`${event.title}, ${formatClockTime(event.startTime, eventTimeFormatter)} a ${formatClockTime(event.endTime, eventTimeFormatter)}`}
-            onClick={() => onSelectEvent(event)}
-            style={{
-              position: 'absolute',
-              left: EVENT_LEFT,
-              right: 16,
-              top: hourDecimal * HOUR_HEIGHT,
-              height: eventHeight,
-              borderRadius: 8,
-              padding: '6px 12px',
-              zIndex: 2,
-              overflow: 'hidden',
-              cursor: 'pointer',
-              border: 'none',
-              borderLeft: `4px solid ${color.accent}`,
-              backgroundColor: color.background.replace('0.12', '0.16'),
-              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.04)',
-              textAlign: 'left',
-              fontFamily: 'inherit',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              transition: 'transform 0.12s ease, box-shadow 0.12s ease',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = `0 4px 12px ${color.border}`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.04)';
-            }}
-          >
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 650,
-                color: 'var(--macos-text, #1c1c1e)',
-                lineHeight: 1.3,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {event.title}
-            </div>
-
-            <div
-              style={{
-                fontSize: 11.5,
-                fontWeight: 500,
-                color: 'var(--macos-text-muted, #636366)',
-                marginTop: 2,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <Icon f7="clock" size="11px" />
-              <span>
-                {formatClockTime(event.startTime, eventTimeFormatter)} – {formatClockTime(event.endTime, eventTimeFormatter)}
-              </span>
-            </div>
-          </button>
-        );
-      })}
     </div>
   );
 };

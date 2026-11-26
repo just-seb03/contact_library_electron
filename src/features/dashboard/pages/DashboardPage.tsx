@@ -1,204 +1,263 @@
-import { Page, Card, CardContent, CardHeader, Icon, Badge, Button } from 'framework7-react';
-import { useDashboard } from '../hooks/useDashboard';
-import { useHomeData } from '../hooks/useHomeData';
-import { UpcomingMeetingCard } from '../components/UpcomingMeetingCard';
-import { DailyProgressCard } from '../components/DailyProgressCard';
-import {
-  DASHBOARD_INNER_SURFACE_STYLE,
-  DASHBOARD_PAGE_STYLE,
-  DASHBOARD_WIDGET_STYLE,
-} from '../styles';
+import type { CSSProperties } from 'react';
+import { Page } from 'framework7-react';
+import { useApp } from '../../../core/context/AppContext';
+import brotherSignatureFont from '../../../assets/fonts/BrotherSignature.otf';
+
+const glassCardBase: CSSProperties = {
+  borderRadius: 16,
+  backgroundColor: 'rgba(255, 255, 255, 0.045)',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+  border: '1px solid rgba(255, 255, 255, 0.09)',
+  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.22)',
+  boxSizing: 'border-box',
+};
+
+const GHOST_OPACITIES = [0.45, 0.28, 0.15, 0.07, 0.02];
 
 export default function Dashboard() {
-  const { lawyerName, todayLabel, nextMeeting, openClient: openClientHome, showTab } = useHomeData();
-  const { todayHearings, openClient } = useDashboard();
+  const { hearings, calendarEvents, payments } = useApp();
+
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const toISODate = (year: number, monthIndex: number, day: number) =>
+    `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+  const hasWorkToday =
+    calendarEvents.some((e) => e.date === todayStr) ||
+    hearings.some((h) => toISODate(h.year, h.monthIndex, h.day) === todayStr) ||
+    payments.some(
+      (p) =>
+        (p.status === 'pending' || p.status === 'overdue') &&
+        (p.date === todayStr || p.status === 'overdue')
+    );
+
+  const hasUpcomingWork =
+    calendarEvents.some((e) => e.date > todayStr) ||
+    hearings.some((h) => toISODate(h.year, h.monthIndex, h.day) > todayStr) ||
+    payments.some((p) => p.status === 'pending' && p.date > todayStr);
+
+  const pendingPaymentsCount = payments.filter(
+    (p) => p.status === 'pending' || p.status === 'overdue'
+  ).length;
+  const totalEventsCount = hearings.length + calendarEvents.length;
+
+  const headlineTop = hasWorkToday
+    ? 'Hay trabajos aproximándose'
+    : hasUpcomingWork
+      ? 'Hay trabajo los próximos'
+      : 'Hoy es un día';
+  const headlineBottom = hasWorkToday
+    ? 'hoy'
+    : hasUpcomingWork
+      ? 'días'
+      : 'tranquilo';
+  const isLongHeadline = hasWorkToday || hasUpcomingWork;
 
   return (
     <Page noNavbar noToolbar>
+      <style>{`
+        @font-face {
+          font-family: 'Brother Signature';
+          src: url('${brotherSignatureFont}') format('opentype');
+          font-weight: normal;
+          font-style: normal;
+          font-display: swap;
+        }
+        @keyframes dashEnter {
+          from {
+            opacity: 0;
+            transform: translateY(16px) scale(0.975);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .dash-anim {
+          opacity: 0;
+          animation: dashEnter 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .dash-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
+
       <div
         style={{
-          ...DASHBOARD_PAGE_STYLE,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          maxWidth: '1280px',
+          minHeight: 'calc(100vh - 52px)',
           width: '100%',
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1.05fr) minmax(360px, 0.95fr)',
+          alignItems: 'center',
+          gap: 32,
+          padding: '24px 48px 56px 48px',
           boxSizing: 'border-box',
         }}
       >
-        {/* ── HEADER: fecha + saludo (izq) | acciones rápidas (der) ── */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px' }}>
-          <div>
-            <span
-              className="text-color-gray text-transform-capitalize"
-              style={{ fontSize: '12px', display: 'block', marginBottom: '7px', letterSpacing: '0.02em' }}
-            >
-              {todayLabel}
+        {/* ── Mitad izquierda: Courier arriba + Brother Signature abajo ── */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <h1
+            style={{
+              margin: 0,
+              fontFamily: "var(--apple-font, 'Courier New', Courier, monospace)",
+              fontSize: isLongHeadline
+                ? 'clamp(32px, 3.6vw, 52px)'
+                : 'clamp(42px, 4.8vw, 66px)',
+              fontWeight: 400,
+              lineHeight: 1.12,
+              letterSpacing: '0.05em',
+              color: 'var(--macos-text, #ececef)',
+            }}
+          >
+            <span className="dash-anim" style={{ display: 'inline-block', animationDelay: '40ms' }}>
+              {headlineTop}
             </span>
-            <h1 className="no-margin font-weight-bold" style={{ fontSize: '30px', letterSpacing: '-0.03em', color: 'var(--macos-text, #1c1c1e)' }}>
-              Hola, {lawyerName}
-            </h1>
+            <br />
+            <span
+              className="dash-anim"
+              style={{
+                fontFamily: "'Brother Signature', Georgia, serif",
+                fontWeight: 400,
+                fontSize: '1.68em',
+                lineHeight: 0.95,
+                letterSpacing: '0.03em',
+                display: 'inline-block',
+                marginTop: 8,
+                animationDelay: '110ms',
+              }}
+            >
+              {headlineBottom}
+            </span>
+          </h1>
+        </div>
+
+        {/* ── Mitad derecha: Cuadros principales centrados + fantasmas hacia abajo ── */}
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
+            width: '100%',
+            maxWidth: 480,
+            justifySelf: 'end',
+          }}
+        >
+          {/* Cuadro grueso principal: estado de reuniones */}
+          <div
+            className="dash-anim"
+            style={{
+              ...glassCardBase,
+              padding: '22px 24px',
+              minHeight: 84,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: 6,
+              animationDelay: '140ms',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                color: 'var(--macos-text, #ececef)',
+              }}
+            >
+              {totalEventsCount === 0
+                ? 'Sin reuniones pendientes'
+                : `${totalEventsCount} ${totalEventsCount === 1 ? 'reunión pendiente' : 'reuniones pendientes'}`}
+            </div>
+            <div
+              style={{
+                fontSize: 12.5,
+                letterSpacing: '0.02em',
+                color: 'var(--macos-text-secondary, #a4a4ab)',
+              }}
+            >
+              {totalEventsCount === 0
+                ? 'No hay audiencias ni citas programadas'
+                : 'Revisa tu agenda para ver los horarios'}
+            </div>
           </div>
 
-          {/* Botones de acción rápida */}
-          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
-            {[
-              { icon: 'calendar_badge_plus', label: '+ Nueva Cita', action: () => showTab('calendar') },
-              { icon: 'person_badge_plus',   label: '+ Cliente',    action: () => showTab('cliente') },
-            ].map(({ icon, label, action }) => (
-              <button
-                key={label}
-                onClick={action}
+          {/* Segundo cuadro grueso: estado de pagos */}
+          <div
+            className="dash-anim"
+            style={{
+              ...glassCardBase,
+              padding: '22px 24px',
+              minHeight: 84,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: 6,
+              animationDelay: '200ms',
+            }}
+          >
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                color: 'var(--macos-text, #ececef)',
+              }}
+            >
+              {pendingPaymentsCount === 0
+                ? 'Sin pagos pendientes'
+                : `${pendingPaymentsCount} ${pendingPaymentsCount === 1 ? 'pago pendiente' : 'pagos pendientes'}`}
+            </div>
+            <div
+              style={{
+                fontSize: 12.5,
+                letterSpacing: '0.02em',
+                color: 'var(--macos-text-secondary, #a4a4ab)',
+              }}
+            >
+              {pendingPaymentsCount === 0
+                ? 'Todo al día en honorarios y cobros'
+                : 'Hay cobros por gestionar en Pagos'}
+            </div>
+          </div>
+
+          {/* Cuadros inferiores a la mitad de grosor, difuminados y desvaneciéndose */}
+          <div
+            className="dash-anim"
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              top: 'calc(100% + 10px)',
+              left: 0,
+              right: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 10,
+              pointerEvents: 'none',
+              animationDelay: '260ms',
+            }}
+          >
+            {GHOST_OPACITIES.map((opacity, index) => (
+              <div
+                key={index}
                 style={{
-                  background: 'var(--macos-input-bg, rgba(255, 255, 255, 0.55))',
-                  border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
-                  borderRadius: '12px',
-                  padding: '8px 14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: 500,
-                  color: 'var(--macos-accent-color, #007aff)',
-                  boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-                  transition: 'background 0.15s, box-shadow 0.15s',
+                  ...glassCardBase,
+                  height: 40,
+                  borderRadius: 14,
+                  opacity,
+                  filter: `blur(${0.6 + index * 0.45}px)`,
                 }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--macos-accent-tint, rgba(0,122,255,0.15))')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'var(--macos-input-bg, rgba(255, 255, 255, 0.55))')}
-              >
-                <Icon f7={icon} size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
-                {label}
-              </button>
+              />
             ))}
           </div>
         </div>
-
-        {/* ── FILA MEDIA: Próxima reunión (izq) | Resumen del día (der) ── */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '16px',
-            alignItems: 'stretch',
-          }}
-        >
-          <UpcomingMeetingCard
-            nextMeeting={nextMeeting}
-            onOpenClient={openClientHome}
-          />
-
-          <DailyProgressCard />
-        </div>
-
-        {/* ── FILA INFERIOR: Audiencias de hoy ── */}
-        <Card outline className="no-margin" style={{ ...DASHBOARD_WIDGET_STYLE, width: '100%' }}>
-          <CardHeader style={{ padding: '14px 16px 10px 16px' }}>
-            <div className="display-flex align-items-center" style={{ gap: '8px', marginLeft: '4px' }}>
-              <Icon f7="calendar_badge_clock" size="18px" style={{ color: 'var(--macos-accent-color, #007aff)', flexShrink: 0 }} />
-              <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--macos-text, #1c1c1e)', marginLeft: '12px' }}>
-                Audiencias de hoy
-              </span>
-              {todayHearings.length > 0 && (
-                <Badge
-                  color="blue"
-                  style={{
-                    fontSize: '11px',
-                    padding: '0 6px',
-                    backgroundColor: 'var(--macos-accent-color, #0056b8)',
-                    color: 'var(--macos-on-accent, #ffffff)',
-                  }}
-                >
-                  {todayHearings.length}
-                </Badge>
-              )}
-            </div>
-          </CardHeader>
-
-          <CardContent style={{ padding: '0 16px 16px 16px' }}>
-            {todayHearings.length === 0 ? (
-              <div
-                className="display-flex align-items-center justify-content-center"
-                style={{ padding: '32px 0', flexDirection: 'column', gap: '8px' }}
-              >
-                <Icon f7="checkmark_seal_fill" size="36px" style={{ color: '#34c759', opacity: 0.7 }} />
-                <span className="text-color-gray" style={{ fontSize: '15px' }}>
-                  No hay audiencias programadas para hoy
-                </span>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {todayHearings.map((hearing) => (
-                  <div
-                    key={hearing.id}
-                    style={{
-                      ...DASHBOARD_INNER_SURFACE_STYLE,
-                      backgroundColor: 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.055))',
-                      padding: '12px 14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      gap: '12px',
-                    }}
-                  >
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <span
-                        style={{
-                          fontSize: '15px',
-                          fontWeight: 600,
-                          color: 'var(--macos-text, #1c1c1e)',
-                          display: 'block',
-                          marginBottom: '8px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {hearing.clientName}
-                      </span>
-
-                      <div
-                        style={{
-                          ...DASHBOARD_INNER_SURFACE_STYLE,
-                          backgroundColor: 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.045))',
-                          padding: '8px 12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '12px',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <div className="display-flex align-items-center" style={{ gap: '4px' }}>
-                          <Icon f7="clock_fill" size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
-                          <span style={{ fontSize: '13px', color: 'var(--macos-accent-color, #007aff)', fontWeight: 600 }}>{hearing.timeStr}</span>
-                        </div>
-                        <div className="display-flex align-items-center" style={{ gap: '4px' }}>
-                          <Icon f7="briefcase_fill" size="14px" className="text-color-gray" />
-                          <span className="text-color-gray" style={{ fontSize: '13px' }}>{hearing.materia}</span>
-                        </div>
-                        {hearing.juzgado && (
-                          <div className="display-flex align-items-center" style={{ gap: '4px' }}>
-                            <Icon f7="building_columns_fill" size="14px" className="text-color-gray" />
-                            <span className="text-color-gray" style={{ fontSize: '13px' }}>{hearing.juzgado}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <Button
-                      small
-                      round
-                      outline
-                      onClick={() => openClient(hearing.clientId)}
-                      style={{ fontSize: '11px', flexShrink: 0 }}
-                    >
-                      Ver expediente
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
       </div>
     </Page>
   );

@@ -1,6 +1,5 @@
-import { Icon } from 'framework7-react';
+import type { CSSProperties } from 'react';
 import { formatCLP } from '../../../core/utils/format';
-import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface StatsProps {
   totalIngresos: number;
@@ -8,55 +7,84 @@ interface StatsProps {
   totalVencidos: number;
 }
 
+const labelStyle: CSSProperties = {
+  fontSize: 12,
+  fontWeight: 400,
+  letterSpacing: '0.02em',
+  color: 'var(--macos-text-secondary, #8e8e93)',
+};
+
 export const PaymentsStats = ({
   totalIngresos,
   totalPendientes,
   totalVencidos,
 }: StatsProps) => (
-  <section
+  <aside
     aria-label="Resumen de pagos"
     style={{
-      display: 'grid',
-      gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-      gap: '12px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'flex-end',
+      textAlign: 'right',
+      gap: 24,
+      userSelect: 'text',
+      WebkitUserSelect: 'text',
     }}
   >
-    {[
-      {
-        label: 'Ingresos cobrados',
-        value: formatCLP(totalIngresos),
-        icon: 'arrow_down_left',
-        color: '#34c759',
-      },
-      {
-        label: 'Por cobrar',
-        value: formatCLP(totalPendientes),
-        icon: 'clock_fill',
-        color: '#ff9500',
-      },
-      {
-        label: 'Vencidos',
-        value: formatCLP(totalVencidos),
-        icon: 'exclamationmark_circle_fill',
-        color: '#ff3b30',
-      },
-    ].map(({ label, value, icon, color }) => (
-      <article
-        key={label}
+    {/* Pendientes en grande arriba */}
+    <div>
+      <div style={labelStyle}>Pendientes</div>
+      <div
         style={{
-          ...PAYMENT_SURFACE_STYLE,
-          minWidth: 0,
-          padding: '15px 16px',
+          marginTop: 4,
+          color: 'var(--macos-text, #ececef)',
+          fontSize: 'clamp(28px, 3vw, 38px)',
+          fontWeight: 400,
+          letterSpacing: '-0.02em',
+          lineHeight: 1.1,
+          fontVariantNumeric: 'tabular-nums',
+          overflowWrap: 'anywhere',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 9, color }}>
-          <Icon f7={icon} size="17px" />
-          <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12, fontWeight: 600 }}>{label}</span>
+        {formatCLP(totalPendientes)}
+      </div>
+    </div>
+
+    {/* Vencidos y Pagados debajo, más pequeños */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'flex-end' }}>
+      <div>
+        <div style={labelStyle}>Vencidos</div>
+        <div
+          style={{
+            marginTop: 2,
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.86,
+            fontSize: 19,
+            fontWeight: 400,
+            lineHeight: 1.2,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {formatCLP(totalVencidos)}
         </div>
-        <div style={{ marginTop: 9, color: 'var(--macos-text, #1c1c1e)', fontSize: 'clamp(18px, 2.2vw, 25px)', fontWeight: 700, lineHeight: 1.15, overflowWrap: 'anywhere', fontVariantNumeric: 'tabular-nums' }}>
-          {value}
+      </div>
+
+      <div>
+        <div style={labelStyle}>Pagados</div>
+        <div
+          style={{
+            marginTop: 2,
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.72,
+            fontSize: 19,
+            fontWeight: 400,
+            lineHeight: 1.2,
+            fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {formatCLP(totalIngresos)}
         </div>
-      </article>
-    ))}
-  </section>
+      </div>
+    </div>
+  </aside>
 );

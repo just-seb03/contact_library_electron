@@ -78,7 +78,7 @@ export const APP_SPACING = {
   glassRadius: 14,
   sectionPadding: 24,
   controlHeight: 36,
-  sidebarWidth: 240,
+  sidebarWidth: 210,
   toolbarHeight: 52,
   pageMaxWidth: 1200,
   pageTopPadding: 24,
@@ -86,7 +86,7 @@ export const APP_SPACING = {
 } as const;
 
 export const MACOS_THEME = {
-  fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  fontFamily: "'Courier New', Courier, monospace",
   sidebarGlass: 'rgba(246, 246, 248, 0.82)',
   sidebarGlassDark: 'rgba(28, 28, 30, 0.82)',
   toolbarGlass: 'rgba(255, 255, 255, 0.82)',
@@ -277,6 +277,8 @@ export const SIDEBAR_SURFACE_STYLE = {
 export const CONTENT_VIEW_STYLE = {
   ...SURFACE_STYLE,
   ...FRAMEWORK_PAGE_VARIABLES,
+  backgroundColor: 'transparent',
+  '--f7-page-bg-color': 'transparent',
   '--f7-page-navbar-offset': '0px',
   '--f7-page-toolbar-top-offset': '0px',
   '--f7-page-content-extra-padding-top': '0px',

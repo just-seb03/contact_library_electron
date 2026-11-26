@@ -2,6 +2,7 @@ import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { CalendarEvent } from '../types';
 import type { HearingEvent } from '../../../core/context/types';
+import { getCalendarEventColor } from '../data/eventColors';
 
 interface AgendaEventDetailProps {
   event: CalendarEvent | HearingEvent | null;
@@ -43,15 +44,16 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 }) => {
   const containerStyle: CSSProperties = {
     padding: '16px 14px',
-    borderTop: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
-    userSelect: 'none',
+    borderTop: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+    userSelect: 'text',
+    WebkitUserSelect: 'text',
   };
 
   const titleStyle: CSSProperties = {
-    fontSize: 13,
-    fontWeight: 700,
+    fontSize: 11.5,
+    fontWeight: 650,
     textTransform: 'uppercase',
-    letterSpacing: '0.04em',
+    letterSpacing: '0.06em',
     color: 'var(--macos-text-secondary, #8e8e93)',
     marginBottom: 12,
   };
@@ -61,7 +63,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
     alignItems: 'flex-start',
     gap: 8,
     fontSize: 12.5,
-    color: 'var(--macos-text-muted, #48484a)',
+    color: 'var(--macos-text-secondary, #a4a4ab)',
     lineHeight: 1.4,
   };
 
@@ -69,18 +71,24 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
-    height: 28,
-    padding: '0 10px',
-    borderRadius: 6,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
-    backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))',
-    color: 'var(--macos-text, #1c1c1e)',
+    gap: 6,
+    height: 30,
+    padding: '0 14px',
+    borderRadius: 999,
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.05))',
+    color: 'var(--macos-text, #ececef)',
     fontSize: 12,
-    fontWeight: 500,
+    fontWeight: 550,
     cursor: 'pointer',
-    transition: 'all 0.12s ease',
+    transition: 'background-color 0.12s ease',
   };
+
+  const dotColor = event
+    ? 'date' in event
+      ? getCalendarEventColor(event.colorId).accent
+      : '#ff453a'
+    : 'var(--macos-text-secondary, #8e8e93)';
 
   return (
     <div style={containerStyle}>
@@ -88,37 +96,55 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
       {event ? (
         <div
+          key={'id' in event ? event.id : 'selected-hearing'}
+          className="cal-switch-anim"
           style={{
-            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.02))',
-            borderRadius: 10,
-            padding: '12px 14px',
-            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.06))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.045))',
+            borderRadius: 14,
+            padding: '14px 16px',
+            border: '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.09))',
+            boxShadow: '0 6px 20px rgba(0, 0, 0, 0.16)',
+            backdropFilter: 'blur(20px) saturate(160%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(160%)',
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
           }}
         >
-          {/* Título e insignia de tipo */}
+          {/* Título e insignia minimalista */}
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 650,
-                color: 'var(--macos-text, #1c1c1e)',
-                lineHeight: 1.3,
-              }}
-            >
-              {'title' in event ? event.title : event.clientName}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+              <span
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  backgroundColor: dotColor,
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontSize: 14,
+                  fontWeight: 650,
+                  color: 'var(--macos-text, #ececef)',
+                  lineHeight: 1.3,
+                }}
+              >
+                {'title' in event ? event.title : event.clientName}
+              </span>
+            </div>
             <span
               style={{
                 fontSize: 10,
-                fontWeight: 700,
-                padding: '2px 6px',
-                borderRadius: 4,
+                fontWeight: 650,
+                padding: '2px 8px',
+                borderRadius: 999,
                 textTransform: 'uppercase',
-                backgroundColor: 'date' in event ? 'rgba(0, 122, 255, 0.15)' : 'rgba(255, 59, 48, 0.15)',
-                color: 'date' in event ? '#007aff' : '#ff3b30',
+                letterSpacing: '0.04em',
+                border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+                backgroundColor: 'var(--macos-active-bg, rgba(128, 128, 136, 0.14))',
+                color: 'var(--macos-text-secondary, #a4a4ab)',
                 flexShrink: 0,
               }}
             >
@@ -130,11 +156,11 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
           {'date' in event ? (
             <>
               <div style={infoRowStyle}>
-                <Icon f7="calendar" size="14px" style={{ color: '#007aff', flexShrink: 0, marginTop: 2 }} />
+                <Icon f7="calendar" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                 <span>{formatEventDate(event.date)}</span>
               </div>
               <div style={infoRowStyle}>
-                <Icon f7="clock" size="14px" style={{ color: '#007aff', flexShrink: 0, marginTop: 2 }} />
+                <Icon f7="clock" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                 <span>
                   {formatClockTime(event.startTime)} – {formatClockTime(event.endTime)}
                 </span>
@@ -143,29 +169,29 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
           ) : (
             <>
               <div style={infoRowStyle}>
-                <Icon f7="calendar" size="14px" style={{ color: '#ff3b30', flexShrink: 0, marginTop: 2 }} />
-                <span>Fecha: {event.dateStr.split(' - ')[0]}</span>
+                <Icon f7="calendar" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
+                <span>{event.dateStr.split(' - ')[0]}</span>
               </div>
               <div style={infoRowStyle}>
-                <Icon f7="clock_fill" size="14px" style={{ color: '#ff3b30', flexShrink: 0, marginTop: 2 }} />
+                <Icon f7="clock" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                 <span>
                   {formatHearingTime(event.timeStr)}
                   {hearingEndTime ? ` – ${formatClockTime(hearingEndTime)}` : ''}
                 </span>
               </div>
               <div style={infoRowStyle}>
-                <Icon f7="briefcase_fill" size="14px" style={{ opacity: 0.7, flexShrink: 0, marginTop: 2 }} />
+                <Icon f7="briefcase" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                 <span>{event.materia}</span>
               </div>
               {event.juzgado && (
                 <div style={infoRowStyle}>
-                  <Icon f7="building_columns_fill" size="14px" style={{ opacity: 0.7, flexShrink: 0, marginTop: 2 }} />
+                  <Icon f7="building_columns" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                   <span>{event.juzgado}</span>
                 </div>
               )}
               {event.expediente && (
                 <div style={infoRowStyle}>
-                  <Icon f7="doc_text_fill" size="14px" style={{ opacity: 0.7, flexShrink: 0, marginTop: 2 }} />
+                  <Icon f7="doc_text" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
                   <span>Expediente: {event.expediente}</span>
                 </div>
               )}
@@ -174,7 +200,7 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
           {clientName && (
             <div style={infoRowStyle}>
-              <Icon f7="person_fill" size="14px" style={{ color: '#5856d6', flexShrink: 0, marginTop: 2 }} />
+              <Icon f7="person" size="13px" style={{ opacity: 0.75, flexShrink: 0, marginTop: 2 }} />
               <span>Cliente: {clientName}</span>
             </div>
           )}
@@ -183,10 +209,11 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
             <div
               style={{
                 fontSize: 12,
-                color: 'var(--macos-text-muted, #636366)',
-                padding: '6px 8px',
-                borderRadius: 6,
-                backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
+                color: 'var(--macos-text-secondary, #a4a4ab)',
+                padding: '8px 10px',
+                borderRadius: 10,
+                border: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+                backgroundColor: 'var(--macos-subtle-bg, rgba(255, 255, 255, 0.03))',
                 whiteSpace: 'pre-wrap',
                 marginTop: 2,
               }}
@@ -195,12 +222,15 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
             </div>
           )}
 
-          {/* Acciones de edición y eliminación para eventos creados */}
+          {/* Acciones */}
           {'date' in event && (
-            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
               <button
                 type="button"
-                style={actionButtonStyle}
+                style={{
+                  ...actionButtonStyle,
+                  flex: 1,
+                }}
                 onClick={() => onEdit?.(event)}
               >
                 <Icon f7="pencil" size="12px" />
@@ -209,16 +239,34 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
 
               <button
                 type="button"
-                style={{
-                  ...actionButtonStyle,
-                  color: '#ff3b30',
-                  borderColor: 'var(--macos-danger-border, rgba(255, 59, 48, 0.25))',
-                  backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.10))',
-                }}
+                aria-label="Eliminar evento"
+                title="Eliminar evento"
                 onClick={() => onDelete?.(event)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 30,
+                  height: 30,
+                  padding: 0,
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--macos-text, #1c1c1e)',
+                  opacity: 0.75,
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'opacity 0.12s ease, transform 0.12s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'scale(1.08)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '0.75';
+                  e.currentTarget.style.transform = 'none';
+                }}
               >
-                <Icon f7="trash" size="12px" />
-                <span>Eliminar</span>
+                <Icon f7="trash" size="15px" />
               </button>
             </div>
           )}
@@ -226,17 +274,18 @@ export const AgendaEventDetail: FC<AgendaEventDetailProps> = ({
       ) : (
         <div
           style={{
-            padding: '28px 12px',
+            minHeight: 112,
+            padding: '20px 12px',
             textAlign: 'center',
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            gap: 8,
+            justifyContent: 'center',
             color: 'var(--macos-text-secondary, #8e8e93)',
           }}
         >
-          <Icon f7="calendar_badge_clock" size="32px" style={{ opacity: 0.5 }} />
-          <span style={{ fontSize: 13 }}>Selecciona una audiencia o evento para ver sus detalles</span>
+          <span style={{ fontSize: 12.5, lineHeight: 1.45 }}>
+            Selecciona una audiencia o evento para ver sus detalles
+          </span>
         </div>
       )}
     </div>

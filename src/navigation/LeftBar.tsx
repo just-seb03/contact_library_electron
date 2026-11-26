@@ -1,24 +1,26 @@
 import { useEffect, type CSSProperties } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon, f7, f7ready } from 'framework7-react';
 import type { Router as Framework7Router } from 'framework7/types';
 import { useApp } from '../core/context/AppContext';
 import type { AppTab } from '../core/context/types';
 import { navigateToTab, getAppTabForRoute } from './navigation';
-import { TrafficLights } from '../core/windowControls/TrafficLights';
-import { MACOS_THEME } from '../core/theme/style';
 
 interface NavItemConfig {
   id: AppTab;
   title: string;
   icon: string;
-  iconColor: string;
+  activeIcon: string;
   badge?: number | null;
-  badgeColor?: string;
   shortcut?: string;
 }
 
-export const LeftBar = () => {
-  const { activeTab, setActiveTab, clients, hearings, payments, settings } = useApp();
+interface LeftBarProps {
+  onOpenSpotlight?: () => void;
+}
+
+export const LeftBar = ({ onOpenSpotlight }: LeftBarProps) => {
+  const { activeTab, setActiveTab, clients, hearings, payments } = useApp();
 
   const handleSelect = (tab: AppTab) => {
     setActiveTab(tab);
@@ -28,17 +30,6 @@ export const LeftBar = () => {
   const pendingPaymentsCount = payments.filter(
     (p) => p.status === 'pending' || p.status === 'overdue'
   ).length;
-
-  const getInitials = (name?: string) => {
-    if (!name || !name.trim()) return 'CL';
-    const parts = name.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  };
-
-  const lawyerName = settings?.lawyerName?.trim() || 'Estudio Jurídico';
-  const lawyerFirm = settings?.lawyerFirm?.trim() || 'Activo • macOS';
-  const initials = getInitials(settings?.lawyerName);
 
   useEffect(() => {
     f7ready(() => {
@@ -68,357 +59,226 @@ export const LeftBar = () => {
     });
   }, [activeTab, setActiveTab]);
 
-  const mainNavItems: NavItemConfig[] = [
+  const navItems: NavItemConfig[] = [
     {
       id: 'inicio',
       title: 'Inicio',
-      icon: 'house_fill',
-      iconColor: 'var(--macos-accent-color, #007aff)',
+      icon: 'house',
+      activeIcon: 'house_fill',
     },
     {
       id: 'calendar',
       title: 'Agenda',
       icon: 'calendar',
-      iconColor: '#ff3b30',
+      activeIcon: 'calendar_today',
       badge: hearings.length > 0 ? hearings.length : null,
-      badgeColor: '#ff3b30',
     },
-  ];
-
-  const libraryNavItems: NavItemConfig[] = [
     {
       id: 'cliente',
       title: 'Clientes',
-      icon: 'person_2_fill',
-      iconColor: '#5856d6',
+      icon: 'person_2',
+      activeIcon: 'person_2_fill',
       badge: clients.length > 0 ? clients.length : null,
-      badgeColor: '#5856d6',
     },
     {
       id: 'pagos',
       title: 'Pagos',
-      icon: 'creditcard_fill',
-      iconColor: '#34c759',
+      icon: 'creditcard',
+      activeIcon: 'creditcard_fill',
       badge: pendingPaymentsCount > 0 ? pendingPaymentsCount : null,
-      badgeColor: '#ff9500',
     },
-  ];
-
-  const systemNavItems: NavItemConfig[] = [
     {
       id: 'config',
       title: 'Ajustes',
-      icon: 'gear_alt_fill',
-      iconColor: '#8e8e93',
+      icon: 'gear_alt',
+      activeIcon: 'gear_alt_fill',
       shortcut: '⌘,',
     },
   ];
 
   const containerStyle: CSSProperties = {
-    height: '100%',
-    width: '100%',
+    position: 'fixed',
+    left: 16,
+    bottom: 14,
+    zIndex: 9000,
     display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: 'var(--macos-sidebar-glass, rgba(246, 246, 248, 0.82))',
-    backdropFilter: MACOS_THEME.backdropBlur,
-    WebkitBackdropFilter: MACOS_THEME.backdropBlur,
-    color: 'var(--macos-text, #1c1c1e)',
-    borderRight: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
+    alignItems: 'center',
+    gap: 10,
     userSelect: 'none',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
+    pointerEvents: 'auto',
   };
 
-  const renderNavGroup = (title: string, items: NavItemConfig[]) => (
-    <div style={{ marginBottom: 16 }}>
-      <div
-        style={{
-          padding: '6px 14px 4px 14px',
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.05em',
-          textTransform: 'uppercase',
-          color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
-        }}
-      >
-        {title}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        {items.map((item) => {
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => handleSelect(item.id)}
+  const renderNavItems = (items: NavItemConfig[]) => (
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', gap: 6 }}>
+      {items.map((item) => {
+        const isActive = activeTab === item.id;
+        const inactiveColor = 'var(--macos-text-secondary, rgba(60, 60, 67, 0.55))';
+        const activeColor = 'var(--macos-text, #ececef)';
+        const hoverColor = 'var(--macos-text, #1c1c1e)';
+        return (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => handleSelect(item.id)}
+            title={item.shortcut ? `${item.title} (${item.shortcut})` : item.title}
+            aria-label={item.title}
+            style={{
+              position: 'relative',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: isActive ? 6 : 0,
+              width: isActive ? 'auto' : 32,
+              height: 32,
+              padding: isActive ? '0 12px' : 0,
+              borderRadius: isActive ? 999 : 0,
+              border: isActive ? '1px solid var(--macos-card-border, rgba(255, 255, 255, 0.14))' : 'none',
+              outline: 'none',
+              cursor: 'pointer',
+              backgroundColor: isActive ? 'var(--macos-active-bg, #323237)' : 'transparent',
+              color: isActive ? activeColor : inactiveColor,
+              boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.16)' : 'none',
+              transition: 'all 0.16s ease',
+              boxSizing: 'border-box',
+              flexShrink: 0,
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.color = hoverColor;
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive) {
+                e.currentTarget.style.color = inactiveColor;
+              }
+            }}
+          >
+            <Icon
+              f7={isActive ? item.activeIcon : item.icon}
+              size={isActive ? '16px' : '19px'}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                margin: '1px 8px',
-                padding: '7px 10px',
-                borderRadius: 8,
-                border: 'none',
-                outline: 'none',
-                cursor: 'pointer',
-                textAlign: 'left',
-                backgroundColor: isActive
-                  ? 'var(--macos-accent-tint, rgba(0, 122, 255, 0.12))'
-                  : 'transparent',
-                color: isActive
-                  ? 'var(--macos-accent-color, #007aff)'
-                  : 'var(--macos-text, #1c1c1e)',
-                fontWeight: isActive ? 600 : 450,
-                fontSize: 13,
-                transition: 'background-color 0.12s ease, transform 0.08s ease',
-                width: 'calc(100% - 16px)',
-                boxSizing: 'border-box',
+                color: 'currentColor',
+                transition: 'color 0.12s ease',
               }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, width: '100%' }}>
-                {/* Contenedor del icono con la esfera de notificación integrada */}
-                <div
-                  style={{
-                    position: 'relative',
-                    width: 24,
-                    height: 24,
-                    borderRadius: 6,
-                    backgroundColor: isActive
-                      ? 'var(--macos-accent-color, #007aff)'
-                      : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                    transition: 'all 0.12s ease',
-                  }}
-                >
-                  <Icon
-                    f7={item.icon}
-                    size="14px"
-                    style={{
-                      color: isActive ? '#ffffff' : item.iconColor,
-                    }}
-                  />
+            />
 
-                  {/* Esfera de notificación estilo macOS/iOS sobre el icono */}
-                  {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
-                    <span
-                      style={{
-                        position: 'absolute',
-                        top: -5,
-                        right: -6,
-                        minWidth: 16,
-                        height: 16,
-                        padding: '0 4px',
-                        borderRadius: 8,
-                        backgroundColor: item.badgeColor || '#ff3b30',
-                        color: '#ffffff',
-                        fontSize: 9.5,
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 0 0 2px var(--macos-canvas-bg, #f5f5f7), 0 1px 3px rgba(0,0,0,0.25)',
-                        lineHeight: 1,
-                        pointerEvents: 'none',
-                        zIndex: 2,
-                        boxSizing: 'border-box',
-                      }}
-                    >
-                      {item.badge > 99 ? '99+' : item.badge}
-                    </span>
-                  )}
-                </div>
+            {isActive && (
+              <span
+                style={{
+                  fontSize: 12.5,
+                  fontWeight: 600,
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {item.title}
+              </span>
+            )}
 
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    flex: 1,
-                  }}
-                >
-                  {item.title}
-                </span>
-
-                {item.shortcut && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 500,
-                      color: 'var(--macos-text-muted, rgba(60, 60, 67, 0.6))',
-                      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
-                      padding: '1px 4px',
-                      borderRadius: 4,
-                      backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
-                      border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-                    }}
-                  >
-                    {item.shortcut}
-                  </span>
-                )}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+            {/* Indicador numérico monocromo sobre el icono */}
+            {item.badge !== undefined && item.badge !== null && item.badge > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: isActive ? -4 : 0,
+                  right: isActive ? -4 : -2,
+                  minWidth: 15,
+                  height: 15,
+                  padding: '0 4px',
+                  borderRadius: 8,
+                  backgroundColor: isActive
+                    ? 'var(--macos-accent-color, #59595e)'
+                    : 'var(--macos-text, #1c1c1e)',
+                  color: isActive
+                    ? 'var(--macos-on-accent, #ffffff)'
+                    : 'var(--macos-canvas-bg, #ffffff)',
+                  fontSize: 9,
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 0 0 1.5px var(--macos-sidebar-glass, #f6f6f8)',
+                  lineHeight: 1,
+                  pointerEvents: 'none',
+                  zIndex: 2,
+                  boxSizing: 'border-box',
+                }}
+              >
+                {item.badge > 99 ? '99+' : item.badge}
+              </span>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 
-  return (
-    <nav style={containerStyle} aria-label="Navegación principal">
+  const navElement = (
+    <nav style={containerStyle} className="chrome-nav-enter" aria-label="Navegación principal">
       <style>{`
-        .sidebar-nav-scroll::-webkit-scrollbar {
-          width: 0px !important;
-          height: 0px !important;
-          display: none !important;
+        @keyframes chromeNavEnter {
+          from { opacity: 0; transform: translateY(12px) scale(0.97); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .sidebar-nav-scroll {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        .chrome-nav-enter {
+          animation: chromeNavEnter 0.38s cubic-bezier(0.16, 1, 0.3, 1) 0.08s backwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chrome-nav-enter { animation: none !important; transform: none !important; }
         }
       `}</style>
+      {renderNavItems(navItems)}
 
-      {/* ── Cabecera de la barra lateral (Traffic Lights + Arrastre) ── */}
-      <div
-        style={{
-          height: 52,
-          minHeight: 52,
-          padding: '0 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          WebkitAppRegion: 'drag',
-          borderBottom: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-        } as CSSProperties}
-      >
-        <div style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}>
-          <TrafficLights />
-        </div>
-      </div>
-
-      {/* ── Grupos de navegación estilo Source List (sin barra de slide horizontal) ── */}
-      <div
-        className="sidebar-nav-scroll"
-        style={{
-          flex: 1,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          padding: '12px 0',
-        }}
-      >
-        {renderNavGroup('Principal', mainNavItems)}
-        {renderNavGroup('Biblioteca', libraryNavItems)}
-        {renderNavGroup('Sistema', systemNavItems)}
-      </div>
-
-      {/* ── Pie de la barra lateral (Perfil del Usuario reflejado desde Ajustes) ── */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => handleSelect('config')}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleSelect('config');
-          }
-        }}
-        title="Ver ajustes y perfil de usuario"
-        style={{
-          padding: '12px 14px',
-          borderTop: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.06))',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
-          cursor: 'pointer',
-          transition: 'background-color 0.12s ease',
-          userSelect: 'none',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(0, 0, 0, 0.04))';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))';
-        }}
-      >
-        <div
+      {onOpenSpotlight && (
+        <button
+          type="button"
+          onClick={onOpenSpotlight}
+          title="Buscar clientes, causas o citas (⌘K)"
+          aria-label="Buscar"
           style={{
-            width: 32,
             height: 32,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--macos-accent-color, #0056b8), var(--macos-accent-gradient-end, #5336c7))',
-            color: 'var(--macos-on-accent, #ffffff)',
+            padding: '0 10px',
+            borderRadius: 999,
+            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.10))',
+            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            color: 'var(--macos-text-secondary, #5c5c5e)',
+            fontSize: 12,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 12,
-            fontWeight: 700,
-            flexShrink: 0,
-            boxShadow: '0 2px 6px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.3))',
-            letterSpacing: '0.5px',
+            gap: 8,
+            cursor: 'pointer',
+            transition: 'border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = 'var(--macos-text, #1c1c1e)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = 'var(--macos-text-secondary, #5c5c5e)';
           }}
         >
-          {initials}
-        </div>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div
+          <Icon f7="search" size="14px" />
+          <span>Buscar...</span>
+          <kbd
             style={{
-              fontSize: 13,
+              fontSize: 10,
               fontWeight: 600,
-              color: 'var(--macos-text, #1c1c1e)',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              padding: '1px 5px',
+              borderRadius: 4,
+              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
+              color: 'var(--macos-text-muted, #636366)',
+              border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
             }}
           >
-            {lawyerName}
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: 'var(--macos-text-secondary, #8e8e93)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-              overflow: 'hidden',
-            }}
-          >
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                backgroundColor: '#34c759',
-                display: 'inline-block',
-                flexShrink: 0,
-              }}
-            />
-            <span
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {lawyerFirm}
-            </span>
-          </div>
-        </div>
-      </div>
+            ⌘K
+          </kbd>
+        </button>
+      )}
     </nav>
   );
+
+  return typeof document !== 'undefined' ? createPortal(navElement, document.body) : navElement;
 };
 
 export const Sidebar = LeftBar;

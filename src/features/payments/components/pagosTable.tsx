@@ -1,9 +1,7 @@
-import { useEffect, useRef, type FC } from 'react';
+import { useEffect, useRef, type FC, type CSSProperties } from 'react';
 import type { Payment } from '../types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from './PaymentActionsMenu';
-import { PaymentStatusIndicator } from './PaymentStatusIndicator';
-import { PAYMENT_SURFACE_STYLE } from '../styles';
 
 interface TableProps {
   payments: Payment[];
@@ -13,14 +11,43 @@ interface TableProps {
   onDelete: (payment: Payment) => void;
 }
 
+const STATUS_LABELS: Record<Payment['status'], string> = {
+  completed: 'Cobrado',
+  pending: 'Pendiente',
+  overdue: 'Vencido',
+};
+
 function formatPaymentDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat('es-CL').format(date);
+  return new Intl.DateTimeFormat('es-CL', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date);
 }
 
-export const PaymentsTable: FC<TableProps> = ({ payments, highlightedPaymentId, onEdit, onDelete }) => {
-  const highlightedRowRef = useRef<HTMLTableRowElement | null>(null);
+const metroRowStyle = (isHighlighted: boolean, isLast: boolean): CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 16,
+  padding: '14px 10px',
+  borderBottom: isLast ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+  backgroundColor: isHighlighted ? 'var(--macos-active-bg, rgba(255, 255, 255, 0.08))' : 'transparent',
+  borderRadius: isHighlighted ? 10 : 0,
+  userSelect: 'text',
+  WebkitUserSelect: 'text',
+  transition: 'background-color 0.16s ease',
+});
+
+export const PaymentsTable: FC<TableProps> = ({
+  payments,
+  highlightedPaymentId,
+  onEdit,
+  onDelete,
+}) => {
+  const highlightedRowRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (highlightedPaymentId) {
@@ -28,85 +55,98 @@ export const PaymentsTable: FC<TableProps> = ({ payments, highlightedPaymentId, 
     }
   }, [highlightedPaymentId]);
 
-  const headerCellStyle = {
-    padding: '12px 14px',
-    color: 'var(--macos-text-secondary, #6e6e73)',
-    fontSize: '11px',
-    fontWeight: 700,
-    textAlign: 'left' as const,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.04em',
-    whiteSpace: 'nowrap' as const,
-    borderBottom: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
-  };
-  const cellStyle = {
-    padding: '14px',
-    color: 'var(--macos-text, #1c1c1e)',
-    fontSize: '14px',
-    borderTop: '1px solid var(--macos-card-border, rgba(60, 60, 67, 0.12))',
-    textAlign: 'left' as const,
-  };
+  if (payments.length === 0) {
+    return (
+      <div
+        style={{
+          padding: '44px 10px',
+          color: 'var(--macos-text-secondary, #8e8e93)',
+          fontSize: 14,
+          fontWeight: 350,
+        }}
+      >
+        No hay pagos que coincidan
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        ...PAYMENT_SURFACE_STYLE,
-        width: '100%',
-        overflowX: 'auto',
-      }}
-    >
-        <table style={{ width: '100%', minWidth: '680px', borderCollapse: 'separate', borderSpacing: 0 }}>
-        <thead>
-          <tr>
-            <th style={headerCellStyle}>Cliente</th>
-            <th style={headerCellStyle}>Concepto</th>
-            <th style={headerCellStyle}>Fecha</th>
-            <th style={{ ...headerCellStyle, textAlign: 'right' }}>Monto</th>
-            <th style={headerCellStyle}>Estado</th>
-            <th style={{ ...headerCellStyle, width: 44 }} aria-label="Acciones" />
-          </tr>
-        </thead>
-        <tbody>
-          {payments.length === 0 ? (
-            <tr>
-              <td colSpan={6} style={{ ...cellStyle, padding: '28px 14px', textAlign: 'center', color: '#8e8e93' }}>
-                No hay pagos que coincidan con los filtros.
-              </td>
-            </tr>
-          ) : (
-            payments.map((payment) => {
-              const isHighlighted = payment.id === highlightedPaymentId;
-              return (
-              <tr
-                key={payment.id}
-                ref={isHighlighted ? highlightedRowRef : undefined}
-                aria-current={isHighlighted ? 'true' : undefined}
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <style>{`
+        .wp-payment-row:hover {
+          background-color: var(--macos-hover-bg, rgba(255, 255, 255, 0.035));
+        }
+      `}</style>
+      {payments.map((payment, index) => {
+        const isHighlighted = payment.id === highlightedPaymentId;
+        const isLast = index === payments.length - 1;
+        return (
+          <div
+            key={payment.id}
+            ref={isHighlighted ? highlightedRowRef : undefined}
+            aria-current={isHighlighted ? 'true' : undefined}
+            className="wp-payment-row"
+            style={metroRowStyle(isHighlighted, isLast)}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
+              <span
                 style={{
-                  backgroundColor: isHighlighted ? 'var(--macos-accent-tint-active, rgba(0, 122, 255, 0.26))' : undefined,
-                  transition: 'background-color 0.6s ease',
+                  fontSize: 18,
+                  fontWeight: 400,
+                  color: 'var(--macos-text, #ececef)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.25,
                 }}
               >
-                <td style={{ ...cellStyle, fontWeight: 600 }}>{payment.client}</td>
-                <td style={cellStyle}>{payment.concept}</td>
-                <td style={{ ...cellStyle, whiteSpace: 'nowrap' }}>{formatPaymentDate(payment.date)}</td>
-                <td style={{ ...cellStyle, whiteSpace: 'nowrap', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                {payment.client}
+              </span>
+              <span
+                style={{
+                  fontSize: 12.5,
+                  color: 'var(--macos-text-secondary, #8e8e93)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {payment.concept} · {formatPaymentDate(payment.date)}
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2 }}>
+                <span
+                  style={{
+                    fontSize: 17,
+                    fontWeight: 400,
+                    color: 'var(--macos-text, #ececef)',
+                    fontVariantNumeric: 'tabular-nums',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
                   {formatCLP(payment.amount)}
-                </td>
-                <td style={cellStyle}>
-                  <PaymentStatusIndicator status={payment.status} />
-                </td>
-                <td style={{ ...cellStyle, width: 44, paddingLeft: 4, paddingRight: 8 }}>
-                  <PaymentActionsMenu
-                    onEdit={() => onEdit(payment)}
-                    onDelete={() => onDelete(payment)}
-                  />
-                </td>
-              </tr>
-              );
-            })
-          )}
-        </tbody>
-      </table>
+                </span>
+                <span
+                  style={{
+                    fontSize: 11.5,
+                    fontStyle: 'italic',
+                    color: 'var(--macos-text-secondary, #8e8e93)',
+                  }}
+                >
+                  {STATUS_LABELS[payment.status] ?? payment.status}
+                </span>
+              </div>
+
+              <PaymentActionsMenu
+                onEdit={() => onEdit(payment)}
+                onDelete={() => onDelete(payment)}
+              />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };

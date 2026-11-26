@@ -40,7 +40,16 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
         padding: 16,
       }}
     >
-      <h2 style={{ color: 'var(--macos-text, #1c1c1e)', fontSize: '16px', fontWeight: 650, margin: '0 0 12px' }}>
+      <h2
+        style={{
+          color: 'var(--macos-text-secondary, #a4a4ab)',
+          fontSize: '11px',
+          fontWeight: 600,
+          letterSpacing: '0.06em',
+          textTransform: 'uppercase',
+          margin: '0 0 12px',
+        }}
+      >
         Filtrar pagos
       </h2>
       <form
@@ -114,15 +123,16 @@ export const PaymentsFilterBar = ({ onApplyFilters }: PaymentsFilterProps) => {
           fill
           aria-label="Buscar pagos"
           style={{
-            width: '42px',
+            width: '40px',
             height: '38px',
-            minWidth: '42px',
-            borderRadius: '8px',
-            backgroundColor: '#28a865',
-            boxShadow: 'none',
+            minWidth: '40px',
+            borderRadius: '999px',
+            backgroundColor: 'var(--macos-text, #ececef)',
+            color: 'var(--macos-canvas-bg, #18181a)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
           }}
         >
-          <Icon f7="search" size="17px" />
+          <Icon f7="search" size="16px" />
         </Button>
       </form>
     </section>
@@ -149,10 +159,10 @@ const fieldStyle = {
   height: '38px',
   boxSizing: 'border-box' as const,
   padding: '0 10px',
-  color: 'var(--macos-text, #1c1c1e)',
-  backgroundColor: 'var(--macos-input-bg, #f2f2f7)',
-  border: '1px solid var(--macos-card-border, #e5e5ea)',
-  borderRadius: '8px',
+  color: 'var(--macos-text, #ececef)',
+  backgroundColor: 'rgba(255, 255, 255, 0.05)',
+  border: '1px solid rgba(255, 255, 255, 0.09)',
+  borderRadius: '10px',
   outline: 'none',
   fontSize: '13px',
 };

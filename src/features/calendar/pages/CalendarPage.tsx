@@ -1,27 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { Button, f7, Page, Block, Card, CardContent } from 'framework7-react';
+import { Button, Page, Block, Card, CardContent, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
+import { GlassConfirmDialog } from '../../../core/components/GlassConfirmDialog';
 import type { HearingEvent } from '../../../core/context/types';
 import { useNavigationFocus } from '../../../navigation/useNavigationFocus';
 
-import { AgendaHeader } from '../components/AgendaHeader';
 import { AgendaTimeline } from '../components/AgendaTimeline';
 import { AgendaWeekView } from '../components/AgendaWeekView';
 import { AgendaMiniCalendar } from '../components/AgendaMiniCalendar';
 import { AgendaEventDetail } from '../components/AgendaEventDetail';
+import { CalendarViewSwitcher } from '../components/CalendarViewSwitcher';
 import { CreateEventPopup } from '../components/CreateEventPopup';
 import type { CalendarEvent } from '../types';
-
-const MONTH_NAMES_FULL = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-];
-
-const MONTH_NAMES_SHORT = [
-  'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN',
-  'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC',
-];
 
 function to24HourTime(time: string): string | null {
   const match = time.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -35,25 +26,23 @@ function to24HourTime(time: string): string | null {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
-const sectionTitleStyle: CSSProperties = {
-  margin: '0 0 14px',
-  fontSize: 22,
-  fontWeight: 700,
-  lineHeight: 1.2,
-  color: 'var(--macos-text, #1c1c1e)',
-};
-
 const calendarCardStyle: CSSProperties = {
-  ['--f7-card-bg-color' as string]: 'var(--macos-card-bg, #ffffff)',
-  ['--f7-card-border-radius' as string]: '16px',
+  ['--f7-card-bg-color' as string]: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
+  ['--f7-card-border-radius' as string]: '18px',
+  backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
+  backdropFilter: 'blur(24px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(24px) saturate(160%)',
   display: 'flex',
   flexDirection: 'column',
-  height: 'calc(100vh - 150px)',
+  width: '100%',
+  height: 'calc(100vh - 172px)',
   minHeight: 320,
   margin: 0,
-  border: '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
-  boxShadow: '0 2px 10px rgba(0,0,0,0.08)',
+  border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+  boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
   overflow: 'hidden',
+  maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
 };
 
 const layoutStyle: CSSProperties = {
@@ -74,6 +63,7 @@ const sidebarPanelStyle: CSSProperties = {
   minHeight: 0,
   flexShrink: 0,
   borderLeft: '1px solid rgba(0,0,0,0.08)',
+  paddingBottom: 68,
   overflowY: 'auto',
   overscrollBehaviorY: 'contain',
 };
@@ -93,7 +83,7 @@ const undoBannerStyle: CSSProperties = {
 const timelineScrollStyle: CSSProperties = {
   height: '100%',
   boxSizing: 'border-box',
-  padding: '8px 0',
+  padding: 0,
   minHeight: 0,
   overflowX: 'hidden',
   overflowY: 'auto',
@@ -112,10 +102,12 @@ export default function Calendar() {
   } = useApp();
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false);
+  const [draftTimeRange, setDraftTimeRange] = useState({ start: '09:00', end: '10:00' });
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | HearingEvent | null>(null);
   const [compactLayout, setCompactLayout] = useState(false);
   const [isWeekView, setIsWeekView] = useState(false);
+  const [eventToDelete, setEventToDelete] = useState<CalendarEvent | null>(null);
   const [deletedEvent, setDeletedEvent] = useState<CalendarEvent | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -170,20 +162,8 @@ export default function Calendar() {
     [calendarEvents, hearings]
   );
 
-  const fullDateLabel = `${MONTH_NAMES_FULL[currentMonthIndex]} ${currentYear}`;
   const weekStart = new Date(currentYear, currentMonthIndex, currentDay);
   weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
-  const weekEnd = new Date(weekStart);
-  weekEnd.setDate(weekEnd.getDate() + 6);
-  const weekDateLabel = `Semana del ${weekStart.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-  })} al ${weekEnd.toLocaleDateString('es-ES', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })}`;
-  const monthShort = MONTH_NAMES_SHORT[currentMonthIndex];
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 900px)');
@@ -213,21 +193,29 @@ export default function Calendar() {
   const handleSelectDate = (date: Date) => {
     setSelectedDate(date);
     setSelectedEvent(null);
+    setIsWeekView(false);
+  };
+
+  const handleOpenCreateAtSlot = (date: Date, startTime: string, endTime: string) => {
+    setSelectedDate(date);
+    setEditingEvent(null);
+    setDraftTimeRange({ start: startTime, end: endTime });
+    setIsCreateEventOpen(true);
   };
 
   const handleDeleteEvent = (event: CalendarEvent) => {
-    f7.dialog.confirm(
-      `¿Quieres eliminar «${event.title}»?`,
-      'Eliminar evento',
-      () => {
-        const removed = removeCalendarEvent(event.id);
-        if (!removed) return;
-        setSelectedEvent(null);
-        setDeletedEvent(removed);
-        if (undoTimer.current) clearTimeout(undoTimer.current);
-        undoTimer.current = setTimeout(() => setDeletedEvent(null), 8000);
-      }
-    );
+    setEventToDelete(event);
+  };
+
+  const confirmDeleteEvent = () => {
+    if (!eventToDelete) return;
+    const removed = removeCalendarEvent(eventToDelete.id);
+    setEventToDelete(null);
+    if (!removed) return;
+    setSelectedEvent(null);
+    setDeletedEvent(removed);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    undoTimer.current = setTimeout(() => setDeletedEvent(null), 8000);
   };
 
   const handleUndoDelete = () => {
@@ -257,72 +245,113 @@ export default function Calendar() {
 
   return (
     <Page noNavbar noToolbar style={{ overflowX: 'hidden' }}>
+      <style>{`
+        @keyframes calEnter {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes calSwitch {
+          from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.988);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes calStep {
+          from {
+            opacity: 0;
+            transform: translateX(10px) scale(0.992);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+          }
+        }
+        .cal-anim {
+          opacity: 0;
+          animation: calEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .cal-switch-anim {
+          animation: calSwitch 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        .cal-step-anim {
+          animation: calStep 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cal-anim,
+          .cal-switch-anim,
+          .cal-step-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
       <Block
-        className="no-margin-top padding-top-half"
+        className="no-margin-top"
         style={{
           width: '100%',
           minWidth: 0,
-          paddingTop: '20px',
+          padding: '12px 24px 0 24px',
           boxSizing: 'border-box',
           overflowX: 'hidden',
         }}
       >
-        <h1 style={sectionTitleStyle}>Calendario</h1>
-        <Card style={calendarCardStyle}>
-          <AgendaHeader
-            day={currentDay}
-            monthShort={monthShort}
-            fullDateLabel={isWeekView ? weekDateLabel : fullDateLabel}
-            isWeekView={isWeekView}
-            onToday={() => handleSelectDate(new Date())}
-            onPreviousDay={() => handleSelectDate(new Date(
-              currentYear,
-              currentMonthIndex,
-              currentDay - (isWeekView ? 7 : 1)
-            ))}
-            onToggleWeekView={() => {
-              setIsWeekView((previous) => !previous);
-              setSelectedEvent(null);
-            }}
-            onNextDay={() => handleSelectDate(new Date(
-              currentYear,
-              currentMonthIndex,
-              currentDay + (isWeekView ? 7 : 1)
-            ))}
-            onAddEvent={() => {
-              setEditingEvent(null);
-              setIsCreateEventOpen(true);
-            }}
-          />
-
+        <Card className="cal-anim" style={{ ...calendarCardStyle, animationDelay: '60ms' }}>
           <div
             style={{
               ...layoutStyle,
-              gridTemplateColumns: compactLayout ? 'minmax(0, 1fr)' : 'minmax(0, 1fr) 300px',
+              flexDirection: compactLayout ? 'column' : 'row',
               overflowY: compactLayout ? 'auto' : 'hidden',
             }}
           >
-            <div style={{
-              ...timelinePanelStyle,
-              height: compactLayout ? '50vh' : '100%',
-            }}>
+            <div
+              key={isWeekView ? 'week-view' : 'day-view'}
+              className="cal-switch-anim"
+              style={{
+                ...timelinePanelStyle,
+                height: compactLayout ? '50vh' : '100%',
+                flex: compactLayout ? '0 0 auto' : 1,
+              }}
+            >
               {isWeekView ? (
                 <CardContent style={{ ...timelineScrollStyle, padding: 0 }}>
-                  <AgendaWeekView
-                    selectedDate={selectedDate}
-                    calendarEvents={calendarEvents}
-                    hearings={hearings}
-                    onSelectEvent={setSelectedEvent}
-                  />
+                  <div key={weekStart.getTime()} className="cal-step-anim" style={{ height: '100%' }}>
+                    <AgendaWeekView
+                      selectedDate={selectedDate}
+                      calendarEvents={calendarEvents}
+                      hearings={hearings}
+                      onSelectEvent={setSelectedEvent}
+                      onCreateAtSlot={handleOpenCreateAtSlot}
+                    />
+                  </div>
                 </CardContent>
               ) : (
                 <CardContent style={timelineScrollStyle}>
-                  <AgendaTimeline
-                    todayHearings={todayHearings}
-                    calendarEvents={selectedDayEvents}
-                    onSelectEvent={setSelectedEvent}
-                    selectedDate={selectedDate}
-                  />
+                  <div
+                    key={`${currentYear}-${currentMonthIndex}-${currentDay}`}
+                    className="cal-step-anim"
+                  >
+                    <AgendaTimeline
+                      todayHearings={todayHearings}
+                      calendarEvents={selectedDayEvents}
+                      onSelectEvent={setSelectedEvent}
+                      onCreateAtSlot={handleOpenCreateAtSlot}
+                      selectedDate={selectedDate}
+                    />
+                  </div>
                 </CardContent>
               )}
             </div>
@@ -331,14 +360,65 @@ export default function Calendar() {
               ...sidebarPanelStyle,
               width: compactLayout ? '100%' : 300,
               minWidth: compactLayout ? 0 : 300,
-              borderLeft: compactLayout ? 'none' : '1px solid var(--macos-card-border, rgba(0,0,0,0.08))',
-              borderTop: compactLayout ? '1px solid var(--macos-card-border, rgba(0,0,0,0.08))' : 'none',
+              borderLeft: compactLayout ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.16))',
+              borderTop: compactLayout ? '1px solid var(--macos-divider, rgba(128, 128, 136, 0.16))' : 'none',
             }}>
               <AgendaMiniCalendar
                 selectedDate={selectedDate}
                 eventDates={eventDates}
                 onSelectDate={handleSelectDate}
               />
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '6px 14px 12px 14px',
+                }}
+              >
+                <CalendarViewSwitcher
+                  isWeekView={isWeekView}
+                  onToggleWeekView={(isWeek) => {
+                    setIsWeekView(isWeek);
+                    setSelectedEvent(null);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingEvent(null);
+                    setDraftTimeRange({ start: '09:00', end: '10:00' });
+                    setIsCreateEventOpen(true);
+                  }}
+                  aria-label="Añadir evento"
+                  title="Añadir evento"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 32,
+                    height: 32,
+                    padding: 0,
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: 'transparent',
+                    color: 'var(--macos-text, #ececef)',
+                    opacity: 0.85,
+                    cursor: 'pointer',
+                    transition: 'opacity 0.14s ease, transform 0.14s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                    e.currentTarget.style.transform = 'scale(1.08)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0.85';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  <Icon f7="plus" size="22px" />
+                </button>
+              </div>
               <AgendaEventDetail
                 event={selectedEvent}
                 clientName={selectedEventClient}
@@ -362,6 +442,8 @@ export default function Calendar() {
       <CreateEventPopup
         opened={isCreateEventOpen}
         selectedDate={selectedDate}
+        initialStartTime={draftTimeRange.start}
+        initialEndTime={draftTimeRange.end}
         clients={clients}
         existingEvents={calendarEvents}
         existingHearings={hearings}
@@ -369,6 +451,13 @@ export default function Calendar() {
         onClose={() => setIsCreateEventOpen(false)}
         onCreate={handleCreateEvent}
         onUpdate={handleUpdateEvent}
+      />
+      <GlassConfirmDialog
+        opened={eventToDelete !== null}
+        title="Eliminar evento"
+        message={eventToDelete ? `¿Quieres eliminar «${eventToDelete.title}»?` : ''}
+        onCancel={() => setEventToDelete(null)}
+        onConfirm={confirmDeleteEvent}
       />
     </Page>
   );

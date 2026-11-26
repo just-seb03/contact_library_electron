@@ -26,16 +26,29 @@ import {
 import { databaseService } from '../database/databaseService';
 import { getThemeTokens, themeTokensToCssVars } from '../theme/themes';
 import type { NavigationTarget } from '../../shared/types/navigation';
+import {
+  TEST_CALENDAR_EVENTS,
+  TEST_CLIENTS,
+  TEST_PAYMENTS,
+  isTestCalendarEvent,
+  isTestClient,
+  isTestPayment,
+  mergeTestItems,
+} from './testSeedData';
 
 /** Si ninguna página consume el foco en este tiempo (elemento borrado, etc.), se descarta. */
 const NAVIGATION_FOCUS_TTL_MS = 5000;
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [clients, setClients] = useState<Client[]>(loadClients);
-  const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(
-    () => loadRegisteredPayments(clients)
+  const [clients, setClients] = useState<Client[]>(() =>
+    mergeTestItems(loadClients(), TEST_CLIENTS, (c) => c.id)
   );
-  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(loadCalendarEvents);
+  const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(() =>
+    mergeTestItems(loadRegisteredPayments(loadClients()), TEST_PAYMENTS, (p) => p.id)
+  );
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() =>
+    mergeTestItems(loadCalendarEvents(), TEST_CALENDAR_EVENTS, (e) => e.id)
+  );
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [navigationFocus, setNavigationFocus] = useState<NavigationTarget | null>(null);
   /** Tablas de SQLite ya leídas al arrancar; hasta entonces no se escribe en ellas. */
@@ -53,7 +66,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, [navigationFocus]);
   const [activeTab, setActiveTab] = useState<AppContextType['activeTab']>('inicio');
   const [darkMode, setDarkMode] = useState<boolean>(() => {
-    return localStorage.getItem('contact_library_dark_mode') === 'true';
+    const stored = localStorage.getItem('contact_library_dark_mode');
+    return stored === null ? true : stored === 'true';
   });
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
@@ -156,13 +170,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         });
 
         if (dbClients && dbClients.length > 0) {
-          setClients(dbClients);
+          setClients(mergeTestItems(dbClients, TEST_CLIENTS, (c) => c.id));
         }
         if (dbPayments && dbPayments.length > 0) {
-          setRegisteredPayments(dbPayments);
+          setRegisteredPayments(mergeTestItems(dbPayments, TEST_PAYMENTS, (p) => p.id));
         }
         if (dbCalendar && dbCalendar.length > 0) {
-          setCalendarEvents(dbCalendar);
+          setCalendarEvents(mergeTestItems(dbCalendar, TEST_CALENDAR_EVENTS, (e) => e.id));
         }
         if (dbSettings && Object.keys(dbSettings).length > 0) {
           setSettings((prev) => ({ ...prev, ...(dbSettings as unknown as Partial<AppSettings>) }));
@@ -183,18 +197,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Sin esto, el primer render guardaba el estado inicial (localStorage, posiblemente vacío)
   // y `saveAll` reemplazaba la tabla completa antes de haberla leído.
   useEffect(() => {
-    saveCalendarEvents(calendarEvents);
-    if (dbHydrated.calendar) databaseService.saveCalendarEvents(calendarEvents);
+    const persistableEvents = calendarEvents.filter((e) => !isTestCalendarEvent(e));
+    saveCalendarEvents(persistableEvents);
+    if (dbHydrated.calendar) databaseService.saveCalendarEvents(persistableEvents);
   }, [calendarEvents, dbHydrated.calendar]);
 
   useEffect(() => {
-    saveClients(clients);
-    if (dbHydrated.clients) databaseService.saveAllClients(clients);
+    const persistableClients = clients.filter((c) => !isTestClient(c));
+    saveClients(persistableClients);
+    if (dbHydrated.clients) databaseService.saveAllClients(persistableClients);
   }, [clients, dbHydrated.clients]);
 
   useEffect(() => {
-    saveRegisteredPayments(registeredPayments);
-    if (dbHydrated.payments) databaseService.savePayments(registeredPayments);
+    const persistablePayments = registeredPayments.filter((p) => !isTestPayment(p));
+    saveRegisteredPayments(persistablePayments);
+    if (dbHydrated.payments) databaseService.savePayments(persistablePayments);
   }, [registeredPayments, dbHydrated.payments]);
 
   useEffect(() => {

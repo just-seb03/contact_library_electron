@@ -108,9 +108,9 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   const navButtonStyle: CSSProperties = {
     width: 26,
     height: 26,
-    borderRadius: 6,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
-    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
+    borderRadius: 8,
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.2))',
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.08))',
     color: 'var(--macos-text, #1c1c1e)',
     display: 'flex',
     alignItems: 'center',
@@ -137,7 +137,7 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   const daysGridStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: 'repeat(7, 1fr)',
-    gap: '2px 0',
+    gap: 4,
   };
 
   const dayCellStyle: CSSProperties = {
@@ -154,15 +154,17 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
   };
 
   const dayNumberBaseStyle: CSSProperties = {
-    width: 24,
-    height: 24,
-    borderRadius: '50%',
+    width: '100%',
+    height: 30,
+    borderRadius: 8,
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 12,
+    gap: 2,
+    fontSize: 12.5,
     fontWeight: 500,
-    transition: 'all 0.12s ease',
+    transition: 'all 0.14s ease',
   };
 
   return (
@@ -192,7 +194,11 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
       </div>
 
       {/* ── Grilla de días del mes con puntos de eventos Apple ── */}
-      <div style={daysGridStyle}>
+      <div
+        key={`${viewYear}-${viewMonth}`}
+        className="cal-switch-anim"
+        style={daysGridStyle}
+      >
         {cells.map((cell, idx) => {
           const todayMatch = isToday(cell.day, cell.isCurrentMonth);
           const cellDate = new Date(
@@ -222,41 +228,38 @@ export const AgendaMiniCalendar: FC<AgendaMiniCalendarProps> = ({
                 }
               }}
             >
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                <div
-                  style={{
-                    ...dayNumberBaseStyle,
-                    backgroundColor: todayMatch
-                      ? 'var(--macos-accent-color, #007aff)'
-                      : selectedMatch
-                      ? 'var(--macos-text, #1c1c1e)'
+              <div
+                style={{
+                  ...dayNumberBaseStyle,
+                  backgroundColor: selectedMatch
+                    ? 'var(--macos-active-bg, #323237)'
+                    : todayMatch
+                      ? 'var(--macos-hover-bg, rgba(128, 128, 136, 0.14))'
                       : 'transparent',
-                    color: todayMatch
-                      ? 'var(--macos-on-accent, #ffffff)'
-                      : selectedMatch
-                      ? 'var(--macos-canvas-bg, #ffffff)'
-                      : cell.isCurrentMonth
-                      ? 'var(--macos-text, #1c1c1e)'
-                      : 'var(--macos-text-muted, rgba(0, 0, 0, 0.25))',
-                    fontWeight: todayMatch || selectedMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
-                    boxShadow: todayMatch ? '0 2px 5px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.4))' : 'none',
-                  }}
-                >
-                  {cell.day}
-                </div>
-
-                {/* Punto indicador de eventos estilo iOS / macOS Calendar */}
-                <div
-                  style={{
-                    width: 4,
-                    height: 4,
-                    borderRadius: '50%',
-                    backgroundColor: hasEvents
-                      ? 'var(--macos-accent-color, #007aff)'
-                      : 'transparent',
-                  }}
-                  aria-hidden="true"
-                />
+                  border: selectedMatch
+                    ? '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.35))'
+                    : todayMatch
+                      ? '1px solid var(--macos-text-secondary, rgba(128, 128, 136, 0.45))'
+                      : '1px solid transparent',
+                  color: cell.isCurrentMonth || selectedMatch || todayMatch
+                    ? 'var(--macos-text, #1c1c1e)'
+                    : 'var(--macos-text-muted, #8e8e93)',
+                  opacity: cell.isCurrentMonth || selectedMatch || todayMatch ? 1 : 0.35,
+                  fontWeight: todayMatch || selectedMatch ? 700 : cell.isCurrentMonth ? 500 : 400,
+                }}
+              >
+                <span style={{ lineHeight: 1 }}>{cell.day}</span>
+                {hasEvents && (
+                  <span
+                    style={{
+                      width: 4,
+                      height: 4,
+                      borderRadius: '50%',
+                      backgroundColor: '#ff3b30',
+                    }}
+                    aria-hidden="true"
+                  />
+                )}
               </div>
             </button>
           );

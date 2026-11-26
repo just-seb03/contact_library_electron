@@ -1,290 +1,431 @@
-import { useState, type CSSProperties } from 'react';
-import { Page } from 'framework7-react';
+import { useState, useEffect, type CSSProperties, type FormEvent } from 'react';
+import { Page, Icon } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
 import { SettingsGroup } from '../components/SettingsGroup';
 import { SettingsRow } from '../components/SettingsRow';
 import { IosSwitch } from '../components/IosSwitch';
 import { SettingsProfileCard } from '../components/SettingsProfileCard';
 import { SettingsAppearanceSelector } from '../components/SettingsAppearanceSelector';
-import { EditProfileModal, type ProfileFormData } from '../components/EditProfileModal';
-import {
-  SOFTWARE_INFO,
-  type AppleAccentColor,
-} from '../data/settingsData';
+import type { ProfileFormData } from '../components/EditProfileModal';
+import type { AppleAccentColor } from '../data/settingsData';
 import { APP_THEMES } from '../../../core/theme/themes';
+
+type SettingsTab = 'general' | 'tema' | 'perfil';
+
+const SETTINGS_TABS: { id: SettingsTab; label: string }[] = [
+  { id: 'general', label: 'General' },
+  { id: 'tema', label: 'Tema' },
+  { id: 'perfil', label: 'Perfil' },
+];
 
 export default function Configuration() {
   const { darkMode, toggleDarkMode, settings, updateSetting, updateSettings } = useApp();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileForm, setProfileForm] = useState<ProfileFormData>({
+    name: settings.lawyerName,
+    firm: settings.lawyerFirm,
+    email: settings.lawyerEmail,
+  });
 
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-
-  const handleSaveProfile = (formData: ProfileFormData) => {
-    updateSettings({
-      lawyerName: formData.name,
-      lawyerFirm: formData.firm,
-      lawyerEmail: formData.email,
+  useEffect(() => {
+    setProfileForm({
+      name: settings.lawyerName,
+      firm: settings.lawyerFirm,
+      email: settings.lawyerEmail,
     });
+  }, [settings.lawyerName, settings.lawyerFirm, settings.lawyerEmail]);
+
+  const isProfileDirty =
+    profileForm.name !== settings.lawyerName ||
+    profileForm.firm !== settings.lawyerFirm ||
+    profileForm.email !== settings.lawyerEmail;
+
+  const handleSaveProfile = (e: FormEvent) => {
+    e.preventDefault();
+    if (!profileForm.name.trim()) return;
+    updateSettings({
+      lawyerName: profileForm.name.trim(),
+      lawyerFirm: profileForm.firm.trim(),
+      lawyerEmail: profileForm.email.trim(),
+    });
+    setProfileSaved(true);
+    window.setTimeout(() => setProfileSaved(false), 2000);
+  };
+
+  const handleResetProfile = () => {
+    setProfileForm({
+      name: settings.lawyerName,
+      firm: settings.lawyerFirm,
+      email: settings.lawyerEmail,
+    });
+    setProfileSaved(false);
   };
 
   const handleAccentColorChange = (color: AppleAccentColor) => {
     updateSetting('accentColor', color);
   };
 
-  // Estilos macOS Inset Grouped
-  const pageContainerStyle: CSSProperties = {
-    maxWidth: 720,
-    margin: '0 auto',
-    padding: '24px 24px 64px 24px',
+  const rootWrapperStyle: CSSProperties = {
+    height: 'calc(100vh - 58px)',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
     boxSizing: 'border-box',
   };
 
-  const titleStyle: CSSProperties = {
-    fontSize: 28,
-    fontWeight: 700,
-    letterSpacing: '-0.025em',
-    color: 'var(--macos-text, #1c1c1e)',
-    margin: 0,
-    lineHeight: 1.2,
+  const tabHeaderStyle: CSSProperties = {
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '10px 24px 6px',
+    flexShrink: 0,
   };
 
-  const descriptionStyle: CSSProperties = {
-    fontSize: 13.5,
-    color: 'var(--macos-text-secondary, #8e8e93)',
-    marginTop: 6,
-    marginBottom: 24,
-    lineHeight: 1.45,
-  };
-
-  const versionBadgeStyle: CSSProperties = {
-    fontSize: 12,
-    fontWeight: 600,
-    color: 'var(--macos-text-muted, #636366)',
-    backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.05))',
-    padding: '4px 8px',
-    borderRadius: 6,
-    fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", monospace',
-  };
-
-  const environmentBadgeStyle: CSSProperties = {
+  const tabSwitcherStyle: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 6,
-    fontSize: 12,
-    fontWeight: 600,
-    color: '#34C759',
-    backgroundColor: 'rgba(52, 199, 89, 0.12)',
-    padding: '3px 8px',
-    borderRadius: 12,
+    padding: 3,
+    borderRadius: 999,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.1))',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    userSelect: 'none',
   };
 
-  const statusDotStyle: CSSProperties = {
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-    backgroundColor: '#34C759',
-    boxShadow: '0 0 4px #34C759',
-    flexShrink: 0,
+  const tabButtonStyle = (active: boolean): CSSProperties => ({
+    padding: '5px 18px',
+    borderRadius: 999,
+    border: 'none',
+    outline: 'none',
+    fontSize: 12.5,
+    fontWeight: active ? 600 : 500,
+    cursor: 'pointer',
+    backgroundColor: active ? 'var(--macos-active-bg, #323237)' : 'transparent',
+    color: active ? 'var(--macos-text, #ececef)' : 'var(--macos-text-muted, #888890)',
+    boxShadow: active ? '0 1px 4px rgba(0, 0, 0, 0.14)' : 'none',
+    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+  });
+
+  const scrollWrapperStyle: CSSProperties = {
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
+    overflowY: 'auto',
+    boxSizing: 'border-box',
+    maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+    WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 88px), transparent 100%)',
+  };
+
+  const pageContainerStyle: CSSProperties = {
+    maxWidth: 720,
+    margin: '0 auto',
+    padding: '14px 24px 96px 24px',
+    boxSizing: 'border-box',
+  };
+
+  const labelStyle: CSSProperties = {
+    display: 'block',
+    fontSize: 12,
+    fontWeight: 600,
+    color: 'var(--macos-text-secondary, #8e8e93)',
+    marginBottom: 6,
+  };
+
+  const inputStyle: CSSProperties = {
+    height: 36,
+    padding: '0 12px',
+    borderRadius: 10,
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.2))',
+    backgroundColor: 'var(--macos-input-bg, rgba(128, 128, 136, 0.08))',
+    color: 'var(--macos-text, #ececef)',
+    fontSize: 13,
+    outline: 'none',
+    boxSizing: 'border-box',
+    width: '100%',
   };
 
   return (
     <Page noNavbar noToolbar>
-      <div style={pageContainerStyle}>
-        {/* Cabecera Principal */}
-        <h1 style={titleStyle}>Ajustes del Sistema</h1>
-        <p style={descriptionStyle}>
-          Personaliza la apariencia, notificaciones, respaldo local y datos de tu despacho jurídico.
-        </p>
+      <style>{`
+        @keyframes cfgEnter {
+          from {
+            opacity: 0;
+            transform: translateY(14px) scale(0.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .cfg-anim {
+          opacity: 0;
+          animation: cfgEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          will-change: transform, opacity;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .cfg-anim {
+            opacity: 1;
+            animation: none !important;
+            transform: none !important;
+          }
+        }
+      `}</style>
 
-        {/* 1. Tarjeta Perfil de Usuario / Despacho estilo Apple ID */}
-        <SettingsProfileCard
-          name={settings.lawyerName}
-          firm={settings.lawyerFirm}
-          email={settings.lawyerEmail}
-          darkMode={darkMode}
-          onEdit={() => setIsEditingProfile(true)}
-        />
+      <div style={rootWrapperStyle}>
+        <div style={tabHeaderStyle}>
+          <div style={tabSwitcherStyle} role="tablist" aria-label="Secciones de configuración">
+            {SETTINGS_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={tabButtonStyle(activeTab === tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {/* 2. Grupo: Apariencia y Personalización */}
-        <SettingsGroup
-          title="Apariencia y personalización"
-          footerText="El color de realce seleccionado se aplica armónicamente a los elementos interactivos del sistema."
-          darkMode={darkMode}
-        >
-          <SettingsAppearanceSelector
-            darkMode={darkMode}
-            onToggleDarkMode={toggleDarkMode}
-            themeId={settings.themeId ?? 'default'}
-            onChangeTheme={(themeId) => {
-              const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
-              updateSettings(
-                recommendedAccent
-                  ? { themeId, accentColor: recommendedAccent }
-                  : { themeId }
-              );
-            }}
-            accentColor={settings.accentColor}
-            onChangeAccentColor={handleAccentColorChange}
-          />
-          <SettingsRow
-            icon="speaker_wave_2_fill"
-            iconBgColor="#af52de"
-            title="Efectos de sonido de la interfaz"
-            subtitle="Reproduce sutiles tonos en la app y el sonido de las notificaciones"
-            control={
-              <IosSwitch
-                checked={settings.soundEffects}
-                onChange={(val) => updateSetting('soundEffects', val)}
-                darkMode={darkMode}
-                ariaLabel="Activar efectos sonoros"
-              />
-            }
-            isLast={true}
-            darkMode={darkMode}
-          />
-        </SettingsGroup>
+        <div style={scrollWrapperStyle}>
+          <div key={activeTab} style={pageContainerStyle}>
+            {activeTab === 'general' && (
+              <>
+                <div className="cfg-anim" style={{ animationDelay: '30ms' }}>
+                  <SettingsGroup title="Notificaciones" darkMode={darkMode}>
+                    <SettingsRow
+                      icon="bell"
+                      title="Eventos del calendario"
+                      subtitle="Notificar según el aviso previo de cada evento"
+                      control={
+                        <IosSwitch
+                          checked={settings.calendarAlerts}
+                          onChange={(val) => updateSetting('calendarAlerts', val)}
+                          darkMode={darkMode}
+                          ariaLabel="Avisos de eventos del calendario"
+                        />
+                      }
+                      isLast={false}
+                      darkMode={darkMode}
+                    />
+                    <SettingsRow
+                      icon="calendar"
+                      title="Audiencias judiciales"
+                      subtitle="Aviso 24 horas antes de cada comparecencia"
+                      control={
+                        <IosSwitch
+                          checked={settings.hearingAlerts}
+                          onChange={(val) => updateSetting('hearingAlerts', val)}
+                          darkMode={darkMode}
+                          ariaLabel="Alertas de audiencias judiciales"
+                        />
+                      }
+                      isLast={false}
+                      darkMode={darkMode}
+                    />
+                    <SettingsRow
+                      icon="creditcard"
+                      title="Cobros y vencimientos"
+                      subtitle="Resumen diario a las 9:00 de pagos pendientes"
+                      control={
+                        <IosSwitch
+                          checked={settings.paymentReminders}
+                          onChange={(val) => updateSetting('paymentReminders', val)}
+                          darkMode={darkMode}
+                          ariaLabel="Recordatorios de cobros"
+                        />
+                      }
+                      isLast={true}
+                      darkMode={darkMode}
+                    />
+                  </SettingsGroup>
+                </div>
 
-        {/* 3. Grupo: Notificaciones y Alertas */}
-        <SettingsGroup
-          title="Notificaciones y agenda"
-          footerText="Las alertas se gestionan dentro de la app sin requerir conexión a servicios externos en la nube."
-          darkMode={darkMode}
-        >
-          <SettingsRow
-            icon="bell_fill"
-            iconBgColor="#007aff"
-            title="Avisos de eventos del calendario"
-            subtitle="Notifica antes de cada evento según el «Aviso previo» que elijas al crearlo"
-            control={
-              <IosSwitch
-                checked={settings.calendarAlerts}
-                onChange={(val) => updateSetting('calendarAlerts', val)}
-                darkMode={darkMode}
-                ariaLabel="Avisos de eventos del calendario"
-              />
-            }
-            isLast={false}
-            darkMode={darkMode}
-          />
-          <SettingsRow
-            icon="calendar"
-            iconBgColor="#ff3b30"
-            title="Alertas de audiencias judiciales"
-            subtitle="Recibe avisos automáticos 24 horas antes de cada comparecencia en tribunales"
-            control={
-              <IosSwitch
-                checked={settings.hearingAlerts}
-                onChange={(val) => updateSetting('hearingAlerts', val)}
-                darkMode={darkMode}
-                ariaLabel="Alertas de audiencias judiciales"
-              />
-            }
-            isLast={false}
-            darkMode={darkMode}
-          />
-          <SettingsRow
-            icon="creditcard_fill"
-            iconBgColor="#ff9500"
-            title="Recordatorios de cobros y vencimientos"
-            subtitle="Resumen diario a las 9:00 de cobros vencidos y de los que vencen esta semana"
-            control={
-              <IosSwitch
-                checked={settings.paymentReminders}
-                onChange={(val) => updateSetting('paymentReminders', val)}
-                darkMode={darkMode}
-                ariaLabel="Recordatorios de cobros"
-              />
-            }
-            isLast={true}
-            darkMode={darkMode}
-          />
-        </SettingsGroup>
+                <div className="cfg-anim" style={{ animationDelay: '80ms' }}>
+                  <SettingsGroup title="Sistema" darkMode={darkMode}>
+                    <SettingsRow
+                      icon="speaker_wave_2"
+                      title="Sonidos de interfaz"
+                      subtitle="Tonos sutiles en notificaciones y acciones"
+                      control={
+                        <IosSwitch
+                          checked={settings.soundEffects}
+                          onChange={(val) => updateSetting('soundEffects', val)}
+                          darkMode={darkMode}
+                          ariaLabel="Activar efectos sonoros"
+                        />
+                      }
+                      isLast={false}
+                      darkMode={darkMode}
+                    />
+                    <SettingsRow
+                      icon="tray"
+                      title="Mantener en segundo plano al cerrar"
+                      subtitle="Permite recibir alertas desde la bandeja del sistema"
+                      control={
+                        <IosSwitch
+                          checked={settings.minimizeToTray}
+                          onChange={(val) => updateSetting('minimizeToTray', val)}
+                          darkMode={darkMode}
+                          ariaLabel="Mantener en segundo plano al cerrar"
+                        />
+                      }
+                      isLast={true}
+                      darkMode={darkMode}
+                    />
+                  </SettingsGroup>
+                </div>
+              </>
+            )}
 
-        {/* 4. Grupo: Comportamiento de la aplicación */}
-        <SettingsGroup
-          title="Comportamiento de la aplicación"
-          footerText="Puedes salir por completo desde el icono de la bandeja del sistema (Windows) o de la barra de menús (macOS)."
-          darkMode={darkMode}
-        >
-          <SettingsRow
-            icon="tray_fill"
-            iconBgColor="#5ac8fa"
-            title="Mantener en segundo plano al cerrar"
-            subtitle="Al cerrar la ventana, la app sigue activa para no perderte alertas de audiencias y cobros"
-            control={
-              <IosSwitch
-                checked={settings.minimizeToTray}
-                onChange={(val) => updateSetting('minimizeToTray', val)}
-                darkMode={darkMode}
-                ariaLabel="Mantener en segundo plano al cerrar"
-              />
-            }
-            isLast={true}
-            darkMode={darkMode}
-          />
-        </SettingsGroup>
+            {activeTab === 'tema' && (
+              <div className="cfg-anim" style={{ animationDelay: '30ms' }}>
+                <SettingsGroup title="Apariencia" darkMode={darkMode}>
+                  <SettingsAppearanceSelector
+                    darkMode={darkMode}
+                    onToggleDarkMode={toggleDarkMode}
+                    themeId={settings.themeId ?? 'default'}
+                    onChangeTheme={(themeId) => {
+                      const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
+                      updateSettings(
+                        recommendedAccent
+                          ? { themeId, accentColor: recommendedAccent }
+                          : { themeId }
+                      );
+                    }}
+                    accentColor={settings.accentColor}
+                    onChangeAccentColor={handleAccentColorChange}
+                  />
+                </SettingsGroup>
+              </div>
+            )}
 
-        {/* 5. Grupo: Información del Sistema */}
-        <SettingsGroup title="Información del software y sistema" darkMode={darkMode}>
-          <SettingsRow
-            icon="desktopcomputer"
-            iconBgColor="#007aff"
-            title={SOFTWARE_INFO.name}
-            subtitle={SOFTWARE_INFO.stack}
-            control={<span style={versionBadgeStyle}>{SOFTWARE_INFO.version}</span>}
-            isLast={false}
-            darkMode={darkMode}
-          />
-          <SettingsRow
-            icon="cpu"
-            iconBgColor="#5856d6"
-            title="Compatibilidad de Procesador"
-            subtitle={SOFTWARE_INFO.architecture}
-            control={<span style={versionBadgeStyle}>Universal Binary</span>}
-            isLast={false}
-            darkMode={darkMode}
-          />
-          <SettingsRow
-            icon="lock_shield_fill"
-            iconBgColor="#34c759"
-            title="Entorno y Privacidad"
-            subtitle="Almacenamiento 100% privado en tu disco local. Cero rastreadores."
-            control={
-              <span style={environmentBadgeStyle}>
-                <span style={statusDotStyle} />
-                Protegido y Local
-              </span>
-            }
-            isLast={true}
-            darkMode={darkMode}
-          />
-        </SettingsGroup>
+            {activeTab === 'perfil' && (
+              <>
+                <div className="cfg-anim" style={{ animationDelay: '30ms' }}>
+                  <SettingsProfileCard
+                    name={profileForm.name || settings.lawyerName}
+                    firm={profileForm.firm || settings.lawyerFirm}
+                    email={profileForm.email || settings.lawyerEmail}
+                    darkMode={darkMode}
+                  />
+                </div>
 
-        {/* Pie de página sutil estilo macOS */}
-        <div
-          style={{
-            textAlign: 'center',
-            fontSize: 11.5,
-            color: 'var(--macos-text-muted, #a1a1aa)',
-            marginTop: 32,
-            userSelect: 'none',
-          }}
-        >
-          {SOFTWARE_INFO.name} • Hecho para macOS • {SOFTWARE_INFO.buildDate}
+                <div className="cfg-anim" style={{ animationDelay: '80ms' }}>
+                  <SettingsGroup title="Datos del despacho" darkMode={darkMode}>
+                    <form onSubmit={handleSaveProfile} style={{ padding: '16px 18px' }}>
+                      <div style={{ marginBottom: 14 }}>
+                        <label style={labelStyle}>Nombre del Titular o Abogado</label>
+                        <input
+                          type="text"
+                          required
+                          value={profileForm.name}
+                          onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                          style={inputStyle}
+                          placeholder="Ej. Sebastián Contreras"
+                        />
+                      </div>
+
+                      <div style={{ marginBottom: 14 }}>
+                        <label style={labelStyle}>Firma o Estudio Jurídico</label>
+                        <input
+                          type="text"
+                          required
+                          value={profileForm.firm}
+                          onChange={(e) => setProfileForm({ ...profileForm, firm: e.target.value })}
+                          style={inputStyle}
+                          placeholder="Ej. Contreras & Asociados • Litigios"
+                        />
+                      </div>
+
+                      <div style={{ marginBottom: 18 }}>
+                        <label style={labelStyle}>Correo Electrónico de Contacto</label>
+                        <input
+                          type="email"
+                          required
+                          value={profileForm.email}
+                          onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                          style={inputStyle}
+                          placeholder="abogado@despacho.cl"
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          gap: 10,
+                          paddingTop: 12,
+                          borderTop: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: 'var(--macos-text-secondary, #8e8e93)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 5,
+                            opacity: profileSaved ? 1 : 0,
+                            transition: 'opacity 0.2s ease',
+                          }}
+                        >
+                          <Icon f7="checkmark_circle_fill" size="13px" />
+                          <span>Cambios guardados</span>
+                        </span>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          {isProfileDirty && (
+                            <button
+                              type="button"
+                              onClick={handleResetProfile}
+                              style={{
+                                height: 32,
+                                padding: '0 14px',
+                                borderRadius: 999,
+                                border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+                                backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.08))',
+                                color: 'var(--macos-text, #ececef)',
+                                fontSize: 12.5,
+                                fontWeight: 500,
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Restablecer
+                            </button>
+                          )}
+
+                          <button
+                            type="submit"
+                            style={{
+                              height: 32,
+                              padding: '0 16px',
+                              borderRadius: 999,
+                              border: '1px solid rgba(255, 255, 255, 0.14)',
+                              backgroundColor: 'var(--macos-text, #ececef)',
+                              color: 'var(--macos-canvas-bg, #18181a)',
+                              fontSize: 12.5,
+                              fontWeight: 600,
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.18)',
+                            }}
+                          >
+                            Guardar cambios
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </SettingsGroup>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
-
-      {/* Modal para editar datos del despacho */}
-      <EditProfileModal
-        isOpen={isEditingProfile}
-        onClose={() => setIsEditingProfile(false)}
-        initialData={{
-          name: settings.lawyerName,
-          firm: settings.lawyerFirm,
-          email: settings.lawyerEmail,
-        }}
-        onSave={handleSaveProfile}
-        darkMode={darkMode}
-      />
     </Page>
   );
 }

@@ -1,37 +1,16 @@
-import type { FC, CSSProperties } from 'react';
-import { Icon } from 'framework7-react';
-import { useApp } from '../context/AppContext';
-import { navigateToTab } from '../../navigation/navigation';
+import { useMemo, type FC, type CSSProperties } from 'react';
 import { TrafficLights } from '../windowControls/TrafficLights';
-import type { AppTab } from '../context/types';
 
-interface UnifiedToolbarProps {
-  isSidebarOpen: boolean;
-  onToggleSidebar: () => void;
-  onOpenSpotlight: () => void;
-  onQuickAction?: () => void;
-}
+export const UnifiedToolbar: FC = () => {
 
-const TAB_TITLES: Record<AppTab, { title: string; subtitle?: string; icon: string }> = {
-  inicio: { title: 'Inicio', subtitle: 'Panel General', icon: 'house_fill' },
-  calendar: { title: 'Agenda', subtitle: 'Citas y Audiencias', icon: 'calendar' },
-  cliente: { title: 'Clientes', subtitle: 'Expedientes y Causas', icon: 'person_2_fill' },
-  pagos: { title: 'Pagos', subtitle: 'Honorarios y Cobranzas', icon: 'creditcard_fill' },
-  config: { title: 'Ajustes', subtitle: 'Configuración del Sistema', icon: 'gear_alt_fill' },
-};
-
-export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
-  isSidebarOpen,
-  onToggleSidebar,
-  onOpenSpotlight,
-}) => {
-  const { activeTab, darkMode, toggleDarkMode, hearings, clients } = useApp();
-
-  const currentTabInfo = TAB_TITLES[activeTab] || {
-    title: 'Contact Library',
-    subtitle: '',
-    icon: 'folder_fill',
-  };
+  const todayLabel = useMemo(() => {
+    return new Intl.DateTimeFormat('es-CL', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date());
+  }, []);
 
   const toolbarStyle: CSSProperties = {
     height: 52,
@@ -45,7 +24,6 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
     backgroundColor: 'var(--macos-toolbar-glass, rgba(255, 255, 255, 0.82))',
     backdropFilter: 'blur(25px) saturate(180%)',
     WebkitBackdropFilter: 'blur(25px) saturate(180%)',
-    borderBottom: '1px solid var(--macos-hairline-border, rgba(0, 0, 0, 0.08))',
     WebkitAppRegion: 'drag',
     zIndex: 400,
     position: 'relative',
@@ -55,209 +33,39 @@ export const UnifiedToolbar: FC<UnifiedToolbarProps> = ({
     WebkitAppRegion: 'no-drag',
   } as CSSProperties;
 
-  const macButtonStyle: CSSProperties = {
-    ...noDragStyle,
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: 6,
-    height: 30,
-    padding: '0 10px',
-    borderRadius: 7,
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
-    backgroundColor: 'var(--macos-input-bg, rgba(255, 255, 255, 0.9))',
-    color: 'var(--macos-text, #1c1c1e)',
-    fontSize: 12,
-    fontWeight: 500,
-    cursor: 'pointer',
-    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.04)',
-    transition: 'all 0.12s ease',
-  };
-
   return (
-    <header style={toolbarStyle}>
-      {/* ── Izquierda: Botón de barra lateral + Título de la vista ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, ...noDragStyle }}>
-        {!isSidebarOpen && (
-          <div style={{ marginRight: 4, display: 'flex', alignItems: 'center' }}>
-            <TrafficLights />
-          </div>
-        )}
-
-        <button
-          type="button"
-          onClick={onToggleSidebar}
-          aria-label={isSidebarOpen ? 'Ocultar barra lateral' : 'Mostrar barra lateral'}
-          title={isSidebarOpen ? 'Ocultar barra lateral (⌘B)' : 'Mostrar barra lateral (⌘B)'}
+    <header style={toolbarStyle} className="chrome-top-enter">
+      <style>{`
+        @keyframes chromeTopEnter {
+          from { opacity: 0; transform: translateY(-8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .chrome-top-enter {
+          animation: chromeTopEnter 0.34s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .chrome-top-enter { animation: none !important; transform: none !important; }
+        }
+      `}</style>
+      {/* ── Izquierda: Controles de ventana + Fecha actual con transparencia ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, ...noDragStyle }}>
+        <TrafficLights />
+        <span
           style={{
-            ...noDragStyle,
-            width: 30,
-            height: 30,
-            borderRadius: 7,
-            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.08))',
-            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: 'var(--macos-text-muted, #555558)',
-            transition: 'background-color 0.12s ease',
+            fontSize: 12,
+            color: 'var(--macos-text, #ececef)',
+            opacity: 0.58,
+            textTransform: 'capitalize',
+            whiteSpace: 'nowrap',
+            letterSpacing: '0.01em',
           }}
         >
-          <Icon f7="sidebar_left" size="16px" />
-        </button>
-
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 650,
-              color: 'var(--macos-text, #1c1c1e)',
-              letterSpacing: '-0.01em',
-            }}
-          >
-            {currentTabInfo.title}
-          </span>
-          {currentTabInfo.subtitle && (
-            <span
-              style={{
-                fontSize: 12,
-                color: 'var(--macos-text-secondary, #8e8e93)',
-                fontWeight: 450,
-              }}
-            >
-              • {currentTabInfo.subtitle}
-            </span>
-          )}
-        </div>
+          {todayLabel}
+        </span>
       </div>
 
-      {/* ── Centro: Buscador estilo Spotlight de macOS ── */}
-      <div
-        style={{
-          flex: '0 1 360px',
-          display: 'flex',
-          justifyContent: 'center',
-          ...noDragStyle,
-        }}
-      >
-        <button
-          type="button"
-          onClick={onOpenSpotlight}
-          style={{
-            width: '100%',
-            maxWidth: 360,
-            height: 30,
-            padding: '0 12px',
-            borderRadius: 8,
-            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.09))',
-            backgroundColor: 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.04))',
-            color: 'var(--macos-text-secondary, #8e8e93)',
-            fontSize: 12.5,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            cursor: 'pointer',
-            transition: 'border-color 0.15s ease, background-color 0.15s ease',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Icon f7="search" size="14px" style={{ opacity: 0.8 }} />
-            <span>Buscar clientes, causas o citas...</span>
-          </div>
-          <kbd
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              padding: '2px 5px',
-              borderRadius: 4,
-              backgroundColor: 'var(--macos-hover-bg, rgba(0, 0, 0, 0.06))',
-              color: 'var(--macos-text-muted, #636366)',
-              border: '1px solid var(--macos-divider, rgba(0, 0, 0, 0.08))',
-            }}
-          >
-            ⌘K
-          </kbd>
-        </button>
-      </div>
-
-      {/* ── Derecha: Acciones rápidas contextuales + Modo Oscuro ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...noDragStyle }}>
-        {/* Acción rápida según pestaña */}
-        {activeTab === 'inicio' && (
-          <button
-            type="button"
-            onClick={() => navigateToTab('calendar')}
-            style={{
-              ...macButtonStyle,
-              backgroundColor: 'rgba(0, 122, 255, 0.12)',
-              color: '#007aff',
-              border: '1px solid rgba(0, 122, 255, 0.25)',
-              fontWeight: 600,
-            }}
-          >
-            <Icon f7="calendar_badge_plus" size="14px" />
-            <span>+ Cita</span>
-          </button>
-        )}
-
-        {activeTab === 'calendar' && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              padding: '4px 8px',
-              borderRadius: 6,
-              backgroundColor: 'var(--macos-danger-surface, rgba(255, 59, 48, 0.1))',
-              color: '#ff3b30',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Icon f7="clock" size="12px" />
-            <span>{hearings.length} audiencias</span>
-          </div>
-        )}
-
-        {activeTab === 'cliente' && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              padding: '4px 8px',
-              borderRadius: 6,
-              backgroundColor: 'rgba(88, 86, 214, 0.12)',
-              color: '#5856d6',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Icon f7="person_2" size="12px" />
-            <span>{clients.length} activos</span>
-          </div>
-        )}
-
-        {/* Botón de cambio de tema (Claro / Oscuro) estilo Apple */}
-        <button
-          type="button"
-          onClick={toggleDarkMode}
-          aria-label={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
-          title={darkMode ? 'Modo Claro' : 'Modo Oscuro'}
-          style={{
-            ...macButtonStyle,
-            width: 30,
-            padding: 0,
-            justifyContent: 'center',
-          }}
-        >
-          <Icon
-            f7={darkMode ? 'sun_max_fill' : 'moon_fill'}
-            size="14px"
-            style={{ color: darkMode ? '#ff9f0a' : '#5856d6' }}
-          />
-        </button>
-      </div>
+      {/* ── Derecha: Espacio reservado ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...noDragStyle }} />
     </header>
   );
 };

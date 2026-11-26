@@ -20,7 +20,7 @@ export function AppContent() {
       theme="ios"
       dark={darkMode}
       routes={routes}
-      view={{ animate: true, transition: 'f7-fade', iosSwipeBack: true }}
+      view={{ animate: false, iosSwipeBack: false }}
     >
       <AppShell />
     </Framework7App>
