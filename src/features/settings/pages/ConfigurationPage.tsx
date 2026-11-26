@@ -76,37 +76,35 @@ export default function Configuration() {
 
   const tabHeaderStyle: CSSProperties = {
     display: 'flex',
-    justifyContent: 'flex-start',
-    padding: '10px 28px 0 28px',
-    maxWidth: 980,
-    width: '100%',
-    boxSizing: 'border-box',
+    justifyContent: 'center',
+    padding: '10px 24px 6px',
     flexShrink: 0,
   };
 
   const tabSwitcherStyle: CSSProperties = {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: 24,
-    width: '100%',
-    borderBottom: '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
+    padding: 3,
+    borderRadius: 999,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.1))',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
     userSelect: 'none',
   };
 
   const tabButtonStyle = (active: boolean): CSSProperties => ({
-    padding: '6px 2px 10px 2px',
-    marginBottom: -1,
+    padding: '5px 18px',
+    borderRadius: 999,
     border: 'none',
-    borderBottom: active
-      ? '2px solid var(--macos-text, #ececef)'
-      : '2px solid transparent',
     outline: 'none',
-    fontSize: 13.5,
-    fontWeight: active ? 650 : 500,
+    fontSize: 12.5,
+    fontWeight: active ? 600 : 500,
     cursor: 'pointer',
-    backgroundColor: 'transparent',
+    backgroundColor: active ? 'var(--macos-active-bg, #323237)' : 'transparent',
     color: active ? 'var(--macos-text, #ececef)' : 'var(--macos-text-muted, #888890)',
-    transition: 'color 0.15s ease, border-color 0.15s ease',
+    boxShadow: active ? '0 1px 4px rgba(0, 0, 0, 0.14)' : 'none',
+    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
   });
 
   const scrollWrapperStyle: CSSProperties = {
@@ -120,10 +118,9 @@ export default function Configuration() {
   };
 
   const pageContainerStyle: CSSProperties = {
-    maxWidth: 980,
-    width: '100%',
-    margin: 0,
-    padding: '18px 28px 96px 28px',
+    maxWidth: 720,
+    margin: '0 auto',
+    padding: '14px 24px 96px 24px',
     boxSizing: 'border-box',
   };
 
