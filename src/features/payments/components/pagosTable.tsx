@@ -91,14 +91,13 @@ export const PaymentsTable: FC<TableProps> = ({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0, flex: 1 }}>
               <span
                 style={{
-                  fontSize: 19,
-                  fontWeight: 350,
-                  letterSpacing: '-0.015em',
+                  fontSize: 18,
+                  fontWeight: 400,
                   color: 'var(--macos-text, #ececef)',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
-                  lineHeight: 1.2,
+                  lineHeight: 1.25,
                 }}
               >
                 {payment.client}

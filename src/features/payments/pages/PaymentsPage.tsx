@@ -104,7 +104,7 @@ export default function PaymentsPage() {
     margin: '0 auto',
     padding: '20px 32px 0 32px',
     display: 'grid',
-    gridTemplateColumns: '260px minmax(0, 1fr)',
+    gridTemplateColumns: 'minmax(0, 1fr) 260px',
     gap: 36,
     boxSizing: 'border-box',
     overflow: 'hidden',
@@ -112,12 +112,12 @@ export default function PaymentsPage() {
     WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 120px), transparent 100%)',
   };
 
-  const leftColumnStyle: CSSProperties = {
+  const rightColumnStatsStyle: CSSProperties = {
     paddingTop: 8,
     minWidth: 0,
   };
 
-  const rightColumnStyle: CSSProperties = {
+  const leftColumnListStyle: CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
@@ -141,9 +141,9 @@ export default function PaymentsPage() {
     border: 'none',
     outline: 'none',
     backgroundColor: 'transparent',
-    fontSize: 24,
-    fontWeight: 300,
-    letterSpacing: '-0.02em',
+    fontFamily: 'inherit',
+    fontSize: 22,
+    fontWeight: 400,
     cursor: 'pointer',
     color: 'var(--macos-text, #ececef)',
     opacity: active ? 1 : 0.36,
@@ -280,21 +280,9 @@ export default function PaymentsPage() {
       `}</style>
 
       <div className="payments-metro-grid" style={rootWrapperStyle}>
-        {/* Margen izquierdo: Pendientes en grande arriba, Vencidos y Pagados debajo más pequeños */}
-        <div className="pay-anim" style={{ ...leftColumnStyle, animationDelay: '30ms' }}>
-          <PaymentsStats
-            totalIngresos={totalIngresos}
-            totalPendientes={totalPendientes}
-            totalVencidos={totalVencidos}
-            pendingCount={pendingPayments.length}
-            overdueCount={overduePayments.length}
-            completedCount={completedPayments.length}
-          />
-        </div>
-
-        {/* Derecha: Pivot estilo Windows Phone + Buscador fuzzy + Lista limpia */}
-        <div style={rightColumnStyle}>
-          <div className="pay-anim" style={{ ...pivotHeaderStyle, animationDelay: '50ms' }} role="tablist" aria-label="Filtrar pagos por estado">
+        {/* Izquierda: Pivot estilo Windows Phone + Buscador fuzzy + Lista limpia */}
+        <div style={leftColumnListStyle}>
+          <div className="pay-anim" style={{ ...pivotHeaderStyle, animationDelay: '30ms' }} role="tablist" aria-label="Filtrar pagos por estado">
             {STATUS_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -309,7 +297,7 @@ export default function PaymentsPage() {
             ))}
           </div>
 
-          <div className="pay-anim" style={{ ...searchBarRowStyle, animationDelay: '80ms' }}>
+          <div className="pay-anim" style={{ ...searchBarRowStyle, animationDelay: '65ms' }}>
             <div style={{ flex: 1, minWidth: 0, position: 'relative', display: 'flex', alignItems: 'center' }}>
               <Icon
                 f7="search"
@@ -378,6 +366,15 @@ export default function PaymentsPage() {
               />
             </div>
           </div>
+        </div>
+
+        {/* Derecha: Pendientes en grande arriba, Vencidos y Pagados debajo más pequeños */}
+        <div className="pay-anim" style={{ ...rightColumnStatsStyle, animationDelay: '50ms' }}>
+          <PaymentsStats
+            totalIngresos={totalIngresos}
+            totalPendientes={totalPendientes}
+            totalVencidos={totalVencidos}
+          />
         </div>
       </div>
 
