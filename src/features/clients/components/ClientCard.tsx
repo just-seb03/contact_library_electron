@@ -5,14 +5,12 @@ import type { Client } from '../types';
 interface ClientCardProps {
   client: Client;
   pendingSummary: string;
-  pendingAccentColor?: string;
   onSelect: (client: Client) => void;
 }
 
 export const ClientCard: FC<ClientCardProps> = ({
   client,
   pendingSummary,
-  pendingAccentColor,
   onSelect,
 }) => {
   const rowStyle: CSSProperties = {
@@ -76,8 +74,8 @@ export const ClientCard: FC<ClientCardProps> = ({
         <span
           style={{
             fontSize: 12.5,
-            fontWeight: pendingAccentColor ? 500 : 400,
-            color: pendingAccentColor ?? 'var(--macos-text-secondary, #8e8e93)',
+            fontWeight: 400,
+            color: 'var(--macos-text-secondary, #8e8e93)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',

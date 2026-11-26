@@ -1,10 +1,7 @@
 import { useMemo, type FC, type CSSProperties } from 'react';
-import { Icon } from 'framework7-react';
-import { useApp } from '../context/AppContext';
 import { TrafficLights } from '../windowControls/TrafficLights';
 
 export const UnifiedToolbar: FC = () => {
-  const { activeTab, clients } = useApp();
 
   const todayLabel = useMemo(() => {
     return new Intl.DateTimeFormat('es-CL', {
@@ -67,27 +64,8 @@ export const UnifiedToolbar: FC = () => {
         </span>
       </div>
 
-      {/* ── Derecha: Contadores contextuales ── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...noDragStyle }}>
-        {activeTab === 'cliente' && (
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 500,
-              padding: '4px 8px',
-              borderRadius: 6,
-              backgroundColor: 'rgba(88, 86, 214, 0.12)',
-              color: '#5856d6',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 4,
-            }}
-          >
-            <Icon f7="person_2" size="12px" />
-            <span>{clients.length} activos</span>
-          </div>
-        )}
-      </div>
+      {/* ── Derecha: Espacio reservado ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, ...noDragStyle }} />
     </header>
   );
 };

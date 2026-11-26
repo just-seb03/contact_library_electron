@@ -30,6 +30,8 @@ const glassClientsContainerStyle: CSSProperties = {
   boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
   boxSizing: 'border-box',
   overflow: 'hidden',
+  maskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 120px), transparent 100%)',
+  WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black calc(100% - 120px), transparent 100%)',
 };
 
 export default function Cliente() {
