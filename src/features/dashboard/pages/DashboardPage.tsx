@@ -18,11 +18,42 @@ const GHOST_OPACITIES = [0.45, 0.28, 0.15, 0.07, 0.02];
 export default function Dashboard() {
   const { hearings, calendarEvents, payments } = useApp();
 
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const toISODate = (year: number, monthIndex: number, day: number) =>
+    `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+  const hasWorkToday =
+    calendarEvents.some((e) => e.date === todayStr) ||
+    hearings.some((h) => toISODate(h.year, h.monthIndex, h.day) === todayStr) ||
+    payments.some(
+      (p) =>
+        (p.status === 'pending' || p.status === 'overdue') &&
+        (p.date === todayStr || p.status === 'overdue')
+    );
+
+  const hasUpcomingWork =
+    calendarEvents.some((e) => e.date > todayStr) ||
+    hearings.some((h) => toISODate(h.year, h.monthIndex, h.day) > todayStr) ||
+    payments.some((p) => p.status === 'pending' && p.date > todayStr);
+
   const pendingPaymentsCount = payments.filter(
     (p) => p.status === 'pending' || p.status === 'overdue'
   ).length;
   const totalEventsCount = hearings.length + calendarEvents.length;
-  const hasPending = totalEventsCount > 0 || pendingPaymentsCount > 0;
+
+  const headlineTop = hasWorkToday
+    ? 'Hay trabajos aproximándose'
+    : hasUpcomingWork
+      ? 'Hay trabajo los próximos'
+      : 'Hoy es un día';
+  const headlineBottom = hasWorkToday
+    ? 'hoy'
+    : hasUpcomingWork
+      ? 'días'
+      : 'tranquilo';
+  const isLongHeadline = hasWorkToday || hasUpcomingWork;
 
   return (
     <Page noNavbar noToolbar>
@@ -76,58 +107,34 @@ export default function Dashboard() {
             style={{
               margin: 0,
               fontFamily: "var(--apple-font, 'Courier New', Courier, monospace)",
-              fontSize: 'clamp(42px, 4.8vw, 66px)',
+              fontSize: isLongHeadline
+                ? 'clamp(32px, 3.6vw, 52px)'
+                : 'clamp(42px, 4.8vw, 66px)',
               fontWeight: 400,
-              lineHeight: 1.08,
-              letterSpacing: '0.06em',
+              lineHeight: 1.12,
+              letterSpacing: '0.05em',
               color: 'var(--macos-text, #ececef)',
             }}
           >
-            {!hasPending ? (
-              <>
-                <span className="dash-anim" style={{ whiteSpace: 'nowrap', display: 'inline-block', animationDelay: '40ms' }}>
-                  Hoy es un día
-                </span>
-                <br />
-                <span
-                  className="dash-anim"
-                  style={{
-                    fontFamily: "'Brother Signature', Georgia, serif",
-                    fontWeight: 400,
-                    fontSize: '1.68em',
-                    lineHeight: 0.95,
-                    letterSpacing: '0.03em',
-                    display: 'inline-block',
-                    marginTop: 8,
-                    animationDelay: '110ms',
-                  }}
-                >
-                  tranquilo
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="dash-anim" style={{ whiteSpace: 'nowrap', display: 'inline-block', animationDelay: '40ms' }}>
-                  Agenda del
-                </span>
-                <br />
-                <span
-                  className="dash-anim"
-                  style={{
-                    fontFamily: "'Brother Signature', Georgia, serif",
-                    fontWeight: 400,
-                    fontSize: '1.68em',
-                    lineHeight: 0.95,
-                    letterSpacing: '0.03em',
-                    display: 'inline-block',
-                    marginTop: 8,
-                    animationDelay: '110ms',
-                  }}
-                >
-                  día
-                </span>
-              </>
-            )}
+            <span className="dash-anim" style={{ display: 'inline-block', animationDelay: '40ms' }}>
+              {headlineTop}
+            </span>
+            <br />
+            <span
+              className="dash-anim"
+              style={{
+                fontFamily: "'Brother Signature', Georgia, serif",
+                fontWeight: 400,
+                fontSize: '1.68em',
+                lineHeight: 0.95,
+                letterSpacing: '0.03em',
+                display: 'inline-block',
+                marginTop: 8,
+                animationDelay: '110ms',
+              }}
+            >
+              {headlineBottom}
+            </span>
           </h1>
         </div>
 
