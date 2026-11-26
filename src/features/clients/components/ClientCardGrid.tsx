@@ -1,9 +1,10 @@
-import { useState, type FC, type CSSProperties } from 'react';
+import { useState, useMemo, type FC, type CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
 import { ClientCard } from './ClientCard';
 import type { CalendarEvent } from '../../calendar/types';
 import type { Payment } from '../../payments/types';
+import { fuzzyScore } from '../../../core/utils/fuzzySearch';
 
 interface ClientCardGridProps {
   clients: Client[];
@@ -30,13 +31,24 @@ export const ClientCardGrid: FC<ClientCardGridProps> = ({
   const [filterText, setFilterText] = useState('');
   const today = getLocalDateValue();
 
-  const filteredClients = clients.filter(
-    (client) =>
-      client.name.toLowerCase().includes(filterText.toLowerCase()) ||
-      client.phone.includes(filterText) ||
-      (client.email?.toLowerCase().includes(filterText.toLowerCase()) ?? false) ||
-      (client.caso?.materia?.toLowerCase().includes(filterText.toLowerCase()) ?? false)
-  );
+  const filteredClients = useMemo(() => {
+    if (!filterText.trim()) return clients;
+    return clients
+      .map((client) => ({
+        client,
+        score: fuzzyScore(filterText, [
+          client.name,
+          client.phone,
+          client.email,
+          client.rut,
+          client.caso?.materia,
+          client.caso?.expediente,
+        ]),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.client);
+  }, [clients, filterText]);
 
   const containerStyle: CSSProperties = {
     display: 'flex',
