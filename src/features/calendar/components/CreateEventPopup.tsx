@@ -177,14 +177,21 @@ export function CreateEventPopup({
       }
       setIsClosing(false);
       setIsVisible(true);
-    } else if (isVisible && !isClosing) {
+      return;
+    }
+
+    setIsVisible((prevVisible) => {
+      if (!prevVisible) return false;
       setIsClosing(true);
+      if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
       closeTimerRef.current = setTimeout(() => {
         setIsVisible(false);
         setIsClosing(false);
+        closeTimerRef.current = null;
       }, CLOSE_ANIMATION_MS);
-    }
-  }, [opened, isVisible, isClosing]);
+      return true;
+    });
+  }, [opened]);
 
   useEffect(() => {
     return () => {
