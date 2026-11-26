@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { Page } from 'framework7-react';
 import { useApp } from '../../../core/context/AppContext';
-import brotherSignatureFont from '../../../../assets/fonts/Brother Signature.otf';
+import brotherSignatureFont from '../../../assets/fonts/BrotherSignature.otf';
 
 const glassCardBase: CSSProperties = {
   borderRadius: 16,
