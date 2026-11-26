@@ -32,7 +32,7 @@ const metroRowStyle = (isHighlighted: boolean, isLast: boolean): CSSProperties =
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: 16,
-  padding: '14px 6px 14px 0',
+  padding: '14px 10px',
   borderBottom: isLast ? 'none' : '1px solid var(--macos-divider, rgba(128, 128, 136, 0.14))',
   backgroundColor: isHighlighted ? 'var(--macos-active-bg, rgba(255, 255, 255, 0.08))' : 'transparent',
   borderRadius: isHighlighted ? 10 : 0,
