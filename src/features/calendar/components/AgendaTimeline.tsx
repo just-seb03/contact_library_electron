@@ -39,18 +39,8 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
   selectedDate = new Date(),
 }) => {
   const rootRef = useRef<HTMLDivElement>(null);
+  const hasMountedRef = useRef(false);
   const [currentTime, setCurrentTime] = useState(() => new Date());
-
-  useEffect(() => {
-    const rafId = window.requestAnimationFrame(() => {
-      const scrollParent = rootRef.current?.closest('.card-content') ?? rootRef.current?.parentElement;
-      if (!scrollParent) return;
-      const now = new Date();
-      const targetTop = Math.max(0, (now.getHours() + now.getMinutes() / 60) * HOUR_HEIGHT - 120);
-      scrollParent.scrollTop = targetTop;
-    });
-    return () => window.cancelAnimationFrame(rafId);
-  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 30000);
@@ -80,6 +70,40 @@ export const AgendaTimeline: FC<AgendaTimelineProps> = ({
     () => groupDayOverlaps(todayHearings, calendarEvents, 0.75),
     [todayHearings, calendarEvents]
   );
+
+  const selectedDayKey = `${selectedDate.getFullYear()}-${selectedDate.getMonth()}-${selectedDate.getDate()}`;
+
+  // Al iniciar o al cambiar de día, desplazar al evento más cercano (o a la hora actual/08:00)
+  useEffect(() => {
+    const rafId = window.requestAnimationFrame(() => {
+      const scrollParent = rootRef.current?.closest('.card-content') ?? rootRef.current?.parentElement;
+      if (!scrollParent) return;
+
+      let targetHour: number;
+      if (clusters.length > 0) {
+        const now = new Date();
+        const nowDecimal = now.getHours() + now.getMinutes() / 60;
+        const nearest = isToday
+          ? clusters.find((c) => c.endHour >= nowDecimal) ?? clusters[0]
+          : clusters[0];
+        targetHour = nearest.startHour;
+      } else if (isToday) {
+        const now = new Date();
+        targetHour = now.getHours() + now.getMinutes() / 60;
+      } else {
+        targetHour = 8;
+      }
+
+      const targetTop = Math.max(0, targetHour * HOUR_HEIGHT - 90);
+      if (hasMountedRef.current && typeof scrollParent.scrollTo === 'function') {
+        scrollParent.scrollTo({ top: targetTop, behavior: 'smooth' });
+      } else {
+        scrollParent.scrollTop = targetTop;
+      }
+      hasMountedRef.current = true;
+    });
+    return () => window.cancelAnimationFrame(rafId);
+  }, [selectedDayKey, clusters, isToday]);
 
   const containerStyle: CSSProperties = {
     position: 'relative',
