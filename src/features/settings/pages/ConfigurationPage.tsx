@@ -36,10 +36,14 @@ export default function Configuration() {
   };
 
   const pageContainerStyle: CSSProperties = {
-    maxWidth: 720,
+    maxWidth: 1120,
     margin: '0 auto',
     padding: '16px 24px 96px 24px',
     boxSizing: 'border-box',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
+    gap: 24,
+    alignItems: 'start',
   };
 
   return (
@@ -71,119 +75,123 @@ export default function Configuration() {
 
       <div style={scrollWrapperStyle}>
         <div style={pageContainerStyle}>
-          <div className="cfg-anim" style={{ animationDelay: '30ms' }}>
-            <SettingsProfileCard
-              name={settings.lawyerName}
-              firm={settings.lawyerFirm}
-              email={settings.lawyerEmail}
-              darkMode={darkMode}
-              onEdit={() => setIsEditingProfile(true)}
-            />
+          <div>
+            <div className="cfg-anim" style={{ animationDelay: '30ms' }}>
+              <SettingsProfileCard
+                name={settings.lawyerName}
+                firm={settings.lawyerFirm}
+                email={settings.lawyerEmail}
+                darkMode={darkMode}
+                onEdit={() => setIsEditingProfile(true)}
+              />
+            </div>
+
+            <div className="cfg-anim" style={{ animationDelay: '80ms' }}>
+              <SettingsGroup title="Notificaciones" darkMode={darkMode}>
+                <SettingsRow
+                  icon="bell"
+                  title="Eventos del calendario"
+                  subtitle="Notificar según el aviso previo de cada evento"
+                  control={
+                    <IosSwitch
+                      checked={settings.calendarAlerts}
+                      onChange={(val) => updateSetting('calendarAlerts', val)}
+                      darkMode={darkMode}
+                      ariaLabel="Avisos de eventos del calendario"
+                    />
+                  }
+                  isLast={false}
+                  darkMode={darkMode}
+                />
+                <SettingsRow
+                  icon="calendar"
+                  title="Audiencias judiciales"
+                  subtitle="Aviso 24 horas antes de cada comparecencia"
+                  control={
+                    <IosSwitch
+                      checked={settings.hearingAlerts}
+                      onChange={(val) => updateSetting('hearingAlerts', val)}
+                      darkMode={darkMode}
+                      ariaLabel="Alertas de audiencias judiciales"
+                    />
+                  }
+                  isLast={false}
+                  darkMode={darkMode}
+                />
+                <SettingsRow
+                  icon="creditcard"
+                  title="Cobros y vencimientos"
+                  subtitle="Resumen diario a las 9:00 de pagos pendientes"
+                  control={
+                    <IosSwitch
+                      checked={settings.paymentReminders}
+                      onChange={(val) => updateSetting('paymentReminders', val)}
+                      darkMode={darkMode}
+                      ariaLabel="Recordatorios de cobros"
+                    />
+                  }
+                  isLast={true}
+                  darkMode={darkMode}
+                />
+              </SettingsGroup>
+            </div>
+
+            <div className="cfg-anim" style={{ animationDelay: '130ms' }}>
+              <SettingsGroup title="Ventana" darkMode={darkMode}>
+                <SettingsRow
+                  icon="speaker_wave_2"
+                  title="Sonidos de interfaz"
+                  subtitle="Tonos sutiles en notificaciones y acciones"
+                  control={
+                    <IosSwitch
+                      checked={settings.soundEffects}
+                      onChange={(val) => updateSetting('soundEffects', val)}
+                      darkMode={darkMode}
+                      ariaLabel="Activar efectos sonoros"
+                    />
+                  }
+                  isLast={false}
+                  darkMode={darkMode}
+                />
+                <SettingsRow
+                  icon="tray"
+                  title="Mantener en segundo plano al cerrar"
+                  subtitle="Permite recibir alertas desde la bandeja del sistema"
+                  control={
+                    <IosSwitch
+                      checked={settings.minimizeToTray}
+                      onChange={(val) => updateSetting('minimizeToTray', val)}
+                      darkMode={darkMode}
+                      ariaLabel="Mantener en segundo plano al cerrar"
+                    />
+                  }
+                  isLast={true}
+                  darkMode={darkMode}
+                />
+              </SettingsGroup>
+            </div>
           </div>
 
-          <div className="cfg-anim" style={{ animationDelay: '80ms' }}>
-            <SettingsGroup title="Apariencia" darkMode={darkMode}>
-              <SettingsAppearanceSelector
-                darkMode={darkMode}
-                onToggleDarkMode={toggleDarkMode}
-                themeId={settings.themeId ?? 'default'}
-                onChangeTheme={(themeId) => {
-                  const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
-                  updateSettings(
-                    recommendedAccent
-                      ? { themeId, accentColor: recommendedAccent }
-                      : { themeId }
-                  );
-                }}
-                accentColor={settings.accentColor}
-                onChangeAccentColor={handleAccentColorChange}
-              />
-              <SettingsRow
-                icon="speaker_wave_2"
-                title="Sonidos de interfaz"
-                subtitle="Tonos sutiles en notificaciones y acciones"
-                control={
-                  <IosSwitch
-                    checked={settings.soundEffects}
-                    onChange={(val) => updateSetting('soundEffects', val)}
-                    darkMode={darkMode}
-                    ariaLabel="Activar efectos sonoros"
-                  />
-                }
-                isLast={true}
-                darkMode={darkMode}
-              />
-            </SettingsGroup>
-          </div>
-
-          <div className="cfg-anim" style={{ animationDelay: '130ms' }}>
-            <SettingsGroup title="Notificaciones" darkMode={darkMode}>
-              <SettingsRow
-                icon="bell"
-                title="Eventos del calendario"
-                subtitle="Notificar según el aviso previo de cada evento"
-                control={
-                  <IosSwitch
-                    checked={settings.calendarAlerts}
-                    onChange={(val) => updateSetting('calendarAlerts', val)}
-                    darkMode={darkMode}
-                    ariaLabel="Avisos de eventos del calendario"
-                  />
-                }
-                isLast={false}
-                darkMode={darkMode}
-              />
-              <SettingsRow
-                icon="calendar"
-                title="Audiencias judiciales"
-                subtitle="Aviso 24 horas antes de cada comparecencia"
-                control={
-                  <IosSwitch
-                    checked={settings.hearingAlerts}
-                    onChange={(val) => updateSetting('hearingAlerts', val)}
-                    darkMode={darkMode}
-                    ariaLabel="Alertas de audiencias judiciales"
-                  />
-                }
-                isLast={false}
-                darkMode={darkMode}
-              />
-              <SettingsRow
-                icon="creditcard"
-                title="Cobros y vencimientos"
-                subtitle="Resumen diario a las 9:00 de pagos pendientes"
-                control={
-                  <IosSwitch
-                    checked={settings.paymentReminders}
-                    onChange={(val) => updateSetting('paymentReminders', val)}
-                    darkMode={darkMode}
-                    ariaLabel="Recordatorios de cobros"
-                  />
-                }
-                isLast={true}
-                darkMode={darkMode}
-              />
-            </SettingsGroup>
-          </div>
-
-          <div className="cfg-anim" style={{ animationDelay: '180ms' }}>
-            <SettingsGroup title="Ventana" darkMode={darkMode}>
-              <SettingsRow
-                icon="tray"
-                title="Mantener en segundo plano al cerrar"
-                subtitle="Permite recibir alertas desde la bandeja del sistema"
-                control={
-                  <IosSwitch
-                    checked={settings.minimizeToTray}
-                    onChange={(val) => updateSetting('minimizeToTray', val)}
-                    darkMode={darkMode}
-                    ariaLabel="Mantener en segundo plano al cerrar"
-                  />
-                }
-                isLast={true}
-                darkMode={darkMode}
-              />
-            </SettingsGroup>
+          <div>
+            <div className="cfg-anim" style={{ animationDelay: '80ms' }}>
+              <SettingsGroup title="Apariencia" darkMode={darkMode}>
+                <SettingsAppearanceSelector
+                  darkMode={darkMode}
+                  onToggleDarkMode={toggleDarkMode}
+                  themeId={settings.themeId ?? 'default'}
+                  onChangeTheme={(themeId) => {
+                    const recommendedAccent = APP_THEMES[themeId]?.recommendedAccent;
+                    updateSettings(
+                      recommendedAccent
+                        ? { themeId, accentColor: recommendedAccent }
+                        : { themeId }
+                    );
+                  }}
+                  accentColor={settings.accentColor}
+                  onChangeAccentColor={handleAccentColorChange}
+                />
+              </SettingsGroup>
+            </div>
           </div>
         </div>
       </div>
