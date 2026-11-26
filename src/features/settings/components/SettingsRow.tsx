@@ -3,7 +3,7 @@ import { Icon } from 'framework7-react';
 
 export interface SettingsRowProps {
   icon: string;
-  iconBgColor: string;
+  iconBgColor?: string;
   iconColor?: string;
   title: string;
   subtitle?: string;
@@ -15,8 +15,7 @@ export interface SettingsRowProps {
 
 export const SettingsRow: React.FC<SettingsRowProps> = ({
   icon,
-  iconBgColor,
-  iconColor = '#FFFFFF',
+  iconColor,
   title,
   subtitle,
   control,
@@ -27,7 +26,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
     position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    padding: '11px 16px',
+    padding: '12px 16px',
     minHeight: 52,
     cursor: onClick ? 'pointer' : 'default',
     boxSizing: 'border-box',
@@ -36,17 +35,14 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
   };
 
   const iconContainerStyle: CSSProperties = {
-    width: 28,
-    height: 28,
-    minWidth: 28,
-    borderRadius: 7,
-    backgroundColor: iconBgColor,
+    width: 24,
+    height: 24,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 14,
+    marginRight: 12,
     flexShrink: 0,
-    boxShadow: `0 2px 5px ${iconBgColor}40`,
+    color: iconColor ?? 'var(--macos-text-secondary, #a4a4ab)',
   };
 
   const textContainerStyle: CSSProperties = {
@@ -95,7 +91,7 @@ export const SettingsRow: React.FC<SettingsRowProps> = ({
       }}
     >
       <div style={iconContainerStyle}>
-        <Icon f7={icon} size="15px" style={{ color: iconColor }} />
+        <Icon f7={icon} size="17px" style={{ color: 'currentColor' }} />
       </div>
 
       <div style={textContainerStyle}>

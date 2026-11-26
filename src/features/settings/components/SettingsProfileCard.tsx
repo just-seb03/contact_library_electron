@@ -20,12 +20,12 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '16px 20px',
-    borderRadius: 14,
-    backgroundColor: 'var(--macos-card-bg, rgba(255, 255, 255, 0.85))',
-    border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.07))',
-    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
+    borderRadius: 16,
+    backgroundColor: 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
+    border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.16)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
     marginBottom: 24,
     userSelect: 'none',
   };
@@ -42,22 +42,21 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
   return (
     <div style={{ ...cardStyle, flexWrap: 'nowrap' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0, flex: 1, marginRight: 16 }}>
-        {/* Avatar estilo Apple con gradiente y anillo */}
+        {/* Avatar monocromo adaptado a la paleta */}
         <div
           style={{
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--macos-accent-color, #0056b8), var(--macos-accent-gradient-end, #5336c7))',
-            color: 'var(--macos-on-accent, #ffffff)',
+            backgroundColor: 'var(--macos-active-bg, rgba(128, 128, 136, 0.2))',
+            border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.25))',
+            color: 'var(--macos-text, #ececef)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: 700,
             flexShrink: 0,
-            boxShadow: '0 4px 12px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.35))',
-            border: '2px solid var(--macos-card-bg, #ffffff)',
           }}
         >
           {getInitials(name) || 'CL'}
@@ -67,15 +66,14 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <span
               style={{
-                fontSize: 16,
+                fontSize: 15.5,
                 fontWeight: 650,
-                color: 'var(--macos-text, #1c1c1e)',
+                color: 'var(--macos-text, #ececef)',
                 letterSpacing: '-0.01em',
               }}
             >
               {name}
             </span>
-            <Icon f7="checkmark_seal_fill" size="14px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
           </div>
 
           <div
@@ -117,28 +115,27 @@ export const SettingsProfileCard: FC<SettingsProfileCardProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            height: 28,
-            padding: '0 12px',
-            borderRadius: 6,
-            border: '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.15))',
-            backgroundColor: 'var(--macos-input-bg, #ffffff)',
-            color: 'var(--macos-text, #1c1c1e)',
+            height: 30,
+            padding: '0 14px',
+            borderRadius: 999,
+            border: '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.22))',
+            backgroundColor: 'var(--macos-active-bg, rgba(128, 128, 136, 0.16))',
+            color: 'var(--macos-text, #ececef)',
             fontSize: 12,
-            fontWeight: 500,
+            fontWeight: 550,
             cursor: 'pointer',
             flexShrink: 0,
             whiteSpace: 'nowrap',
-            boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
             transition: 'background-color 0.12s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, #f2f2f7)';
+            e.currentTarget.style.backgroundColor = 'var(--macos-hover-bg, rgba(128, 128, 136, 0.22))';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--macos-input-bg, #ffffff)';
+            e.currentTarget.style.backgroundColor = 'var(--macos-active-bg, rgba(128, 128, 136, 0.16))';
           }}
         >
-          <Icon f7="pencil" size="11px" style={{ color: 'var(--macos-accent-color, #007aff)' }} />
+          <Icon f7="pencil" size="11px" style={{ color: 'currentColor' }} />
           <span>Editar</span>
         </button>
       )}

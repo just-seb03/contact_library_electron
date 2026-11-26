@@ -42,15 +42,15 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
   const previewWindowStyle = (isDarkPreview: boolean, selected: boolean): CSSProperties => ({
     width: '100%',
     height: 72,
-    borderRadius: 8,
+    borderRadius: 10,
     border: selected
-      ? '2px solid var(--macos-accent-color, #007aff)'
-      : '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.12))',
+      ? '2px solid var(--macos-text-secondary, #a4a4ab)'
+      : '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
     backgroundColor: isDarkPreview ? darkPreview.canvas : lightPreview.canvas,
     display: 'flex',
     overflow: 'hidden',
     boxShadow: selected
-      ? '0 0 0 3px var(--macos-accent-tint-active, rgba(0, 122, 255, 0.25))'
+      ? '0 4px 12px rgba(0, 0, 0, 0.18)'
       : '0 2px 6px rgba(0, 0, 0, 0.05)',
     transition: 'all 0.15s ease',
   });
@@ -197,11 +197,11 @@ export const SettingsAppearanceSelector: FC<SettingsAppearanceSelectorProps> = (
                   padding: '9px 11px',
                   borderRadius: 10,
                   border: isSelected
-                    ? '2px solid var(--macos-accent-color, #007aff)'
-                    : '1px solid var(--macos-card-border, rgba(0, 0, 0, 0.1))',
+                    ? '1.5px solid var(--macos-text-secondary, #a4a4ab)'
+                    : '1px solid var(--macos-card-border, rgba(128, 128, 136, 0.18))',
                   backgroundColor: isSelected
-                    ? 'var(--macos-accent-tint-subtle, rgba(0, 122, 255, 0.08))'
-                    : 'var(--macos-subtle-bg, rgba(0, 0, 0, 0.03))',
+                    ? 'var(--macos-active-bg, rgba(128, 128, 136, 0.18))'
+                    : 'var(--macos-subtle-bg, rgba(128, 128, 136, 0.06))',
                   cursor: 'pointer',
                   textAlign: 'left',
                   outline: 'none',
