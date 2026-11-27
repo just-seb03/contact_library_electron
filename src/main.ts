@@ -154,6 +154,12 @@ function bootstrap() {
   })
 
   app.whenReady().then(async () => {
+    // macOS en desarrollo: se ejecuta el Electron.app genérico, así que el Dock mostraría el logo
+    // de Electron. Ya empaquetada, el icono lo pone el bundle (.icns generado desde build/icon.png).
+    if (process.platform === 'darwin' && !app.isPackaged) {
+      app.dock?.setIcon(path.join(process.env.VITE_PUBLIC, 'icon.png'))
+    }
+
     await initDatabase()
     await loadSystemPreferences()
     registerClientController()
