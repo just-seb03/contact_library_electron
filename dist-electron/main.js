@@ -1,11 +1,11 @@
-var Me = Object.defineProperty;
-var Pe = (n, e, t) => e in n ? Me(n, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : n[e] = t;
-var j = (n, e, t) => Pe(n, typeof e != "symbol" ? e + "" : e, t);
-import { app as E, Menu as P, Notification as ue, Tray as Ue, nativeImage as de, ipcMain as l, nativeTheme as Fe, BrowserWindow as xe, shell as pe, powerMonitor as me } from "electron";
-import { fileURLToPath as Be } from "node:url";
+var xe = Object.defineProperty;
+var Be = (n, e, t) => e in n ? xe(n, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : n[e] = t;
+var j = (n, e, t) => Be(n, typeof e != "symbol" ? e + "" : e, t);
+import { app as E, Menu as P, Notification as ue, Tray as $e, nativeImage as de, ipcMain as l, nativeTheme as ke, BrowserWindow as je, shell as pe, powerMonitor as me } from "electron";
+import { fileURLToPath as ze } from "node:url";
 import m from "node:path";
 import g from "node:fs";
-import $e from "sqlite3";
+import We from "sqlite3";
 const V = `
 CREATE TABLE IF NOT EXISTS clients (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,7 +83,7 @@ CREATE INDEX IF NOT EXISTS idx_documents_client_id ON documents(client_id);
 CREATE INDEX IF NOT EXISTS idx_payments_client_id ON payments(client_id);
 CREATE INDEX IF NOT EXISTS idx_calendar_date ON calendar_events(date);
 CREATE INDEX IF NOT EXISTS idx_calendar_client_id ON calendar_events(client_id);
-`, ke = `
+`, Xe = `
 CREATE TABLE IF NOT EXISTS notification_log (
   id TEXT PRIMARY KEY,
   kind TEXT NOT NULL,
@@ -91,19 +91,19 @@ CREATE TABLE IF NOT EXISTS notification_log (
 );
 CREATE INDEX IF NOT EXISTS idx_notification_log_sent_at ON notification_log (sent_at);
 `;
-async function je(n) {
-  await Xe(n), await We(n);
+async function He(n) {
+  await Ye(n), await Ge(n);
 }
-async function ze(n) {
+async function Ve(n) {
   const e = await n.prepare("PRAGMA user_version;").get();
   return (e == null ? void 0 : e.user_version) ?? 0;
 }
-async function We(n) {
-  await ze(n) >= 2 || (await n.transaction(async () => {
-    await n.exec(ke), await n.pragma("user_version = 2");
+async function Ge(n) {
+  await Ve(n) >= 2 || (await n.transaction(async () => {
+    await n.exec(Xe), await n.pragma("user_version = 2");
   }), console.log("[SQLite Migrator] Esquema v2 (registro de notificaciones) aplicado con éxito."));
 }
-async function Xe(n) {
+async function Ye(n) {
   const e = await n.prepare("PRAGMA user_version;").get();
   if (((e == null ? void 0 : e.user_version) ?? 0) === 0) {
     if (console.log("[SQLite Migrator] Detectada base de datos sin versión (versión 0). Verificando esquema..."), await n.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='clients'").get() && (await n.prepare("PRAGMA table_info(clients)").all()).some((c) => c.name === "caso")) {
@@ -177,7 +177,7 @@ async function Xe(n) {
   }
 }
 let v = null;
-function He() {
+function Ke() {
   var n;
   try {
     const e = (n = E) != null && n.getPath ? E.getPath("userData") : process.cwd();
@@ -186,7 +186,7 @@ function He() {
     return m.join(process.cwd(), "contact_library.db");
   }
 }
-function Ve() {
+function qe() {
   var n;
   try {
     const e = (n = E) != null && n.getPath ? E.getPath("userData") : process.cwd(), t = m.join(e, "documents");
@@ -199,14 +199,14 @@ function Ve() {
 function G(n) {
   return n.length === 1 && Array.isArray(n[0]) ? n[0] : n;
 }
-function Ge(n) {
+function Qe(n) {
   return new Promise((e, t) => {
-    const a = new $e.Database(n, (r) => {
+    const a = new We.Database(n, (r) => {
       r ? t(r) : e(a);
     });
   });
 }
-function Ye(n) {
+function Je(n) {
   let e = Promise.resolve();
   const t = (a) => new Promise((r, o) => {
     n.exec(a, (c) => {
@@ -224,9 +224,9 @@ function Ye(n) {
                 i(p);
                 return;
               }
-              s.all(o, (y, h) => {
+              s.all(o, (y, N) => {
                 s.finalize((L) => {
-                  y || L ? i(y || L) : c(h);
+                  y || L ? i(y || L) : c(N);
                 });
               });
             });
@@ -240,9 +240,9 @@ function Ye(n) {
                 i(p);
                 return;
               }
-              s.get(o, (y, h) => {
+              s.get(o, (y, N) => {
                 s.finalize((L) => {
-                  y || L ? i(y || L) : c(h);
+                  y || L ? i(y || L) : c(N);
                 });
               });
             });
@@ -257,8 +257,8 @@ function Ye(n) {
                 return;
               }
               s.run(o, function(y) {
-                s.finalize((h) => {
-                  y || h ? i(y || h) : c({ lastInsertRowid: this.lastID, changes: this.changes });
+                s.finalize((N) => {
+                  y || N ? i(y || N) : c({ lastInsertRowid: this.lastID, changes: this.changes });
                 });
               });
             });
@@ -300,13 +300,13 @@ function Ye(n) {
     }
   };
 }
-async function Ke(n) {
+async function Ze(n) {
   if (v) return v;
-  const e = He(), t = m.dirname(e);
+  const e = Ke(), t = m.dirname(e);
   g.mkdirSync(t, { recursive: !0 });
-  const a = await Ge(e), r = Ye(a);
+  const a = await Qe(e), r = Je(a);
   try {
-    await r.pragma("foreign_keys = ON"), await je(r);
+    await r.pragma("foreign_keys = ON"), await He(r);
   } catch (o) {
     throw await r.close(), o;
   }
@@ -317,12 +317,12 @@ function d() {
     throw new Error("[SQLite] La base de datos no ha sido inicializada. Asegúrate de llamar a initDatabase() primero.");
   return v;
 }
-async function qe() {
+async function et() {
   if (!v) return;
   const n = v;
   v = null, await n.close();
 }
-function Qe(n, e) {
+function tt(n, e) {
   const t = !E.isPackaged || !!process.env.VITE_DEV_SERVER_URL;
   return [
     // 1. Menú de la Aplicación (App Menu)
@@ -412,14 +412,14 @@ function Qe(n, e) {
     }
   ];
 }
-function Je(n, e) {
+function nt(n, e) {
   if (process.platform === "darwin") {
-    const t = Qe(n), a = P.buildFromTemplate(t);
+    const t = tt(n), a = P.buildFromTemplate(t);
     P.setApplicationMenu(a);
   } else
     P.setApplicationMenu(null);
 }
-const Ze = {
+const at = {
   calendar: "/calendar/",
   hearing: "/calendar/",
   payment: "/pagos/",
@@ -428,110 +428,110 @@ const Ze = {
 function re(n, ...e) {
   return [n, ...e.map((t) => String(t).replace(/:/g, "_"))].join(":");
 }
-const et = {
+const rt = {
   calendarEvent: "/calendar/",
   hearing: "/calendar/",
   client: "/cliente/",
   payment: "/pagos/"
-}, tt = {
+}, ot = {
   calendarAlerts: !0,
   hearingAlerts: !0,
   paymentReminders: !0,
   sound: !0
 };
-function nt(n) {
-  const { target: e } = n, t = n.route ?? (e ? et[e.type] : Ze[n.kind]);
+function it(n) {
+  const { target: e } = n, t = n.route ?? (e ? rt[e.type] : at[n.kind]);
   return e ? { route: t, target: e } : { route: t };
 }
 let I = null;
-function at(n) {
+function st(n) {
   I = n;
 }
-function Ae() {
+function Ie() {
   var n;
-  return ((n = I == null ? void 0 : I.getPreferences) == null ? void 0 : n.call(I)) ?? tt;
+  return ((n = I == null ? void 0 : I.getPreferences) == null ? void 0 : n.call(I)) ?? ot;
 }
-function rt(n) {
+function ct(n) {
   if (!I)
     return console.warn("[Notifications] Servicio no inicializado; se descarta:", n.id), !1;
   const { adapter: e, onOpen: t, navigate: a } = I;
   if (!e.isSupported()) return !1;
-  const r = nt(n);
+  const r = it(n);
   return e.show(n, {
-    silent: !Ae().sound,
+    silent: !Ie().sound,
     onClick: () => {
       t(), a(r);
     }
   }), !0;
 }
-function ot() {
+function lt() {
   I == null || I.adapter.dispose(), I = null;
 }
-const it = 30;
-async function st(n) {
+const ut = 30;
+async function dt(n) {
   if (n.length === 0) return /* @__PURE__ */ new Set();
   const e = n.map(() => "?").join(", "), t = await d().prepare(`SELECT id FROM notification_log WHERE id IN (${e})`).all(...n);
   return new Set(t.map((a) => a.id));
 }
-async function ct(n) {
+async function pt(n) {
   await d().prepare("INSERT OR IGNORE INTO notification_log (id, kind) VALUES (?, ?)").run(n.id, n.kind);
 }
-async function lt(n = it) {
+async function mt(n = ut) {
   return (await d().prepare("DELETE FROM notification_log WHERE sent_at < datetime('now', ?)").run(`-${n} days`)).changes;
 }
-const ut = 6e4, dt = 15, Se = /* @__PURE__ */ new Map();
+const Et = 6e4, Tt = 15, Le = /* @__PURE__ */ new Map();
 let B = null, Q = null, C = null, U = null, Y = !1;
 function K(n) {
-  Se.set(n.kind, n);
+  Le.set(n.kind, n);
 }
-function pt(n = {}) {
+function ft(n = {}) {
   B || (C = {
-    intervalMs: n.intervalMs ?? ut,
-    catchUpMinutes: n.catchUpMinutes ?? dt,
+    intervalMs: n.intervalMs ?? Et,
+    catchUpMinutes: n.catchUpMinutes ?? Tt,
     now: n.now ?? (() => /* @__PURE__ */ new Date())
-  }, Q = null, lt().catch((e) => {
+  }, Q = null, mt().catch((e) => {
     console.error("[Notifications] No se pudo limpiar el registro de notificaciones:", e);
   }), J(), B = setInterval(() => void J(), C.intervalMs));
 }
-function mt() {
+function gt() {
   B && clearInterval(B), B = null, C = null;
 }
 function J() {
   return C ? U ? (Y = !0, U) : (U = (async () => {
     do
-      Y = !1, await Et();
+      Y = !1, await yt();
     while (Y && C);
   })().finally(() => {
     U = null;
   }), U) : Promise.resolve();
 }
-async function Et() {
+async function yt() {
   if (!C) return;
-  const n = C.now(), e = Tt(n, Q, C.catchUpMinutes);
+  const n = C.now(), e = _t(n, Q, C.catchUpMinutes);
   if (Q = n, !e) return;
-  const t = await ft(e);
+  const t = await ht(e);
   if (t.length === 0) return;
   let a;
   try {
-    a = await st(t.map((r) => r.id));
+    a = await dt(t.map((r) => r.id));
   } catch (r) {
     console.error("[Notifications] No se pudo leer el registro de enviados:", r);
     return;
   }
   for (const r of t)
-    if (!a.has(r.id) && rt(r))
+    if (!a.has(r.id) && ct(r))
       try {
-        await ct(r);
+        await pt(r);
       } catch (o) {
         console.error(`[Notifications] No se pudo registrar "${r.id}":`, o);
       }
 }
-function Tt(n, e, t) {
+function _t(n, e, t) {
   const a = new Date(n.getTime() - t * 6e4);
   return e && e.getTime() > n.getTime() ? null : { from: e && e > a ? e : a, to: n };
 }
-async function ft(n) {
-  const e = Ae(), t = [...Se.values()].filter((o) => o.isEnabled(e)), a = await Promise.all(
+async function ht(n) {
+  const e = Ie(), t = [...Le.values()].filter((o) => o.isEnabled(e)), a = await Promise.all(
     t.map(async (o) => {
       try {
         return await o.getDue(n);
@@ -543,7 +543,7 @@ async function ft(n) {
   for (const o of a.flat()) r.set(o.id, o);
   return [...r.values()];
 }
-const gt = 50;
+const Nt = 50;
 class oe {
   constructor(e = process.platform) {
     j(this, "platform");
@@ -584,7 +584,7 @@ class oe {
   // No se libera en el evento 'close': en Windows se emite cuando el aviso pasa al
   // Centro de actividades, y desde ahí el usuario todavía puede hacer clic.
   track(e) {
-    if (this.tracked.add(e), this.tracked.size > gt) {
+    if (this.tracked.add(e), this.tracked.size > Nt) {
       const t = this.tracked.values().next().value;
       t && this.release(t);
     }
@@ -593,12 +593,12 @@ class oe {
     e.removeAllListeners(), this.tracked.delete(e);
   }
 }
-class yt extends oe {
+class At extends oe {
   constructor() {
     super("darwin");
   }
 }
-class _t extends oe {
+class St extends oe {
   constructor(t = {}) {
     super("win32");
     j(this, "iconPath");
@@ -611,34 +611,34 @@ class _t extends oe {
     };
   }
 }
-function Nt(n = {}) {
+function It(n = {}) {
   const { platform: e = process.platform, iconPath: t } = n;
   switch (e) {
     case "win32":
-      return new _t({ iconPath: t });
+      return new St({ iconPath: t });
     case "darwin":
-      return new yt();
+      return new At();
     default:
       return new oe(e);
   }
 }
-const X = "Contact Library", ht = "cl.contactlibrary.desktop", At = ["YourAppName", "contact_library_electron"], $ = "contact_library.db", St = [
+const X = "Contact Library", Lt = "cl.contactlibrary.desktop", Rt = ["YourAppName", "contact_library_electron"], $ = "contact_library.db", bt = [
   $,
   `${$}-wal`,
   `${$}-shm`,
   "documents",
   "Local Storage"
 ];
-function It() {
+function wt() {
   try {
     const n = E.getPath("userData");
     if (g.existsSync(m.join(n, $))) return null;
     const e = E.getPath("appData");
-    for (const t of At) {
+    for (const t of Rt) {
       const a = m.join(e, t);
       if (m.resolve(a) !== m.resolve(n) && g.existsSync(m.join(a, $))) {
         g.mkdirSync(n, { recursive: !0 });
-        for (const r of St) {
+        for (const r of bt) {
           const o = m.join(a, r);
           g.existsSync(o) && g.cpSync(o, m.join(n, r), { recursive: !0, force: !0 });
         }
@@ -657,7 +657,7 @@ const ie = {
   paymentReminders: !0,
   soundEffects: !0
 }, Z = Object.keys(ie);
-function Ie() {
+function Re() {
   return ie;
 }
 function ee(n) {
@@ -666,7 +666,7 @@ function ee(n) {
     typeof t == "boolean" && (ie[e] = t);
   }
 }
-async function Lt() {
+async function vt() {
   try {
     const n = Z.map(() => "?").join(", "), e = await d().prepare(`SELECT key, value FROM settings WHERE key IN (${n})`).all(...Z), t = {};
     for (const a of e)
@@ -681,7 +681,7 @@ async function Lt() {
   }
 }
 let A = null, Ee = !1;
-function Rt(n) {
+function Ot(n) {
   const e = m.join(n, "tray");
   if (process.platform === "darwin") {
     const a = de.createFromPath(m.join(e, "trayTemplate.png"));
@@ -690,10 +690,10 @@ function Rt(n) {
   const t = process.platform === "win32" ? "tray.ico" : "tray.png";
   return de.createFromPath(m.join(e, t));
 }
-function bt({ publicDir: n, onOpen: e, onQuit: t }) {
+function Ct({ publicDir: n, onOpen: e, onQuit: t }) {
   if (A) return A;
-  const a = Rt(n);
-  return a.isEmpty() ? (console.error("[Tray] No se encontró el icono de bandeja en", m.join(n, "tray")), null) : (A = new Ue(a), A.setToolTip(X), A.setContextMenu(
+  const a = Ot(n);
+  return a.isEmpty() ? (console.error("[Tray] No se encontró el icono de bandeja en", m.join(n, "tray")), null) : (A = new $e(a), A.setToolTip(X), A.setContextMenu(
     P.buildFromTemplate([
       { label: `Abrir ${X}`, click: e },
       { type: "separator" },
@@ -701,17 +701,17 @@ function bt({ publicDir: n, onOpen: e, onQuit: t }) {
     ])
   ), process.platform !== "darwin" && A.on("click", e), A);
 }
-function Le() {
+function be() {
   return A !== null && !A.isDestroyed();
 }
-function wt() {
-  process.platform !== "win32" || Ee || !Le() || (Ee = !0, A == null || A.displayBalloon({
+function Dt() {
+  process.platform !== "win32" || Ee || !be() || (Ee = !0, A == null || A.displayBalloon({
     title: X,
     content: "La aplicación sigue ejecutándose en segundo plano. Haz clic en el icono para abrirla.",
     iconType: "info"
   }));
 }
-function vt() {
+function Mt() {
   A && !A.isDestroyed() && A.destroy(), A = null;
 }
 const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => Number(e.trim()).toString(16).padStart(2, "0")).join("")}`, w = {
@@ -720,7 +720,7 @@ const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => N
   warning: "255, 149, 0",
   danger: "255, 59, 48",
   neutral: "142, 142, 147"
-}, Te = "0, 0, 0", q = "255, 255, 255", Ot = "245, 245, 247", te = {
+}, Te = "0, 0, 0", q = "255, 255, 255", Pt = "245, 245, 247", te = {
   white: "#ffffff",
   black: "#000000",
   background: "#f5f5f7",
@@ -738,7 +738,7 @@ const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => N
   // Overlays y bordes translúcidos
   cardBorder: b(Te, 0.05),
   glassBorder: b(Te, 0.06),
-  glassSurface: b(Ot, 0.65),
+  glassSurface: b(Pt, 0.65),
   whiteOverlay: b(q, 0.2),
   whiteTextMuted: b(q, 0.9),
   whiteTextFaint: b(q, 0.6),
@@ -758,7 +758,7 @@ const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => N
   // Variantes del primario
   primaryStrong: "var(--macos-accent-color, #0a84ff)",
   primaryLight: "var(--macos-accent-color, #30b0ff)"
-}, Ct = {
+}, Ut = {
   "--f7-page-bg-color": "var(--macos-canvas-bg, #f5f5f7)",
   "--f7-bars-bg-color": "var(--macos-card-bg, #ffffff)",
   "--f7-navbar-bg-color": "var(--macos-card-bg, #ffffff)",
@@ -766,7 +766,7 @@ const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => N
   "--f7-card-bg-color": "transparent",
   "--f7-list-strong-bg-color": "var(--macos-card-bg, #ffffff)",
   "--f7-list-bg-color": "var(--macos-card-bg, #ffffff)"
-}, Dt = () => {
+}, Ft = () => {
   const n = {
     "--f7-theme-color": te.primary,
     "--f7-theme-color-rgb": w.primary
@@ -784,11 +784,11 @@ const b = (n, e) => `rgba(${n}, ${e})`, z = (n) => `#${n.split(",").map((e) => N
   };
   for (const [t, a] of Object.entries(e))
     n[`--f7-color-${t}`] = `var(--app-color-${a})`, n[`--f7-color-${t}-rgb`] = `var(--app-color-${a}-rgb)`;
-  for (const [t, a] of Object.entries(Ct))
+  for (const [t, a] of Object.entries(Ut))
     n[t] = String(a);
   return n;
 };
-Dt();
+Ft();
 const T = {
   // Clientes
   CLIENTS_LIST: "clients:list",
@@ -830,7 +830,7 @@ function _(n) {
 function u(n) {
   return { success: !1, error: n instanceof Error ? n.message : String(n) };
 }
-function Mt(n) {
+function xt(n) {
   n.webContents.on("context-menu", (e, t) => {
     const { isEditable: a, selectionText: r } = t;
     a ? P.buildFromTemplate([
@@ -848,9 +848,9 @@ function Mt(n) {
     ]).popup({ window: n });
   });
 }
-let f = null, Re = !1;
+let f = null, we = !1;
 function se() {
-  Re = !0;
+  we = !0;
 }
 function R() {
   return f && !f.isDestroyed() ? f : null;
@@ -859,15 +859,15 @@ function ne() {
   const n = R();
   n && (n.isMinimized() && n.restore(), n.isVisible() || n.show(), n.focus());
 }
-function Pt(n) {
+function Bt(n) {
   const e = R();
   if (!e) return;
   const t = () => e.webContents.send(T.APP_NAVIGATE, n);
   e.webContents.isLoading() ? e.webContents.once("did-finish-load", t) : t();
 }
-function Ut(n) {
+function $t(n) {
   const e = process.platform === "darwin";
-  return f = new xe({
+  return f = new je({
     width: 1320,
     height: 820,
     minWidth: 1e3,
@@ -885,11 +885,11 @@ function Ut(n) {
     webPreferences: {
       preload: n.preloadPath
     }
-  }), e || f.setMenu(null), Mt(f), f.once("ready-to-show", () => {
+  }), e || f.setMenu(null), xt(f), f.once("ready-to-show", () => {
     f == null || f.show();
   }), f.on("close", (t) => {
     var a;
-    Re || Ie().minimizeToTray && n.canHideToBackground() && (t.preventDefault(), f == null || f.hide(), (a = n.onHiddenToBackground) == null || a.call(n));
+    we || Re().minimizeToTray && n.canHideToBackground() && (t.preventDefault(), f == null || f.hide(), (a = n.onHiddenToBackground) == null || a.call(n));
   }), f.on("session-end", () => {
     se();
   }), f.on("closed", () => {
@@ -898,7 +898,7 @@ function Ut(n) {
     f == null || f.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   }), n.devServerUrl ? f.loadURL(n.devServerUrl) : f.loadFile(m.join(n.rendererDist, "index.html")), f;
 }
-function Ft() {
+function kt() {
   const n = () => {
     var a;
     return (a = R()) == null ? void 0 : a.minimize();
@@ -910,12 +910,12 @@ function Ft() {
     return (a = R()) == null ? void 0 : a.close();
   };
   l.on(T.WINDOW_MINIMIZE, n), l.on(T.WINDOW_MAXIMIZE, e), l.on(T.WINDOW_CLOSE, t), l.handle(T.APP_GET_PLATFORM, () => _(process.platform)), l.on(T.APP_SET_THEME, (a, r) => {
-    Fe.themeSource = r != null && r.isDark ? "dark" : "light";
+    ke.themeSource = r != null && r.isDark ? "dark" : "light";
     const o = R();
     o && (r != null && r.backgroundColor) && /^#[0-9a-fA-F]{6}$/.test(r.backgroundColor) && o.setBackgroundColor(r.backgroundColor);
   }), l.on("window-minimize", n), l.on("window-maximize", e), l.on("window-close", t), l.handle("get-platform", () => process.platform);
 }
-class xt {
+class jt {
   toEntity(e) {
     return {
       id: e.id,
@@ -971,7 +971,7 @@ class xt {
     const a = d(), r = await a.prepare("SELECT * FROM calendar_events WHERE id = ?").get(e);
     if (!r)
       throw new Error(`Evento con id ${e} no encontrado`);
-    const o = t.title !== void 0 ? t.title : r.title, c = t.date !== void 0 ? t.date : r.date, i = t.startTime !== void 0 ? t.startTime : r.start_time, s = t.endTime !== void 0 ? t.endTime : r.end_time, p = t.colorId !== void 0 ? t.colorId : r.color_id, y = t.alarmMinutes !== void 0 ? t.alarmMinutes : r.alarm_minutes, h = t.clientId !== void 0 ? t.clientId : r.client_id, L = t.details !== void 0 ? t.details : r.details;
+    const o = t.title !== void 0 ? t.title : r.title, c = t.date !== void 0 ? t.date : r.date, i = t.startTime !== void 0 ? t.startTime : r.start_time, s = t.endTime !== void 0 ? t.endTime : r.end_time, p = t.colorId !== void 0 ? t.colorId : r.color_id, y = t.alarmMinutes !== void 0 ? t.alarmMinutes : r.alarm_minutes, N = t.clientId !== void 0 ? t.clientId : r.client_id, L = t.details !== void 0 ? t.details : r.details;
     await a.prepare(`
       UPDATE calendar_events
       SET title = ?, date = ?, start_time = ?, end_time = ?, color_id = ?, alarm_minutes = ?, client_id = ?, details = ?, updated_at = CURRENT_TIMESTAMP
@@ -983,7 +983,7 @@ class xt {
       s,
       p,
       y,
-      h,
+      N,
       L,
       e
     );
@@ -1032,8 +1032,8 @@ class xt {
     });
   }
 }
-const F = new xt();
-function Bt() {
+const F = new jt();
+function zt() {
   l.handle(
     T.CALENDAR_LIST,
     async () => {
@@ -1054,7 +1054,7 @@ function Bt() {
     }
   ), l.handle("db:calendar:getAll", () => F.getAll()), l.handle("db:calendar:saveAll", async (n, e) => (await F.replaceAll(e), !0));
 }
-class $t {
+class Wt {
   toEntity(e) {
     return {
       id: e.id,
@@ -1127,13 +1127,13 @@ class $t {
     return (await d().prepare("DELETE FROM cases WHERE client_id = ?").run(e)).changes > 0;
   }
 }
-const O = new $t();
-function kt(n) {
+const O = new Wt();
+function Xt(n) {
   return n.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_").replace(/\s+/g, "_").trim();
 }
 const M = {
   getStorageDir() {
-    return Ve();
+    return qe();
   },
   getAbsolutePath(n) {
     return m.join(this.getStorageDir(), n);
@@ -1141,7 +1141,7 @@ const M = {
   async saveDocumentFile(n, e, t) {
     const a = this.getStorageDir(), r = m.join(a, String(n));
     g.existsSync(r) || await g.promises.mkdir(r, { recursive: !0 });
-    const o = kt(e) || "documento.pdf", c = `doc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, i = `${c}_${o}`, s = m.join(r, i), p = `${n}/${i}`;
+    const o = Xt(e) || "documento.pdf", c = `doc-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, i = `${c}_${o}`, s = m.join(r, i), p = `${n}/${i}`;
     await g.promises.writeFile(s, t);
     const y = await g.promises.stat(s);
     return {
@@ -1201,7 +1201,7 @@ const M = {
     }
   }
 };
-class jt {
+class Ht {
   toEntity(e) {
     return {
       id: e.id,
@@ -1313,8 +1313,8 @@ class jt {
     return t ? M.readAsBase64(t.relativePath) : null;
   }
 }
-const S = new jt();
-class zt {
+const S = new Ht();
+class Vt {
   formatClient(e, t, a, r) {
     return {
       id: e.id,
@@ -1351,12 +1351,12 @@ class zt {
     a.length > 0 && (o += ` WHERE ${a.join(" AND ")}`), o += " ORDER BY id ASC", e != null && e.limit && (o += ` LIMIT ${Number(e.limit)}`, e != null && e.offset && (o += ` OFFSET ${Number(e.offset)}`));
     const c = await t.prepare(o).all(...r), i = [];
     for (const s of c) {
-      const [p, y, h] = await Promise.all([
+      const [p, y, N] = await Promise.all([
         O.getByClientId(s.id),
         S.getByClientId(s.id),
         this.getLatestPaymentInfo(s.id)
       ]);
-      i.push(this.formatClient(s, p, y, h));
+      i.push(this.formatClient(s, p, y, N));
     }
     return i;
   }
@@ -1454,13 +1454,24 @@ class zt {
     } : null;
   }
 }
-const N = new zt();
-function Wt() {
+const h = new Vt(), ve = 15;
+function Oe(n) {
+  return n.replace(/\D/g, "").slice(0, ve);
+}
+function fe(n) {
+  const e = Oe(n);
+  return e ? e.startsWith("56") ? `+${[e.slice(0, 2), e.slice(2, 3), e.slice(3, 7), e.slice(7)].filter(Boolean).join(" ")}` : `+${[e.slice(0, 2), ...e.slice(2).match(/.{1,4}/g) ?? []].filter(Boolean).join(" ")}` : "";
+}
+function ge(n) {
+  const e = Oe(n).length;
+  return e >= 7 && e <= ve;
+}
+function Gt() {
   l.handle(
     T.CLIENTS_LIST,
     async (n, e) => {
       try {
-        const t = await N.getAll(e);
+        const t = await h.getAll(e);
         return _(t);
       } catch (t) {
         return u(t);
@@ -1472,7 +1483,7 @@ function Wt() {
       try {
         if (typeof e != "number" || isNaN(e) || e <= 0)
           return u("ID de cliente inválido.");
-        const t = await N.getById(e);
+        const t = await h.getById(e);
         return _(t);
       } catch (t) {
         return u(t);
@@ -1489,15 +1500,18 @@ function Wt() {
           return u("El nombre del cliente es obligatorio.");
         if (!e.phone || typeof e.phone != "string" || e.phone.trim() === "")
           return u("El teléfono del cliente es obligatorio.");
-        const r = await N.create({
+        const r = fe(e.phone);
+        if (!r || !ge(e.phone))
+          return u("El teléfono del cliente debe tener entre 7 y 15 dígitos.");
+        const o = await h.create({
           name: e.name.trim(),
-          phone: e.phone.trim(),
+          phone: r,
           email: ((t = e.email) == null ? void 0 : t.trim()) || void 0,
           rut: ((a = e.rut) == null ? void 0 : a.trim()) || void 0,
           status: e.status || "activo",
           caso: e.caso
         });
-        return _(r);
+        return _(o);
       } catch (r) {
         return u(r);
       }
@@ -1510,8 +1524,17 @@ function Wt() {
           return u("ID de cliente inválido para actualización.");
         if (!t || typeof t != "object")
           return u("Datos de actualización no proporcionados.");
-        const a = await N.update(e, t);
-        return _(a);
+        const a = { ...t };
+        if (t.phone !== void 0) {
+          if (typeof t.phone != "string")
+            return u("El teléfono del cliente no es válido.");
+          const o = fe(t.phone);
+          if (o && !ge(t.phone))
+            return u("El teléfono del cliente debe tener entre 7 y 15 dígitos.");
+          a.phone = o;
+        }
+        const r = await h.update(e, a);
+        return _(r);
       } catch (a) {
         return u(a);
       }
@@ -1522,7 +1545,7 @@ function Wt() {
       try {
         if (typeof e != "number" || isNaN(e) || e <= 0)
           return u("ID de cliente inválido para eliminación.");
-        const t = await N.delete(e);
+        const t = await h.delete(e);
         return _(t);
       } catch (t) {
         return u(t);
@@ -1535,7 +1558,7 @@ function Wt() {
         if (!Array.isArray(e))
           return u("Se esperaba una lista de clientes.");
         for (const t of e)
-          t.id ? await N.getById(t.id) ? await N.update(t.id, t) : await N.create(t) : await N.create(t);
+          t.id ? await h.getById(t.id) ? await h.update(t.id, t) : await h.create(t) : await h.create(t);
         return _(!0);
       } catch (t) {
         return u(t);
@@ -1567,20 +1590,20 @@ function Wt() {
         return u(a);
       }
     }
-  ), l.handle("db:clients:getAll", async (n, e) => N.getAll(e)), l.handle("db:clients:getById", async (n, e) => N.getById(e)), l.handle("db:clients:create", async (n, e) => N.create({
+  ), l.handle("db:clients:getAll", async (n, e) => h.getAll(e)), l.handle("db:clients:getById", async (n, e) => h.getById(e)), l.handle("db:clients:create", async (n, e) => h.create({
     name: e.name,
     phone: e.phone,
     email: e.email,
     rut: e.rut,
     status: e.status,
     caso: e.caso
-  })), l.handle("db:clients:update", async (n, e, t) => N.update(e, t)), l.handle("db:clients:delete", async (n, e) => N.delete(e)), l.handle("db:clients:saveAll", async (n, e) => {
+  })), l.handle("db:clients:update", async (n, e, t) => h.update(e, t)), l.handle("db:clients:delete", async (n, e) => h.delete(e)), l.handle("db:clients:saveAll", async (n, e) => {
     for (const t of e)
-      t.id ? await N.getById(t.id) ? await N.update(t.id, t) : await N.create(t) : await N.create(t);
+      t.id ? await h.getById(t.id) ? await h.update(t.id, t) : await h.create(t) : await h.create(t);
     return !0;
   }), l.handle("db:cases:getByClientId", async (n, e) => O.getByClientId(e)), l.handle("db:cases:upsert", async (n, e, t) => O.upsert(e, t));
 }
-function Xt(n) {
+function Yt(n) {
   const e = n.indexOf(";base64,");
   if (e !== -1) {
     const t = n.substring(e + 8);
@@ -1588,7 +1611,7 @@ function Xt(n) {
   }
   return Buffer.from(n);
 }
-function Ht() {
+function Kt() {
   l.handle(
     T.DOCUMENTS_GET_BY_CLIENT_ID,
     async (n, e) => {
@@ -1619,7 +1642,7 @@ function Ht() {
         if (e.fileBuffer)
           t = Buffer.from(e.fileBuffer);
         else if (e.dataUrl)
-          t = Xt(e.dataUrl);
+          t = Yt(e.dataUrl);
         else
           return u("Se debe proporcionar fileBuffer o dataUrl para el documento.");
         const a = await S.saveDocument(e.clientId, e.name.trim(), t), r = {
@@ -1679,7 +1702,7 @@ function Ht() {
     }
   ), l.handle("db:documents:delete", async (n, e) => S.deleteDocument(e)), l.handle("db:documents:open", async (n, e) => S.openDocument(e)), l.handle("db:documents:showInFinder", async (n, e) => S.showInFinder(e));
 }
-class Vt {
+class qt {
   toEntity(e) {
     return {
       id: e.id,
@@ -1741,10 +1764,10 @@ class Vt {
       y,
       e
     );
-    const h = await this.getById(e);
-    if (!h)
+    const N = await this.getById(e);
+    if (!N)
       throw new Error(`Error al recuperar pago actualizado con id ${e}`);
-    return h;
+    return N;
   }
   async delete(e) {
     return (await d().prepare("DELETE FROM payments WHERE id = ?").run(e)).changes > 0;
@@ -1758,10 +1781,10 @@ class Vt {
     const r = [];
     e && (a += " WHERE client_id = ?", r.push(e));
     const o = await t.prepare(a).all(...r);
-    let c = 0, i = 0, s = 0, p = 0, y = 0, h = 0, L = 0;
+    let c = 0, i = 0, s = 0, p = 0, y = 0, N = 0, L = 0;
     for (const D of o) {
       const k = Number(D.amount) || 0;
-      c += k, D.status === "completed" ? (i += k, y++) : D.status === "pending" ? (s += k, h++) : D.status === "overdue" && (p += k, L++);
+      c += k, D.status === "completed" ? (i += k, y++) : D.status === "pending" ? (s += k, N++) : D.status === "overdue" && (p += k, L++);
     }
     return {
       totalAmount: c,
@@ -1770,7 +1793,7 @@ class Vt {
       overdueAmount: p,
       totalCount: o.length,
       completedCount: y,
-      pendingCount: h,
+      pendingCount: N,
       overdueCount: L
     };
   }
@@ -1799,8 +1822,8 @@ class Vt {
     });
   }
 }
-const x = new Vt();
-function Gt() {
+const x = new qt();
+function Qt() {
   l.handle(
     T.PAYMENTS_LIST,
     async () => {
@@ -1821,7 +1844,7 @@ function Gt() {
     }
   ), l.handle("db:payments:getAll", () => x.getAll()), l.handle("db:payments:saveAll", async (n, e) => (await x.replaceAll(e), !0));
 }
-function Yt() {
+function Jt() {
   l.handle(
     T.SETTINGS_GET,
     async () => {
@@ -1880,7 +1903,7 @@ function Yt() {
     }), ee(e), !0;
   });
 }
-const Kt = 6e4, qt = {
+const Zt = 6e4, en = {
   jan: 0,
   ene: 0,
   feb: 1,
@@ -1899,7 +1922,7 @@ const Kt = 6e4, qt = {
   dec: 11,
   dic: 11
 };
-function Qt(n) {
+function tn(n) {
   var o;
   const e = n.trim().match(/^(\d{1,2}):(\d{2})\s*([AaPp][Mm])?$/);
   if (!e) return null;
@@ -1913,39 +1936,39 @@ function Qt(n) {
     return null;
   return { hours: t, minutes: a };
 }
-function be(n) {
+function Ce(n) {
   const e = n.trim(), t = e.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (t)
-    return fe(Number(t[1]), Number(t[2]) - 1, Number(t[3]));
+    return ye(Number(t[1]), Number(t[2]) - 1, Number(t[3]));
   const a = e.match(/^(\d{1,2})\s+([A-Za-zÁÉÍÓÚáéíóú]{3,})\.?,?\s+(\d{4})$/);
   if (a) {
-    const r = qt[a[2].slice(0, 3).toLowerCase()];
-    return r === void 0 ? null : fe(Number(a[3]), r, Number(a[1]));
+    const r = en[a[2].slice(0, 3).toLowerCase()];
+    return r === void 0 ? null : ye(Number(a[3]), r, Number(a[1]));
   }
   return null;
 }
-function we(n, e) {
-  const t = be(n), a = Qt(e);
+function De(n, e) {
+  const t = Ce(n), a = tn(e);
   return !t || !a ? null : (t.setHours(a.hours, a.minutes, 0, 0), t);
 }
-function Jt(n) {
+function nn(n) {
   const e = n.lastIndexOf(" - ");
-  return e === -1 ? null : we(n.slice(0, e), n.slice(e + 3));
+  return e === -1 ? null : De(n.slice(0, e), n.slice(e + 3));
 }
 function ae(n) {
   return `${n.getFullYear()}-${H(n.getMonth() + 1)}-${H(n.getDate())}`;
 }
-function Zt(n) {
+function an(n) {
   return `${H(n.getHours())}:${H(n.getMinutes())}`;
 }
 function ce(n, e) {
-  return new Date(n.getTime() + e * Kt);
+  return new Date(n.getTime() + e * Zt);
 }
-function ve(n, e) {
+function Me(n, e) {
   const t = new Date(n);
   return t.setDate(t.getDate() + e), t;
 }
-function en(n) {
+function rn(n) {
   const e = new Date(n);
   return e.setHours(0, 0, 0, 0), e;
 }
@@ -1953,57 +1976,57 @@ function le(n, e, t) {
   const a = n.getTime();
   return a > e.getTime() && a <= t.getTime();
 }
-function fe(n, e, t) {
+function ye(n, e, t) {
   const a = new Date(n, e, t);
   return a.getFullYear() === n && a.getMonth() === e && a.getDate() === t ? a : null;
 }
 function H(n) {
   return String(n).padStart(2, "0");
 }
-const tn = 24 * 60;
-function nn(n, e) {
+const on = 24 * 60;
+function sn(n, e) {
   const t = [];
   for (const a of n) {
     if (!(a.alarmMinutes > 0)) continue;
-    const r = we(a.date, a.startTime);
+    const r = De(a.date, a.startTime);
     if (!r) continue;
     const o = ce(r, -a.alarmMinutes);
     le(o, e.from, e.to) && t.push({
       id: re("calendar", a.id, `${a.date}T${a.startTime}`),
       kind: "calendar",
       title: a.title,
-      body: `Comienza ${an(a.alarmMinutes)} · ${a.startTime}–${a.endTime}`,
+      body: `Comienza ${cn(a.alarmMinutes)} · ${a.startTime}–${a.endTime}`,
       target: { type: "calendarEvent", id: a.id }
     });
   }
   return t;
 }
-function an(n) {
+function cn(n) {
   if (n % 60 === 0) {
     const e = n / 60;
     return e === 1 ? "en 1 hora" : `en ${e} horas`;
   }
   return n === 1 ? "en 1 minuto" : `en ${n} minutos`;
 }
-const rn = {
+const ln = {
   kind: "calendar",
   isEnabled: (n) => n.calendarAlerts,
   async getDue(n) {
     const e = await F.getByDateRange(
       ae(n.from),
-      ae(ce(n.to, tn))
+      ae(ce(n.to, on))
     );
-    return nn(e, n);
+    return sn(e, n);
   }
 };
-function on(n, e) {
+function un(n, e) {
   const t = [];
   for (const a of n) {
-    const r = Jt(a.proximaAudiencia);
+    const r = nn(a.proximaAudiencia);
     if (!r) continue;
     const o = ce(r, -24 * 60);
     if (!le(o, e.from, e.to)) continue;
-    const c = [Zt(r), a.juzgado, a.expediente && `Exp. ${a.expediente}`].filter(Boolean).join(" · ");
+    const c = [an(r), a.juzgado, a.expediente && `Exp. ${a.expediente}`].filter(Boolean).join(" · ");
     t.push({
       id: re("hearing", a.clientId, r.toISOString()),
       kind: "hearing",
@@ -2015,14 +2038,14 @@ function on(n, e) {
   }
   return t;
 }
-const sn = {
+const dn = {
   kind: "hearing",
   isEnabled: (n) => n.hearingAlerts,
   async getDue(n) {
     const e = await O.getScheduledHearings();
-    return on(e, n);
+    return un(e, n);
   }
-}, ge = (n) => {
+}, _e = (n) => {
   try {
     return new Intl.NumberFormat("es-CL", {
       style: "currency",
@@ -2032,31 +2055,31 @@ const sn = {
   } catch {
     return `$${Math.round(n).toLocaleString("es-CL")}`;
   }
-}, cn = 9, ln = 7;
-function un(n, e) {
+}, pn = 9, mn = 7;
+function En(n, e) {
   let t = null;
-  for (let r = en(e.from); r <= e.to; r = ve(r, 1)) {
+  for (let r = rn(e.from); r <= e.to; r = Me(r, 1)) {
     const o = new Date(r);
-    o.setHours(cn, 0, 0, 0), le(o, e.from, e.to) && (t = r);
+    o.setHours(pn, 0, 0, 0), le(o, e.from, e.to) && (t = r);
   }
-  const a = t ? dn(n, t) : null;
+  const a = t ? Tn(n, t) : null;
   return a ? [a] : [];
 }
-function dn(n, e) {
-  const t = ve(e, ln), a = [], r = [];
+function Tn(n, e) {
+  const t = Me(e, mn), a = [], r = [];
   for (const s of n) {
     if (s.status === "completed") continue;
     if (s.status === "overdue") {
       a.push(s);
       continue;
     }
-    const p = be(s.date);
+    const p = Ce(s.date);
     p && (p < e ? a.push(s) : p <= t && r.push(s));
   }
   if (a.length === 0 && r.length === 0) return null;
   const o = [
-    a.length > 0 && `${_e(a.length, "vencido", "vencidos")} (${ge(ye(a))})`,
-    r.length > 0 && `${_e(r.length, "vence", "vencen")} esta semana (${ge(ye(r))})`
+    a.length > 0 && `${Ne(a.length, "vencido", "vencidos")} (${_e(he(a))})`,
+    r.length > 0 && `${Ne(r.length, "vence", "vencen")} esta semana (${_e(he(r))})`
   ].filter(Boolean), c = [...a, ...r], i = c.length === 1 ? c[0] : null;
   return {
     id: re("payment", "summary", ae(e)),
@@ -2067,41 +2090,41 @@ function dn(n, e) {
     target: i ? { type: "payment", id: i.id } : void 0
   };
 }
-function ye(n) {
+function he(n) {
   return n.reduce((e, t) => e + t.amount, 0);
 }
-function _e(n, e, t) {
+function Ne(n, e, t) {
   return `${n} ${n === 1 ? e : t}`;
 }
-const pn = {
+const fn = {
   kind: "payment",
   isEnabled: (n) => n.paymentReminders,
   async getDue(n) {
     const e = await x.getAll();
-    return un(e, n);
+    return En(e, n);
   }
-}, Oe = m.dirname(Be(import.meta.url));
-process.env.APP_ROOT = m.join(Oe, "..");
-const Ce = process.env.VITE_DEV_SERVER_URL, An = m.join(process.env.APP_ROOT, "dist-electron"), De = m.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = Ce ? m.join(process.env.APP_ROOT, "public") : De;
+}, Pe = m.dirname(ze(import.meta.url));
+process.env.APP_ROOT = m.join(Pe, "..");
+const Ue = process.env.VITE_DEV_SERVER_URL, Rn = m.join(process.env.APP_ROOT, "dist-electron"), Fe = m.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = Ue ? m.join(process.env.APP_ROOT, "public") : Fe;
 E.name = X;
-const mn = 3e3;
+const gn = 3e3;
 function W() {
-  Ut({
-    preloadPath: m.join(Oe, "preload.mjs"),
+  $t({
+    preloadPath: m.join(Pe, "preload.mjs"),
     publicDir: process.env.VITE_PUBLIC,
-    rendererDist: De,
-    devServerUrl: Ce,
+    rendererDist: Fe,
+    devServerUrl: Ue,
     // En macOS el Dock permite reabrir siempre; en Windows/Linux solo si el icono de bandeja existe.
-    canHideToBackground: () => process.platform === "darwin" || Le(),
-    onHiddenToBackground: wt
+    canHideToBackground: () => process.platform === "darwin" || be(),
+    onHiddenToBackground: Dt
   });
 }
-function Ne() {
+function Ae() {
   R() ? ne() : W();
 }
-function En() {
-  const n = Ie();
+function yn() {
+  const n = Re();
   return {
     calendarAlerts: n.calendarAlerts,
     hearingAlerts: n.hearingAlerts,
@@ -2109,11 +2132,11 @@ function En() {
     sound: n.soundEffects
   };
 }
-function he() {
+function Se() {
   se(), E.quit();
 }
-function Tn() {
-  It(), process.platform === "win32" && E.setAppUserModelId(E.isPackaged ? ht : process.execPath), Ft(), E.on("second-instance", () => {
+function _n() {
+  wt(), process.platform === "win32" && E.setAppUserModelId(E.isPackaged ? Lt : process.execPath), kt(), E.on("second-instance", () => {
     R() ? ne() : E.isReady() && W();
   }), E.on("window-all-closed", () => {
     process.platform !== "darwin" && E.quit();
@@ -2122,30 +2145,30 @@ function Tn() {
   });
   let n = !1;
   E.on("will-quit", (e) => {
-    if (mt(), ot(), vt(), n) return;
+    if (gt(), lt(), Mt(), n) return;
     e.preventDefault();
-    const t = new Promise((a) => setTimeout(a, mn));
-    Promise.race([qe(), t]).catch((a) => console.error("[SQLite] Error al cerrar:", a)).finally(() => {
+    const t = new Promise((a) => setTimeout(a, gn));
+    Promise.race([et(), t]).catch((a) => console.error("[SQLite] Error al cerrar:", a)).finally(() => {
       n = !0, E.quit();
     });
   }), E.on("activate", () => {
     R() ? ne() : E.isReady() && W();
   }), E.whenReady().then(async () => {
-    await Ke(), await Lt(), Wt(), Ht(), Gt(), Bt(), Yt(), Je(R), W(), bt({
+    await Ze(), await vt(), Gt(), Kt(), Qt(), zt(), Jt(), nt(R), W(), Ct({
       publicDir: process.env.VITE_PUBLIC,
-      onOpen: Ne,
-      onQuit: he
-    }), at({
-      adapter: Nt({ iconPath: m.join(process.env.VITE_PUBLIC, "icon.png") }),
-      getPreferences: En,
-      onOpen: Ne,
-      navigate: Pt
-    }), K(rn), K(sn), K(pn), pt(), me.on("resume", () => void J()), me.on("shutdown", he);
+      onOpen: Ae,
+      onQuit: Se
+    }), st({
+      adapter: It({ iconPath: m.join(process.env.VITE_PUBLIC, "icon.png") }),
+      getPreferences: yn,
+      onOpen: Ae,
+      navigate: Bt
+    }), K(ln), K(dn), K(fn), ft(), me.on("resume", () => void J()), me.on("shutdown", Se);
   });
 }
-E.requestSingleInstanceLock() ? Tn() : E.quit();
+E.requestSingleInstanceLock() ? _n() : E.quit();
 export {
-  An as MAIN_DIST,
-  De as RENDERER_DIST,
-  Ce as VITE_DEV_SERVER_URL
+  Rn as MAIN_DIST,
+  Fe as RENDERER_DIST,
+  Ue as VITE_DEV_SERVER_URL
 };

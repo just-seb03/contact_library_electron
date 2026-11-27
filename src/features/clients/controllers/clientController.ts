@@ -18,6 +18,7 @@ import {
   type ClientFiltersDTO,
   type UpsertCaseDTO,
 } from '../../../shared/types/ipc'
+import { formatPhone, isValidPhone } from '../../../shared/utils/phone'
 
 /**
  * Registra todos los handlers IPC correspondientes al dominio de clientes y casos.
@@ -66,10 +67,14 @@ export function registerClientController(): void {
         if (!clientData.phone || typeof clientData.phone !== 'string' || clientData.phone.trim() === '') {
           return createIpcError('El teléfono del cliente es obligatorio.')
         }
+        const normalizedPhone = formatPhone(clientData.phone)
+        if (!normalizedPhone || !isValidPhone(clientData.phone)) {
+          return createIpcError('El teléfono del cliente debe tener entre 7 y 15 dígitos.')
+        }
 
         const created = await clientRepository.create({
           name: clientData.name.trim(),
-          phone: clientData.phone.trim(),
+          phone: normalizedPhone,
           email: clientData.email?.trim() || undefined,
           rut: clientData.rut?.trim() || undefined,
           status: clientData.status || 'activo',
@@ -94,7 +99,19 @@ export function registerClientController(): void {
           return createIpcError('Datos de actualización no proporcionados.')
         }
 
-        const updated = await clientRepository.update(id, clientData)
+        const sanitizedUpdate: UpdateClientDTO = { ...clientData }
+        if (clientData.phone !== undefined) {
+          if (typeof clientData.phone !== 'string') {
+            return createIpcError('El teléfono del cliente no es válido.')
+          }
+          const normalizedPhone = formatPhone(clientData.phone)
+          if (normalizedPhone && !isValidPhone(clientData.phone)) {
+            return createIpcError('El teléfono del cliente debe tener entre 7 y 15 dígitos.')
+          }
+          sanitizedUpdate.phone = normalizedPhone
+        }
+
+        const updated = await clientRepository.update(id, sanitizedUpdate)
         return createIpcSuccess(updated)
       } catch (error) {
         return createIpcError(error)

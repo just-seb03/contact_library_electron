@@ -1,6 +1,7 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
+import { formatPhone } from '../../../shared/utils/phone';
 
 interface ClientCardProps {
   client: Client;
@@ -107,7 +108,7 @@ export const ClientCard: FC<ClientCardProps> = ({
             }}
           >
             <Icon f7="phone" size="13px" style={{ opacity: 0.7 }} />
-            <span>{client.phone}</span>
+            <span>{formatPhone(client.phone)}</span>
           </span>
         )}
 

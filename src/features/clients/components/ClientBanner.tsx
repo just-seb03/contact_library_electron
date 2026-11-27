@@ -1,6 +1,7 @@
 import type { FC, CSSProperties } from 'react';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
+import { formatPhone } from '../../../shared/utils/phone';
 
 interface ClientBannerProps {
   client: Client;
@@ -104,7 +105,7 @@ export const ClientBanner: FC<ClientBannerProps> = ({ client, onEdit }) => {
         {client.phone.trim() && (
           <span style={contactItemStyle}>
             <Icon f7="phone" size="12px" style={{ opacity: 0.75 }} />
-            <span>{client.phone}</span>
+            <span>{formatPhone(client.phone)}</span>
           </span>
         )}
         {hasValidEmail && (

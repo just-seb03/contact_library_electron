@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Icon } from 'framework7-react';
 import type { Client } from '../types';
 import { triggerSlideMode } from '../../../core/slide/slideCache';
+import { formatPhone, isValidPhone } from '../../../shared/utils/phone';
 
 interface AddClientPopupProps {
   opened: boolean;
@@ -98,7 +99,7 @@ export function AddClientPopup({
       setIsClosing(false);
       setIsVisible(true);
       setName(client?.name ?? '');
-      setPhone(client?.phone ?? '');
+      setPhone(formatPhone(client?.phone ?? ''));
       setEmail(client?.email ?? '');
       setCaseType(client?.caso?.materia ?? '');
       setFieldErrors({});
@@ -146,12 +147,15 @@ export function AddClientPopup({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const trimmedName = name.trim();
-    const trimmedPhone = phone.trim();
+    const sanitizedPhone = formatPhone(phone);
     const trimmedEmail = email.trim();
     const trimmedCaseType = caseType.trim();
 
     const nextErrors: Partial<Record<'name' | 'phone' | 'email' | 'caseType', string>> = {};
     if (!trimmedName) nextErrors.name = 'Ingresa el nombre del cliente.';
+    if (sanitizedPhone && !isValidPhone(sanitizedPhone)) {
+      nextErrors.phone = 'Ingresa un teléfono válido (entre 7 y 15 dígitos).';
+    }
     if (trimmedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       nextErrors.email = 'El formato del correo no es válido.';
     }
@@ -165,7 +169,7 @@ export function AddClientPopup({
     if (client) {
       onUpdate(client.id, {
         name: trimmedName,
-        phone: trimmedPhone,
+        phone: sanitizedPhone,
         email: trimmedEmail || undefined,
         ...(trimmedCaseType
           ? {
@@ -183,7 +187,7 @@ export function AddClientPopup({
     } else {
       onAdd({
         name: trimmedName,
-        phone: trimmedPhone,
+        phone: sanitizedPhone,
         ...(trimmedEmail ? { email: trimmedEmail } : {}),
         status: 'activo',
         ...(trimmedCaseType
@@ -312,13 +316,14 @@ export function AddClientPopup({
               <input
                 id="new-client-phone"
                 type="tel"
-                maxLength={30}
+                inputMode="numeric"
+                autoComplete="tel"
                 value={phone}
                 onChange={(event) => {
-                  setPhone(event.target.value);
+                  setPhone(formatPhone(event.target.value));
                   if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
                 }}
-                placeholder="Teléfono de contacto"
+                placeholder="+56 9 1234 5678"
                 style={{
                   ...controlStyle,
                   borderColor: fieldErrors.phone ? 'rgba(255, 69, 58, 0.6)' : undefined,
