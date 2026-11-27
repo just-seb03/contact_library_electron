@@ -85,7 +85,9 @@ function toDateValue(date: Date): string {
 
 function fromDateValue(value: string): Date {
   const [y, m, d] = value.split('-').map(Number);
-  return new Date(y, m - 1, d);
+  const date = new Date(y, m - 1, d);
+  // Un valor mal formado no debe tumbar toda la UI (Intl.format lanza con fechas inválidas).
+  return Number.isNaN(date.getTime()) ? new Date() : date;
 }
 
 interface EventDatePickerProps {

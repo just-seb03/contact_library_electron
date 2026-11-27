@@ -22,6 +22,8 @@ export interface ClientFilters {
 }
 
 export interface CreateClientDTO {
+  /** ID asignado por el frontend; si se omite, SQLite asigna uno autoincremental. */
+  id?: number
   name: string
   phone: string
   email?: string
@@ -149,10 +151,13 @@ export class ClientRepository {
     const db = getDatabase()
 
     return db.transaction(async () => {
+      // Se respeta el ID del frontend para que pagos/eventos que lo referencian sigan
+      // apuntando al mismo cliente y el próximo saveAll lo encuentre (en vez de duplicarlo).
       const info = await db.prepare(`
-        INSERT INTO clients (name, phone, email, rut, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO clients (id, name, phone, email, rut, status, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `).run(
+        data.id && data.id > 0 ? data.id : null,
         data.name,
         data.phone,
         data.email || null,

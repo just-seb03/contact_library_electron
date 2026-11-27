@@ -4,6 +4,7 @@ import type { Payment } from '../../payments/types';
 import type { HearingEvent } from '../../../core/context/types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from '../../payments/components/PaymentActionsMenu';
+import { displayPaymentDate } from '../../payments/utils/paymentFormat';
 
 const PAYMENT_STATUS_LABELS: Record<Payment['status'], string> = {
   completed: 'Cobrado',
@@ -111,7 +112,7 @@ export const ClientActivityDetails: FC<ClientActivityDetailsProps> = ({
                       {payment.concept}
                     </span>
                     <span style={{ color: 'var(--macos-text-secondary, #8e8e93)', fontSize: 12 }}>
-                      {formatCLP(payment.amount)} · {payment.date}
+                      {formatCLP(payment.amount)} · {displayPaymentDate(payment.date)}
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>

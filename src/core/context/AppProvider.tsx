@@ -35,16 +35,28 @@ import {
   isTestPayment,
   mergeTestItems,
 } from './testSeedData';
+import { normalizePaymentDate } from '../../features/payments/utils/paymentFormat';
+
+/** Migra fechas de pagos antiguas ("27 Nov 2026") a `YYYY-MM-DD`. */
+function normalizePayments(payments: Payment[]): Payment[] {
+  return payments.map((p) => ({ ...p, date: normalizePaymentDate(p.date) }));
+}
+
+function normalizeClientPayments(clients: Client[]): Client[] {
+  return clients.map((c) => (
+    c.pago ? { ...c, pago: { ...c.pago, fecha: normalizePaymentDate(c.pago.fecha) } } : c
+  ));
+}
 
 /** Si ninguna página consume el foco en este tiempo (elemento borrado, etc.), se descarta. */
 const NAVIGATION_FOCUS_TTL_MS = 5000;
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [clients, setClients] = useState<Client[]>(() =>
-    mergeTestItems(loadClients(), TEST_CLIENTS, (c) => c.id)
+    mergeTestItems(normalizeClientPayments(loadClients()), TEST_CLIENTS, (c) => c.id)
   );
   const [registeredPayments, setRegisteredPayments] = useState<Payment[]>(() =>
-    mergeTestItems(loadRegisteredPayments(loadClients()), TEST_PAYMENTS, (p) => p.id)
+    mergeTestItems(normalizePayments(loadRegisteredPayments(loadClients())), TEST_PAYMENTS, (p) => p.id)
   );
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>(() =>
     mergeTestItems(loadCalendarEvents(), TEST_CALENDAR_EVENTS, (e) => e.id)
@@ -170,10 +182,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         });
 
         if (dbClients && dbClients.length > 0) {
-          setClients(mergeTestItems(dbClients, TEST_CLIENTS, (c) => c.id));
+          setClients(mergeTestItems(normalizeClientPayments(dbClients), TEST_CLIENTS, (c) => c.id));
         }
         if (dbPayments && dbPayments.length > 0) {
-          setRegisteredPayments(mergeTestItems(dbPayments, TEST_PAYMENTS, (p) => p.id));
+          setRegisteredPayments(mergeTestItems(normalizePayments(dbPayments), TEST_PAYMENTS, (p) => p.id));
         }
         if (dbCalendar && dbCalendar.length > 0) {
           setCalendarEvents(mergeTestItems(dbCalendar, TEST_CALENDAR_EVENTS, (e) => e.id));
@@ -369,7 +381,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   // Agregar nuevo cliente
   const addClient = (newClientData: Omit<Client, 'id'>) => {
     setClients((prev) => {
-      const nextId = prev.length > 0 ? Math.max(...prev.map((c) => c.id)) + 1 : 1;
+      // Los clientes de prueba usan IDs >= 900000; si se incluyeran, el nuevo cliente
+      // recibiría un ID "de prueba" y nunca se guardaría (isTestClient lo descarta).
+      const realIds = prev.filter((c) => !isTestClient(c)).map((c) => c.id);
+      const nextId = realIds.length > 0 ? Math.max(...realIds) + 1 : 1;
       const created: Client = { ...newClientData, id: nextId };
       return [...prev, created];
     });
@@ -388,6 +403,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       event.clientId === id ? { ...event, clientId: null } : event
     )));
     setSelectedClientId((previous) => (previous === id ? null : previous));
+
+    // `saveAllClients` solo crea/actualiza: sin esto el cliente seguía en SQLite y
+    // reaparecía al reabrir la app. El repositorio también borra sus archivos en disco.
+    if (!isTestClient(deletedClient) && databaseService.isElectronDbAvailable()) {
+      void databaseService.deleteClient(id);
+    }
   };
 
   const addCalendarEvent = (event: Omit<CalendarEvent, 'id'>) => {

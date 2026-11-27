@@ -202,8 +202,9 @@ export class CalendarRepository {
       await db.prepare('DELETE FROM calendar_events').run()
       const statement = db.prepare(`
         INSERT INTO calendar_events (id, title, date, start_time, end_time, color_id, alarm_minutes, client_id, details)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT id FROM clients WHERE id = ?), ?)
       `)
+      // Igual que en pagos: un client_id inexistente ya no hace fallar el guardado completo.
       for (const event of events) {
         await statement.run(
           event.id,

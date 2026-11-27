@@ -234,9 +234,12 @@ export class PaymentRepository {
     const db = getDatabase()
     await db.transaction(async () => {
       await db.prepare('DELETE FROM payments').run()
+      // Con foreign_keys = ON, un solo pago con client_id inexistente (cliente de prueba, o cliente
+      // cuyo guardado aún no terminó) hacía fallar la transacción y no se guardaba NINGÚN pago.
+      // Si el cliente no existe, se guarda sin vínculo (client_name se conserva).
       const statement = db.prepare(`
         INSERT INTO payments (id, client_id, client_name, concept, amount, date, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, (SELECT id FROM clients WHERE id = ?), ?, ?, ?, ?, ?)
       `)
       for (const payment of payments) {
         await statement.run(

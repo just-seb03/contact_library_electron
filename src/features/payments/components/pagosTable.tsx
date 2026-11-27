@@ -2,6 +2,7 @@ import { useEffect, useRef, type FC, type CSSProperties } from 'react';
 import type { Payment } from '../types';
 import { formatCLP } from '../../../core/utils/format';
 import { PaymentActionsMenu } from './PaymentActionsMenu';
+import { displayPaymentDate } from '../utils/paymentFormat';
 
 interface TableProps {
   payments: Payment[];
@@ -17,15 +18,8 @@ const STATUS_LABELS: Record<Payment['status'], string> = {
   overdue: 'Vencido',
 };
 
-function formatPaymentDate(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat('es-CL', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).format(date);
-}
+// `new Date("2026-11-27")` se interpreta en UTC y en Chile mostraba el día anterior.
+const formatPaymentDate = displayPaymentDate;
 
 const metroRowStyle = (isHighlighted: boolean, isLast: boolean): CSSProperties => ({
   display: 'flex',
